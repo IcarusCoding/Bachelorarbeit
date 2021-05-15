@@ -1,0 +1,128 @@
+\documentclass[a4paper,titlepage,bibtotoc,liststotoc,final,twoside,openright,cleardoubleempty,BCOR12mm]{scrreprt} % ABGABEFASSUNG
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{bibgerm}
+\usepackage{breakurl}
+\usepackage{ae,aecompl}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{lscape}
+\usepackage{subfigure}
+
+% Abstände bei Trennzeichen für Zahlen korrekt machen
+\mathcode`,="013B
+\mathcode`.="613A
+
+% Tex ist kein Zeichenprogramm...
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata,shapes,topaths}
+
+% Vorlage - Obere Linie, Seitenzahlen
+\usepackage{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\clearscrheadfoot
+\automark[section]{chapter}
+\setheadsepline{.4pt}
+\ihead[]{\leftmark}
+\ohead[]{\rightmark}
+\ofoot[\pagemark]{\pagemark}
+
+% Index erstellen
+\usepackage{makeidx}
+\makeindex
+
+% Arbeitsbeschreibung & Makros
+\newcommand{\Name}{Deniz Groenhoff}
+\newcommand{\Email}{deniz.groenhoff@uni-oldenburg.de}
+\newcommand{\MatrNr}{5477417}
+\newcommand{\Titel}{Annotationsbasierte Einstiegserleichterung in die Entwicklung von JavaFX-Anwendungen}
+\newcommand{\Department}{Department für Informatik}
+\newcommand{\Abteilung}{Medieninformatik und Multimedia-Systeme}
+\newcommand{\ErstGutachter}{Prof. Dr. Susanne Boll}
+\newcommand{\ZweitGutachter}{Dr.-Ing. Dietrich Boles}
+\newcommand{\ArbeitTyp}{Bachelorarbeit}
+
+
+\newcommand{\MONTH}{%
+	\ifcase\the\month
+	\or Januar% 1
+	\or Februar% 2
+	\or März% 3
+	\or April% 4
+	\or Mai% 5
+	\or Juni% 6
+	\or Juli% 7
+	\or August% 8
+	\or September% 9
+	\or Oktober% 10
+	\or November% 11
+	\or Dezember% 12
+	\fi}
+
+\title{\Titel}
+\author{\Name}
+\date{\today}
+
+\begin{document}
+
+% Fuers inhaltsvz gibts andere seitenzahlen
+\pagenumbering{Roman}
+
+% Titelseite erstellen
+\begin{titlepage}
+	\include{Kapitel/Titelseite}
+\end{titlepage}
+
+\newpage
+\thispagestyle{empty}
+\quad
+
+% Eigenstaendigkeitserklaerung
+\include{Kapitel/Eigenstaendigkeitserklaerung}
+
+
+% Zusammenfassung erstellen
+\begin{abstract}
+	\input{Sonstiges/Zusammenfassung.tex}
+	\input{Sonstiges/Abstract.tex}
+\end{abstract}
+
+% Inhaltsverzeichnis erstellen
+\tableofcontents
+% Abbildungsverzeichnis
+\listoffigures
+% Tabellenverzeichnis
+\listoftables
+
+\chapter{Einleitung}
+\pagenumbering{arabic} % Seitenzahlen umstellen
+\label{einleitung}
+Einleitung
+
+\chapter{Inhalt 1}
+
+\chapter{Inhalt 2}
+
+\chapter{Fazit}
+
+\begin{appendix}
+\chapter{Appendix 1}
+\chapter{Appendix 2}
+\end{appendix}
+
+% Literaturverzeichnis...
+\nocite{*}
+\bibliographystyle{geralpha}
+\bibliography{Bibliographie/Bibliographie}
+
+% Index ausgeben
+\newpage
+\printindex
+
+\end{document}
