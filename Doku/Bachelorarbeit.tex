@@ -17,6 +17,7 @@
 \usepackage{xcolor}
 \usepackage{xargs}
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage{acronym}
 
 % Abstände bei Trennzeichen für Zahlen korrekt machen
 \mathcode`,="013B
@@ -96,14 +97,14 @@
 	\input{Sonstiges/Zusammenfassung.tex}
 	\input{Sonstiges/Abstract.tex}
 \end{abstract}
-
 % Inhaltsverzeichnis erstellen
 \tableofcontents
 % Abbildungsverzeichnis
 \listoffigures
 % Tabellenverzeichnis
 \listoftables
-
+% Abkürzungsverzeichnis
+\include{Sonstiges/Abkürzungsverzeichnis}
 \pagenumbering{arabic} % Seitenzahlen umstellen
 
 \input{Kapitel/Einleitung.tex}
