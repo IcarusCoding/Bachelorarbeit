@@ -14,6 +14,9 @@
 \usepackage{rotating}
 \usepackage{lscape}
 \usepackage{subfigure}
+\usepackage{xcolor}
+\usepackage{xargs}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 
 % Abstände bei Trennzeichen für Zahlen korrekt machen
 \mathcode`,="013B
@@ -48,6 +51,7 @@
 \newcommand{\ZweitGutachter}{Dr.-Ing. Dietrich Boles}
 \newcommand{\ArbeitTyp}{Bachelorarbeit}
 
+\newcommandx{\add}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
 
 \newcommand{\MONTH}{%
 	\ifcase\the\month
@@ -76,7 +80,7 @@
 
 % Titelseite erstellen
 \begin{titlepage}
-	\include{Kapitel/Titelseite}
+	\include{Sonstiges/Titelseite}
 \end{titlepage}
 
 \newpage
@@ -84,7 +88,7 @@
 \quad
 
 % Eigenstaendigkeitserklaerung
-\include{Kapitel/Eigenstaendigkeitserklaerung}
+\include{Sonstiges/Eigenstaendigkeitserklaerung}
 
 
 % Zusammenfassung erstellen
@@ -100,16 +104,15 @@
 % Tabellenverzeichnis
 \listoftables
 
-\chapter{Einleitung}
 \pagenumbering{arabic} % Seitenzahlen umstellen
-\label{einleitung}
-Einleitung
 
-\chapter{Inhalt 1}
-
-\chapter{Inhalt 2}
-
-\chapter{Fazit}
+\input{Kapitel/Einleitung.tex}
+\input{Kapitel/Grundlagen.tex}
+\input{Kapitel/Stand der Technik.tex}
+\input{Kapitel/Konzeption und Entwurf.tex}
+\input{Kapitel/Implementierung.tex}
+\input{Kapitel/Evaluation.tex}
+\input{Kapitel/Fazit.tex}
 
 \begin{appendix}
 \chapter{Appendix 1}
@@ -120,6 +123,8 @@ Einleitung
 \nocite{*}
 \bibliographystyle{geralpha}
 \bibliography{Bibliographie/Bibliographie}
+
+\listoftodos[Notes]
 
 % Index ausgeben
 \newpage
