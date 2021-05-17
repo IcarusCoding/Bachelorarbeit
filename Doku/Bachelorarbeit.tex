@@ -99,12 +99,7 @@
 \end{abstract}
 % Inhaltsverzeichnis erstellen
 \tableofcontents
-% Abbildungsverzeichnis
-\listoffigures
-% Tabellenverzeichnis
-\listoftables
-% Abkürzungsverzeichnis
-\include{Sonstiges/Abkürzungsverzeichnis}
+
 \pagenumbering{arabic} % Seitenzahlen umstellen
 
 \input{Kapitel/Einleitung.tex}
@@ -120,6 +115,15 @@
 \chapter{Appendix 2}
 \end{appendix}
 
+% Abkürzungsverzeichnis
+\include{Sonstiges/Abkürzungsverzeichnis}
+
+% Abbildungsverzeichnis
+\listoffigures
+
+% Tabellenverzeichnis
+\listoftables
+
 % Literaturverzeichnis...
 \nocite{*}
 \bibliographystyle{geralpha}
@@ -128,7 +132,8 @@
 \listoftodos[Notes]
 
 % Index ausgeben
-\newpage
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Index}
 \printindex
 
 \end{document}
