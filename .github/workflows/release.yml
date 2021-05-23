@@ -27,7 +27,7 @@ jobs:
       - name: Build & Package
         run: |
           mvn -B package --file pom.xml
-          mkdir build && cp SimpliFX/target/*.jar build && cp DemoApplications/target/*.jar build && cp Doku/Bachelorarbeit.pdf build
+          mkdir build && cp SimpliFX/target/*.jar build && cp DemoApplications/target/*.jar build && cp Doku/Bachelorarbeit.pdf build && cp ReflectionUtils/target/*.jar build
       - name: Cache setup
         uses: actions/cache@v2
         with:
@@ -47,7 +47,7 @@ jobs:
           file: build/*.*
           tag: ${{ github.ref }}
           file_glob: true
-          release_name: SimpliFX & Demo Application
+          release_name: SimpliFX & ReflectionUtils & Demo Application
       - name: Publish package
         run: mvn -B deploy -s settings.xml
         env:

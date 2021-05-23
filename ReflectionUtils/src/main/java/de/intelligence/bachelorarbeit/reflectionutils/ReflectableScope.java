@@ -1,10 +1,15 @@
-package de.intelligence.bachelorarbeit.simplifx.reflect;
+package de.intelligence.bachelorarbeit.reflectionutils;
 
-class ReflectableType<T> implements Reflectable<T> {
+/**
+ * The {@link ReflectableScope} class is the base class of every implemented reflection scope
+ *
+ * @author Deniz Groenhoff
+ */
+class ReflectableScope<T> implements Reflectable<T> {
 
     protected final T reflectable;
 
-    protected ReflectableType(T reflectable) {
+    protected ReflectableScope(T reflectable) {
         this.reflectable = reflectable;
     }
 
