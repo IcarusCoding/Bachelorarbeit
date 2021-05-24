@@ -5,12 +5,12 @@
     <parent>
         <artifactId>bachelorarbeit</artifactId>
         <groupId>de.intelligence</groupId>
-        <version>1.0</version>
+        <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>demo-applications</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <maven.compiler.source>${source.version}</maven.compiler.source>
