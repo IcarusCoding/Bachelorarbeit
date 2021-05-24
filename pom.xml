@@ -10,6 +10,7 @@
     <modules>
         <module>SimpliFX</module>
         <module>DemoApplications</module>
+        <module>ReflectionUtils</module>
     </modules>
 
     <properties>
