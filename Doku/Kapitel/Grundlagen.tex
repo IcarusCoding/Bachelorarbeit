@@ -1,7 +1,9 @@
 \chapter{Grundlagen}
 \label{grundlagen}
-
-\add{Intro}
+\add{Correction}
+\noindent In diesem Kapitel werden die theoretischen Grundlagen von essentiellen Komponenten dieser Arbeit erläutert. Dazu wird die Relevanz von Entwurfsmustern justifiziert und auf zwei bedeutende Muster näher eingegangen. Diese sind sowohl erforderlich für die folgenden Kapitel als auch für das Verständnis der softwaretechnischen Prinzipien von JavaFX.\\
+Danach wird die JavaFX-Bibliothek vorgestellt und fundamentale Konzepte wie beispielsweise die auf der \ac{xml} basierende Layouting-Sprache erläutert.\\
+Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und jeweils mit Beispielen untermauert, sowie die Möglichkeiten der eigentlichen Auswertung von Annotationen skizziert.
 
 \section{Entwurfsmuster}
 \label{entwurfsmuster}
@@ -20,7 +22,6 @@
 
 \section{JavaFX}
 \label{javafx}
-
 \add{Intro}
 
 \subsection{Funktionsumfang}
@@ -30,18 +31,63 @@
 
 \section{Java-Annotationen}
 \label{java_annotationen}
-
-\add{Intro}
-
+Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
+In der Informatik sind Annotationen ebenfalls nur ein deskriptives Strukturkonzept, welche es dem Entwickler ermöglicht, verschiedenen strukturellen Elementen der Programmierung (wie Felder oder Klassen), Metadaten zuzuweisen \cite{Yu2019}. Das Nutzen von Annotationen in Anwendungen ist aufgrund ihrer meist simpel gehaltenen Syntax auch für Programmiereinsteiger vorteilhaft und durch ihre Anpassungsfähigkeit und Flexibilität sind sie in vielen Bibliotheken und Programmiersprachen vertreten.
 \subsection{Definition}
 \label{java_annotationen_definition}
-
-\add{Definition Annotationen}
-
+\add{Reference}
+\add{Move footnote to first occurence}
+\noindent Annotationen \footnote{Wenn in der Arbeit über Annotationen gesprochen wird, ist immer von Java-Annotationen auszugehen (außer anders angegeben)} wurden mit Java 5 (2014) in die Sprache eingeführt und werden seitdem immer häufiger für verschiedene Aspekte der Programmierung genutzt \cite{Rocha2011}. Mit ihnen kann eine Steuerung des Compilers erfolgen, eine Verarbeitung der Metadaten zu Kompilierzeit durchgeführt werden oder das Verhalten von Anwendungen zu Laufzeit modifiziert oder gelenkt werden \cite{Yu2019}. Aufgrund der Tatsache, dass es sich nur um rein deskriptive Metadaten handelt, ist es Annotationen nicht direkt möglich mit existierendem Quelltext zu interagieren.  Möglichkeiten zur Verarbeitung dieser Metadaten werden in Kapitel \ref{TODO - Auswertung Ref} vorgestellt. Neben den von Java vordefinierten Annotationen wie z.B. \texttt{@Override} für das Überschreiben von vererbten Methoden oder \texttt{@SuppressWarnings} für das Unterdrücken von Compilerwarnungen, können auch eigene Annotationen deklariert werden.\\
+Es handelt sich bei Annotationen in Java um spezialisierte Schnittstellen bei welchen das \texttt{interface}-Schlüsselwort durch ein \texttt{@}-Zeichen Präfix zu \texttt{@interface} erweitert wird \cite{Gosling2005}. Außerdem ist es Annotationen nicht erlaubt wie bei normalen Schnittstellendefinitionen das Schlüsselwort \texttt{extends} für eine Vererbung zu verwenden, da die Superschnittstelle implizit vom Compiler auf die \texttt{Annotation} Klasse des \texttt{java.lang.annotation} Pakets gesetzt wird \cite{Oracle2017}. Ein Beispiel einer  Annotationsdefinition ist in \autoref{lst:annotation_definition} dargestellt.
+\begin{figure}[H]
+	\centering
+	\begin{lstlisting}[caption={Beispiel einer Annotationsdefinition.}, captionpos=b, label=lst:annotation_definition]
+	public @interface TestAnnotation {
+	    // ...
+	}
+	\end{lstlisting}
+\end{figure}
+\noindent In der Analogie des Kapitels \ref{java_annotationen} können Elemente mit strukturgebenden Charakter wie Bestandteile eines Satzes annotiert werden. Analog dazu sind in der Java-Programmierung Klassen, Methoden, Felder etc. für die Strukturierung des Quelltextes und der Softwarearchitektur verantwortlich und somit auch mit Annotationen erweiterbar. Um Sprachelemente zu annotieren muss wie in \autoref{lst:annotated_example} dargestellt, ein \texttt{@}-Präfix zum eigentlichen Klassennamen hinzugefügt werden.
+\begin{figure}[H]
+	\centering
+	\begin{lstlisting}[caption={Beispiel einer annotierten Klasse.}, captionpos=b, label=lst:annotated_example]
+	@TestAnnotation
+	public class TestClass {
+	    // ...
+	}
+	\end{lstlisting}
+\end{figure}
+\noindent Aufgrund der besonders einfachen Syntax und dem vergleichsweise geringen Aufwand, ist ein steigender Trend der Nutzung von Java-Annotationen in Open-Source Anwendungen zu erkennen. Werden Annotationen jedoch übermäßig verwendet, so kann es schnell zu Quelltext-Verschmutzung kommen, was im Kontext der Annotationsprogrammierung auch \glqq annotation hell\grqq{} (dt. Annotationshölle) genannt wird. Annotationen erreichen dann das Gegenteil des gewünschten Zwecks -- Statt den Entwicklungsprozess vereinfachend zu unterstützen, wird der Quelltext schwer nachvollziehbar und wirkt unstrukturiert und unübersichtlich.\\
+Dennoch zeigt eine Studie aus dem Jahre 2011, welche 1094 quelloffene GitHub-Projekte auf die Verwendung von Annotationen untersucht hat, dass javabasierte Anwendungen und Bibliotheken, bei aktiver Nutzung von Annotationen, eine geringere Fehleranfälligkeit aufweisen \cite{Rocha2011}.
 \subsection{Syntax}
 \label{java_annotationen_anwendung}
-
-\add{Syntax von Annotationen}
+\add{lst design}
+\noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
+\begin{description}
+	\item \textbf{Normal Annotations} sind ganz normal deklarierte Annotationen, bei welchen die Attribute mittels Aufzählung in Klammern übergeben werden.
+	\begin{figure}[H]
+		\noindent
+		\newlength\heightone
+		\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+			\begin{lstlisting}[caption=Deklaration -- Normal Annotation., captionpos=b, label=lst:decl_normal]
+public @interface Entity {
+	String name();
+	int size();
+}
+			\end{lstlisting}
+		\end{adjustbox}\hfill
+		\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+			\begin{lstlisting}[caption=Anwendung -- Normal Annotation, captionpos=b, label=lst:appl_normal]
+@Entity(name="test", size=2)
+public class TestEntity {
+	// ...
+}
+			\end{lstlisting}
+		\end{adjustbox}
+	\end{figure}
+	\item \textbf{Single-Element Annotations} sind eine Kurzform der normalen Annotationen mit einem \texttt{value}-Attribut und keine weiteren nicht-default Attribute.
+	\item \textbf{Marker Annotations} sind ebenfalls eine Kurzform der normalen Annotationen mit keinen oder nur default Attributen.
+\end{description}
 
 \subsection{Beispiele der Annotationsprogrammierung}
 \label{java_annotationen_annotationsprogrammierung}
