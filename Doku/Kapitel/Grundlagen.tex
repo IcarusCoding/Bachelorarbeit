@@ -51,7 +51,7 @@ Es handelt sich bei Annotationen in Java um spezialisierte Schnittstellen bei we
 \begin{figure}[H]
 	\centering
 	\begin{lstlisting}[caption={Beispiel einer annotierten Klasse.}, captionpos=b, label=lst:annotated_example]
-	@TestAnnotation
+	#@TestAnnotation
 	public class TestClass {
 	    // ...
 	}
@@ -62,7 +62,7 @@ Dennoch zeigt eine Studie aus dem Jahre 2011, welche 1094 quelloffene GitHub-Pro
 \subsection{Syntax}
 \label{java_annotationen_anwendung}
 \add{lst design}
-\noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
+\noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays aus den vorherigen Typen. Außerdem ist es möglich, Attributen einen voreingestellten Wert mittels des Schlüsselwortes \texttt{default} zuzuweisen \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
 \begin{description}
 	\item \textbf{Normal Annotations} sind ganz normal deklarierte Annotationen, bei welchen die Attribute mittels Aufzählung in Klammern übergeben werden.
 	\begin{figure}[H]
@@ -72,22 +72,103 @@ Dennoch zeigt eine Studie aus dem Jahre 2011, welche 1094 quelloffene GitHub-Pro
 			\begin{lstlisting}[caption=Deklaration -- Normal Annotation., captionpos=b, label=lst:decl_normal]
 public @interface Entity {
 	String name();
-	int size();
+	int id();
 }
 			\end{lstlisting}
 		\end{adjustbox}\hfill
 		\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
 			\begin{lstlisting}[caption=Anwendung -- Normal Annotation, captionpos=b, label=lst:appl_normal]
-@Entity(name="test", size=2)
+#@Entity(name="test", id=2)
 public class TestEntity {
 	// ...
 }
 			\end{lstlisting}
 		\end{adjustbox}
 	\end{figure}
-	\item \textbf{Single-Element Annotations} sind eine Kurzform der normalen Annotationen mit einem \texttt{value}-Attribut und keine weiteren nicht-default Attribute.
+	\item \textbf{Single-Element Annotations} sind eine Kurzform der normalen Annotationen mit einem \texttt{value}-Attribut und keinen weiteren nicht-default Attributen.
+	\begin{figure}[H]
+		\noindent
+		\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+			\begin{lstlisting}[caption=Deklaration -- Single-Element Annotation., captionpos=b, label=lst:decl_single]
+public @interface Entity {
+	String value();
+	int id() default -1;
+}
+			\end{lstlisting}
+		\end{adjustbox}\hfill
+		\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+			\begin{lstlisting}[caption=Anwendung -- Single-Element Annotation, captionpos=b, label=lst:appl_single]
+#@Entity("test")
+public class TestEntity {
+	// ...
+}
+			\end{lstlisting}
+		\end{adjustbox}
+	\end{figure}
 	\item \textbf{Marker Annotations} sind ebenfalls eine Kurzform der normalen Annotationen mit keinen oder nur default Attributen.
+	\begin{figure}[H]
+		\noindent
+		\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+			\begin{lstlisting}[caption=Deklaration -- Marker Annotation., captionpos=b, label=lst:decl_marker]
+public @interface Entity {
+	String name() default "";
+	int id() default -1;
+}
+			\end{lstlisting}
+		\end{adjustbox}\hfill
+		\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+			\begin{lstlisting}[caption=Anwendung -- Marker Annotation, captionpos=b, label=lst:appl_marker]
+#@Entity
+public class TestEntity {
+	// ...
+}
+			\end{lstlisting}
+		\end{adjustbox}
+	\end{figure}
 \end{description}
+\noindent Die Sichtbarkeit von eigenen Annotationen zu verschiedenen Phasen des Codezyklus kann durch die von Java bereitgestellte Annotation \texttt{@Retention} gesteuert werden. Das übergebene Enum-Attribut klassifiziert die Annotation dann in einen von drei Typen \cite{Rocha2011}:
+\begin{description}
+	\item \textbf{Quellcode-Annotationen} sind nur beim Kompiliervorgang auslesbar und können dem Compiler Anweisungen geben oder mithilfe von Annotation-Prozessoren z.B. neue Klassen automatisch generieren. Sie sind in der kompilierten Java-Anwendung nicht mehr erhalten.
+	\item \textbf{Klassen-Annotationen} sind nach dem Kompilierungsprozess noch in der Anwendung erhalten und können durch externe Tools wie z.B. dem Code-Obfuskator ProGuard ausgelesen werden.
+	\item \textbf{Laufzeit-Annotationen} sind nach der Kompilierung und beim Start der Anwendung erhalten und können dann mithilfe der Reflection-API zur Laufzeit ausgewertet werden.
+\end{description}
+\noindent Des Weiteren kann gesteuert werden, welche Typen der Strukturelemente eines Quellcodes annotiert werden können. Ein Beispiel für eine zur Laufzeit beibehaltene Annotation, welche nur an Methoden angebracht werden kann ist in \autoref{lst:full_annotation_example} zu erkennen.
+\begin{figure}[H]
+	\centering
+	\begin{lstlisting}[caption={Beispiel einer Laufzeit Annotation.}, captionpos=b, label=lst:full_annotation_example]
+	
+	#@Target(ElementType.(@\tikzmark{aLeft}{}@)METHOD(@\tikzmark{aRight}{}@))
+	#@Retention(RetentionPolicy.(@\tikzmark{bLeft}{}@)RUNTIME(@\tikzmark{bRight}{}@))
+	public @interface Event {
+		int id();
+		int priority() default 0;
+	}
+	(@
+	\begin{tikzpicture}[overlay,remember picture]
+		\foreach \x/\y in {a/red, b/blue} {
+			\DrawOverBar[-, \y, thick]{\x Left.north}{\x Right.north}
+		}
+		\node[draw](onlymethods) at (8.5,3) {Nur an Methoden};
+		\node[draw](runtime) at (8.5,1.5) {Zur Laufzeit};
+		\DrawArrow[red, in=-180]{a}{onlymethods}{-4.8em, 0}
+		\DrawArrow[blue, in=-270, out=20]{b}{runtime}{0, 0.65em}
+	\end{tikzpicture}
+	@)
+	\end{lstlisting}
+\end{figure}
+
+\add{Add compile time annotation processing if used in this thesis}
+\subsection{Auswertung von Laufzeit-Annotationen}
+Für eine Auswertung von Laufzeit-Annotationen, muss zwangsläufig die Reflection-API von Java genutzt werden. Wenn eine Programmiersprache eine Form von Reflection (dt. Spiegelung) aufweist, so ist es möglich Attribute, Logikfluss und andere Eigenschaften während der Laufzeit zu ändern. In objektorientierten Sprachen wie Java wird diese \glqq computational reflection\grqq{} genutzt, um die Möglichkeit einer Selbstbeobachtung der eigenen Sprachelemente zu schaffen \cite{Li2017}. Die API ermöglicht somit beispielsweise das Auslesen von Laufzeit-Annotationen und deren deklarierte Attribute oder das dynamische Instanziieren von Klassen \cite{Forman2004}. Jedes Java-Element der Reflection API (Feld, Methode, Klasse, ...), welches annotierbar ist, wird durch die Vererbung der \texttt{AnnotatedElement}-Klasse als solches klassifiziert \cite{Schildt2019}. Damit nun alle vorhandenen Annotation ausgelesen werden können, kann die Methode \inlinecode{java}{AnnotatedElement#getDeclaredAnnotations} aufgerufen werden \cite{Pigula2015}. Das Lesen der Attribute der in \autoref{lst:full_annotation_example} vordefinierten Annotation ist in \autoref{lst:annotation_processing_example} zu erkennen.
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Auslesen einer Laufzeit-Annotation.}, captionpos=b, label=lst:annotation_processing_example]
+    if(Test.class.isAnnotationPresent(Event.class)) {
+	    Event e = Test.class.getDeclaredAnnotation(Event.class);
+	    int id = e.id();
+	    int priority = e.priority();
+    }
+	\end{lstlisting}
+\end{figure}
 
 \subsection{Beispiele der Annotationsprogrammierung}
 \label{java_annotationen_annotationsprogrammierung}
