@@ -51,6 +51,27 @@
 	escapeinside={(@}{@)}
 }
 
+\definecolor{Maroon}{rgb}{0.5,0,0}
+\definecolor{Darkgreen}{rgb}{0,0.5,0}
+
+\lstdefinelanguage{XML} {
+	basicstyle=\ttfamily\footnotesize,
+	morestring=[b]",
+	morecomment=[s]{<?}{?>},
+	morecomment=[s]{<!--}{-->},
+	commentstyle=\color{Darkgreen},
+	moredelim=[s][\color{black}]{>}{<},
+	stringstyle=\color{blue},
+	identifierstyle=\color{Maroon},
+	keywordstyle=\color{red},
+	numbers=none,
+	tabsize=2,
+	rulecolor=\color{black},
+	breaklines=false,
+	captionpos=b,
+	morekeywords={xmlns}
+}
+
 \newcommand{\inlinecode}[2]{\lstinline[language=#1]$#2$}
 
 \renewcommand{\lstlistingname}{Code}

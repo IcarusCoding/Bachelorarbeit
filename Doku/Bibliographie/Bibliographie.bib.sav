@@ -217,7 +217,7 @@
   year      = {2014},
   isbn      = {978-3-658-02835-0},
   month     = {06},
-  booktitle = {Einführung in JavaFX: Moderne GUIs für RIAs und Java-Applikationen},
+  booktitle = {Einführung in JavaFX},
   doi       = {10.1007/978-3-658-02836-7_5},
 }
 

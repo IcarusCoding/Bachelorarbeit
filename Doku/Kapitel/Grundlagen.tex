@@ -19,25 +19,73 @@ Abschließend wird das generelle Annotationenkonzept in der Informatik mit spezi
 \label{entwurfsmuster_notwendigkeit}
 
 \add{Notwendigkeit \& Justifikation von Entwurfsmustern}
-
+\newpage
 \section{JavaFX}
 \label{javafx}
-\add{Intro}
+\add{glossar für fxml z.B.?}
+\noindent JavaFX ist eine auf Java basierte, quelloffene Bibliothek für das Entwickeln von grafischen Benutzerschnittstellen für Client Applikationen. Im Vergleich zum Vorgänger GUI-Toolkit Java-Swing, bietet JavaFX ein modernes, zeitgemäßes Design der allgemeinen Benutzeroberfläche sowie den dort enthaltenen Schaltflächen und Komponenten \cite{Sharan2015}. Kombiniert mit den objektorientierten Konzepten von Java, ist JavaFX in der Lage auch komplexe nebenläufige Anwendungen mit vielen Abhängigkeiten darzustellen und aufgrund der Plattformunabhängigkeit auch ohne viele Restriktionen in allen bekannten Betriebssystemen einsetzbar.\\
+Dazu ist JavaFX auch weitgehend konform mit bekannten Entwurfsmustern der Softwareentwicklung wie beispielsweise dem \ac{mvc}- oder dem Beobachter-Muster, weshalb implementierte Anwendung selbst bei vielen \ac{loc}, eine grundsätzlich hohe Strukturiertheit auf Quelltextebene aufweisen. Das grafische Layout kann dabei nicht ausschließlich durch Java-Quelltext sondern auch mittels der an die \ac{xml} angelehnte Markup-Sprache FXML erstellt werden. Letzteres kann durch externe Tools wie dem Scene-Builder enorm vereinfacht werden \cite{Vos2018}.
 
-\subsection{Funktionsumfang}
-\label{javafx_funktionsumfang}
+\subsection{Aufbau und Szenengraph}
+\label{javafx_szenengraph}
+Damit eine JavaFX-Anwendung als solche identifiziert werden kann, muss die Hauptklasse von der \texttt{Application}-Klasse erben. Die Namensgebung der Klassen, welche für die Struktur bzw. den Aufbau einer JavaFX-Anwendung zuständig sind, basiert auf Begriffe der Theaterumgebung \cite{Anderson2019}:
+\begin{description}
+	\item Die \textbf{\texttt{Stage}} Klasse repräsentiert ein Anwendungsfenster, welches das Design des Fensterlayouts des aktuell genutzten Betriebssystems nutzt. Eine \texttt{Stage} ist teilweise modifizierbar, so können beispielsweise die Standardschaltflächen in der Titelleiste entfernt order deaktiviert werden. Werden mehrere Fenster benötigt, so können nach dem Initialisieren der Haupt-\texttt{Stage} durch die JavaFX-Plattform, manuell Weitere hinzugefügt werden.
+	\item Die \textbf{\texttt{Scene}} Klasse ist für das Layout und die Darstellung von vorhandenen oder selbsterstellten JavaFX-Komponenten verantwortlich. Jede Komponente, welche durch eine \texttt{Scene}-Instanz angezeigt und verwaltet werden soll, wird in einer hierarchisch angeordneten, objektorientierten Datenstruktur eingefügt, welche in der Computergrafik als Szenengraph bekannt ist \cite{Hughes2013}. Jeder \texttt{Stage} muss zwangsläufig eine \texttt{Scene} zugewiesen werden.
+	\item Die \textbf{\texttt{Node}} Klasse ist eine darstellbare Komponente im Szenengraphen wie beispielsweise eine Schaltfläche oder ein Containerelement. \texttt{Node} Instanzen im Szenengraph können Kindelemente enthalten und maximal einem Elternelement zugeordnet sein. Der Szenengraph ähnelt somit einer Baumstruktur mit einer Wurzel und einem oder mehreren Blättern. Damit eine \texttt{Node}-Instanz Kindelemente besitzen darf, muss diese immer von der abstrakten \texttt{Parent}-Klasse erben. Das Layouting und die Positionierung im lokalen Koordinatensystem wird bei vorhandenen Kindelementen immer durch das Elternelement kontrolliert. Jede darzustellende Komponente muss von der \texttt{Node}-Klasse erben \cite{Juneau2013}.
+\end{description}
+Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche das Zusammenspiel der oben genannten Konzepte und Klassen widerspiegelt, ist in \autoref{lst:example_javafxapp} dargestellt.
 
-\add{Funktionsumfang JavaFX}
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- Minimale JavaFX-Anwendung.}, captionpos=b, label=lst:example_javafxapp]
+		public class TestApplication extends Application {
+		
+			public static void main(String[] args) {
+				launch(args);
+			}
+			
+			@Override
+			public void start(Stage primaryStage) {
+				final Pane root = new Pane();
+				root.getChildren().add(new Button("TestButton"));
+				final Scene scene = new Scene(root, 250, 250);
+				primaryStage.setScene(scene);
+				primaryStage.show();
+			}
+		
+		}
+	\end{lstlisting}
+\end{figure}
+
+\subsection{Properties und Bindings}
+
+\subsection{Layouting: FXML vs. Quelltext}
+Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung auch per FXML zu erstellen. Eine Prävention von Boilerplate-Code kann durch das Auslagern von häufig verwendeten JavaFX-Komponenten in externe FXML-Dateien erfolgen \cite{Kruk2018}. Das Verwenden von solchen Dateien sorgt für eine bessere Trennung von Controllern und Logik im Sinne des z.B. \ac{mvc}-Entwurfsmusters \cite{Juneau2013} und durch die hohe Konfigurierbarkeit sind für eine eventuelle Veröffentlichung der Applikation wichtige Konzepte wie die Internationalisierung, leichter umzusetzen \cite{Steyer2014}. Durch das Parsen und Aufbauen des Szenengraphen zur Laufzeit des Programms ist eine Verwendung von FXML-Dateien jedoch langsamer als benötigte Komponenten direkt im Java Quelltext zu deklarieren. Fast alle JavaFX-Nodes können ohne Weiteres in XML-Elementen verwendet und angepasst werden. Außerdem ist es möglich, direkt eine manuell erstellte Controller-Klasse mit einer FXML-Datei zu assoziieren. Das Laden einer FXML-Datei und das darauffolgende Aufbauen des Szenengraphen wird durch die \texttt{FXMLLoader}-Klasse durchgeführt. Das Beispiel aus \autoref{lst:example_javafxapp} ist als FXML-Datei in \autoref{lst:example_fxmllayouting} zu erkennen.
+
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- FXML Layouting.}, captionpos=b, label=lst:example_fxmllayouting, language=XML]
+	<?xml version="1.0" encoding="UTF-8"?>
+	
+	<?import javafx.scene.layout.Pane?>
+	<?import javafx.scene.control.Button?>
+	
+	<Pane xmlns="http://javafx.com/javafx">
+		<Button>TestButton</Button>
+	</Pane>
+	\end{lstlisting}
+\end{figure}
+\add{example with controller}
+\subsection{Scene-Builder}
 
 \section{Java-Annotationen}
 \label{java_annotationen}
-Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
+\noindent Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
 In der Informatik sind Annotationen ebenfalls nur ein deskriptives Strukturkonzept, welche es dem Entwickler ermöglicht, verschiedenen strukturellen Elementen der Programmierung (wie Felder oder Klassen), Metadaten zuzuweisen \cite{Yu2019}. Das Nutzen von Annotationen in Anwendungen ist aufgrund ihrer meist simpel gehaltenen Syntax auch für Programmiereinsteiger vorteilhaft und durch ihre Anpassungsfähigkeit und Flexibilität sind sie in vielen Bibliotheken und Programmiersprachen vertreten.
 \subsection{Definition}
 \label{java_annotationen_definition}
 \add{Reference}
 \add{Move footnote to first occurence}
-\noindent Annotationen \footnote{Wenn in der Arbeit über Annotationen gesprochen wird, ist immer von Java-Annotationen auszugehen (außer anders angegeben)} wurden mit Java 5 (2014) in die Sprache eingeführt und werden seitdem immer häufiger für verschiedene Aspekte der Programmierung genutzt \cite{Rocha2011}. Mit ihnen kann eine Steuerung des Compilers erfolgen, eine Verarbeitung der Metadaten zu Kompilierzeit durchgeführt werden oder das Verhalten von Anwendungen zu Laufzeit modifiziert oder gelenkt werden \cite{Yu2019}. Aufgrund der Tatsache, dass es sich nur um rein deskriptive Metadaten handelt, ist es Annotationen nicht direkt möglich mit existierendem Quelltext zu interagieren.  Möglichkeiten zur Verarbeitung dieser Metadaten werden in Kapitel \ref{TODO - Auswertung Ref} vorgestellt. Neben den von Java vordefinierten Annotationen wie z.B. \texttt{@Override} für das Überschreiben von vererbten Methoden oder \texttt{@SuppressWarnings} für das Unterdrücken von Compilerwarnungen, können auch eigene Annotationen deklariert werden.\\
+\noindent Annotationen \footnote{Wenn in der Arbeit über Annotationen gesprochen wird, ist immer von Java-Annotationen auszugehen (außer anders angegeben)} wurden mit Java 5 (2014) in die Sprache eingeführt und werden seitdem immer häufiger für verschiedene Aspekte der Programmierung genutzt \cite{Rocha2011}. Mit ihnen kann eine Steuerung des Compilers erfolgen, eine Verarbeitung der Metadaten zu Kompilierzeit durchgeführt werden oder das Verhalten von Anwendungen zu Laufzeit modifiziert oder gelenkt werden \cite{Yu2019}. Aufgrund der Tatsache, dass es sich nur um rein deskriptive Metadaten handelt, ist es Annotationen nicht direkt möglich mit existierendem Quelltext zu interagieren.  Möglichkeiten zur Verarbeitung dieser Metadaten werden in Sektion \ref{java_annotation_laufzeitauswertung} vorgestellt. Neben den von Java vordefinierten Annotationen wie z.B. \texttt{@Override} für das Überschreiben von vererbten Methoden oder \texttt{@SuppressWarnings} für das Unterdrücken von Compilerwarnungen, können auch eigene Annotationen deklariert werden.\\
 Es handelt sich bei Annotationen in Java um spezialisierte Schnittstellen bei welchen das \texttt{interface}-Schlüsselwort durch ein \texttt{@}-Zeichen Präfix zu \texttt{@interface} erweitert wird \cite{Gosling2005}. Außerdem ist es Annotationen nicht erlaubt wie bei normalen Schnittstellendefinitionen das Schlüsselwort \texttt{extends} für eine Vererbung zu verwenden, da die Superschnittstelle implizit vom Compiler auf die \texttt{Annotation} Klasse des \texttt{java.lang.annotation} Pakets gesetzt wird \cite{Oracle2017}. Ein Beispiel einer  Annotationsdefinition ist in \autoref{lst:annotation_definition} dargestellt.
 \begin{figure}[H]
 	\centering
@@ -159,6 +207,7 @@ public class TestEntity {
 
 \add{Add compile time annotation processing if used in this thesis}
 \subsection{Auswertung von Laufzeit-Annotationen}
+\label{java_annotation_laufzeitauswertung}
 Für eine Auswertung von Laufzeit-Annotationen, muss zwangsläufig die Reflection-API von Java genutzt werden. Wenn eine Programmiersprache eine Form von Reflection (dt. Spiegelung) aufweist, so ist es möglich Attribute, Logikfluss und andere Eigenschaften während der Laufzeit zu ändern. In objektorientierten Sprachen wie Java wird diese \glqq computational reflection\grqq{} genutzt, um die Möglichkeit einer Selbstbeobachtung der eigenen Sprachelemente zu schaffen \cite{Li2017}. Die API ermöglicht somit beispielsweise das Auslesen von Laufzeit-Annotationen und deren deklarierte Attribute oder das dynamische Instanziieren von Klassen \cite{Forman2004}. Jedes Java-Element der Reflection API (Feld, Methode, Klasse, ...), welches annotierbar ist, wird durch die Vererbung der \texttt{AnnotatedElement}-Klasse als solches klassifiziert \cite{Schildt2019}. Damit nun alle vorhandenen Annotation ausgelesen werden können, kann die Methode \inlinecode{java}{AnnotatedElement#getDeclaredAnnotations} aufgerufen werden \cite{Pigula2015}. Das Lesen der Attribute der in \autoref{lst:full_annotation_example} vordefinierten Annotation ist in \autoref{lst:annotation_processing_example} zu erkennen.
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Auslesen einer Laufzeit-Annotation.}, captionpos=b, label=lst:annotation_processing_example]
