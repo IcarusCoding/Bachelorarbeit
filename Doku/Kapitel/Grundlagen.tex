@@ -1,25 +1,30 @@
+\add{Bugfixing in tex code}
 \chapter{Grundlagen}
 \label{grundlagen}
 \add{Correction}
 \noindent In diesem Kapitel werden die theoretischen Grundlagen von essentiellen Komponenten dieser Arbeit erläutert. Dazu wird die Relevanz von Entwurfsmustern justifiziert und auf zwei bedeutende Muster näher eingegangen. Diese sind sowohl erforderlich für die folgenden Kapitel als auch für das Verständnis der softwaretechnischen Prinzipien von JavaFX.\\
 Danach wird die JavaFX-Bibliothek vorgestellt und fundamentale Konzepte wie beispielsweise die auf der \ac{xml} basierende Layouting-Sprache erläutert.\\
-Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und jeweils mit Beispielen untermauert, sowie die Möglichkeiten der eigentlichen Auswertung von Annotationen skizziert.
+Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und die Möglichkeiten der eigentlichen Auswertung dieser skizziert. Komplexe Konzepte werden dabei durch visuelle Beispiele wie Quelltextausschnitte\footnote{Die dargestellten Quelltextausschnitte sind aufgrund der Simplizität nicht immer kompilierbar, da irrelevante Programmkonstrukte wie Importe von Klassen nicht für ein Verständnis des dargestellten Kontextes benötigt werden.} oder \ac{uml}-Diagramme untermauert und möglicherweise vereinfacht.
 
 \section{Entwurfsmuster}
 \label{entwurfsmuster}
-
-\add{Intro}
-
-\subsection{Definition}
-\label{entwurfsmuster_definition}
-
-\add{Definition Entwurfsmuster}
-
-\subsection{Notwendigkeit}
-\label{entwurfsmuster_notwendigkeit}
-
-\add{Notwendigkeit \& Justifikation von Entwurfsmustern}
-\newpage
+Entwurfsmuster sind Lösungen für immer wieder auftretende Probleme bei der Softwareentwicklung. Sie stellen eine wiederverwendbare Problemlösung für architektonisch begründete Problematiken dar, welche im Endeffekt durch nur wenige Klassen und Schnittstellen effektiv und schnell gelöst werden können. Ein Entwurfsmuster setzt sich aus vier Komponenten zusammen: Dem Namen des Musters, dem zu lösenden Problem, der daraus resultierende Lösung und die auftretenden positiven sowie negativen Auswirkungen bei Nutzung des Musters \cite{Gamma1993}.\\
+Im Folgenden werden das \ac{mvc}- sowie das Beobachter-Entwurfsmuster für das Verständnis von JavaFX Prinzipien beschrieben.
+\subsection{Beobachter}
+Das Beobachter Entwurfsmuster ist ein essentieller Bestandteil von vielen auf der reaktiven Programmierung aufbauenden Bibliotheken und APIs \cite{Salvaneschi2015} und obwohl es häufig in der Kritik steht, wird es dennoch in vielen Bereitstellungsumgebungen genutzt \cite{Maier2010}.
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{Abbildungen/Observer Pattern.png}
+	\caption{UML-Diagramm -- Beobachter-Entwurfsmuster}
+	\label{fig:observer_pattern}
+\end{figure}
+\noindent Das Entwurfsmuster benötigt für die korrekte Implementierung mindestens vier Komponenten (siehe \autoref{fig:observer_pattern}) \cite{Gamma1993}:
+\begin{description}
+	\item Die \texttt{\textbf{Subjekt}} Schnittstelle ...
+	\item Die \texttt{\textbf{Beobachter}} Schnittstelle ...
+	\item Die \texttt{\textbf{KonkretesSubjekt}}? Klasse ...
+	\item Die \texttt{\textbf{KonkreterBeobachter}}? Klasse ...
+\end{description}
+\subsection{\ac{mvc}}
 \section{JavaFX}
 \label{javafx}
 \add{glossar für fxml z.B.?}
@@ -35,7 +40,7 @@ Damit eine JavaFX-Anwendung als solche identifiziert werden kann, muss die Haupt
 	\item Die \textbf{\texttt{Node}} Klasse ist eine darstellbare Komponente im Szenengraphen wie beispielsweise eine Schaltfläche oder ein Containerelement. \texttt{Node} Instanzen im Szenengraph können Kindelemente enthalten und maximal einem Elternelement zugeordnet sein. Der Szenengraph ähnelt somit einer Baumstruktur mit einer Wurzel und einem oder mehreren Blättern. Damit eine \texttt{Node}-Instanz Kindelemente besitzen darf, muss diese immer von der abstrakten \texttt{Parent}-Klasse erben. Das Layouting und die Positionierung im lokalen Koordinatensystem wird bei vorhandenen Kindelementen immer durch das Elternelement kontrolliert. Jede darzustellende Komponente muss von der \texttt{Node}-Klasse erben \cite{Juneau2013}.
 \end{description}
 Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche das Zusammenspiel der oben genannten Konzepte und Klassen widerspiegelt, ist in \autoref{lst:example_javafxapp} dargestellt.
-
+\add{maybe beautify with fancy arrows}
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- Minimale JavaFX-Anwendung.}, captionpos=b, label=lst:example_javafxapp]
 		public class TestApplication extends Application {
@@ -56,11 +61,27 @@ Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche 
 		}
 	\end{lstlisting}
 \end{figure}
-
+\add{Fix weird spacing (fault of figure before)}
 \subsection{Properties und Bindings}
+JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster basierende API, welche es dem Programmierer ermöglicht, eine synchronisierende Beziehung zwischen zwei oder mehr Variablen zu erstellen. Wird eine Variable in einer solchen Beziehung geändert, so wird automatisch auch die Andere geändert \cite{Hommel2013}. Dabei ist es auch möglich, Event Listener für eigene oder durch von JavaFX-Nodes automatisch erzeugte Properties zu registrieren. Soll beispielsweise Quelltext ausgeführt werden, wenn eine Änderung eines Wertes einer Property festgestellt wird, so kann dies mit dem Erstellen einer \texttt{ChangeListener}-Instanz durchgeführt werden \cite{Gao2019}. Im ersten Teil von \autoref{lst:property_example} soll der Text einer Schaltfläche bei einer Änderung auf die Konsole ausgegeben werden. Dazu wird mittels Lambda Ausdruck ein neuer \texttt{ChangeListener} mit der \texttt{StringProperty} der Schaltfläche verknüpft.\\
+Des Weiteren unterstützt JavaFX ein Event-System, welches anhand von verschiedenen Aktionen Events durch den Szenengraphen propagiert. Ein solches Event wird beispielsweise durch das Eintragen von Text in ein Textfeld oder das Aktivieren einer Dropdown-Liste ausgelöst. In zweiten Teil von \autoref{lst:property_example} wird ein \texttt{EventHandler} für das Aktivieren einer Schaltfläche erstellt.
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- ChangeListener \& EventHandler., captionpos=b, label=lst:property_example]
+Button btn = new Button("Test");
+// ChangeListener für den Schaltflächentext
+btn.textProperty().addListener((obs, oVal, nVal) -> {
+	System.out.println(nVal);
+});	
+// EventHandler für die Schaltflächenaktivierung
+btn.setOnAction(e -> {
+	System.out.println("Clicked!");
+})
+	\end{lstlisting}
+\end{figure}
+
 
 \subsection{Layouting: FXML vs. Quelltext}
-Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung auch per FXML zu erstellen. Eine Prävention von Boilerplate-Code kann durch das Auslagern von häufig verwendeten JavaFX-Komponenten in externe FXML-Dateien erfolgen \cite{Kruk2018}. Das Verwenden von solchen Dateien sorgt für eine bessere Trennung von Controllern und Logik im Sinne des z.B. \ac{mvc}-Entwurfsmusters \cite{Juneau2013} und durch die hohe Konfigurierbarkeit sind für eine eventuelle Veröffentlichung der Applikation wichtige Konzepte wie die Internationalisierung, leichter umzusetzen \cite{Steyer2014}. Durch das Parsen und Aufbauen des Szenengraphen zur Laufzeit des Programms ist eine Verwendung von FXML-Dateien jedoch langsamer als benötigte Komponenten direkt im Java Quelltext zu deklarieren. Fast alle JavaFX-Nodes können ohne Weiteres in XML-Elementen verwendet und angepasst werden. Außerdem ist es möglich, direkt eine manuell erstellte Controller-Klasse mit einer FXML-Datei zu assoziieren. Das Laden einer FXML-Datei und das darauffolgende Aufbauen des Szenengraphen wird durch die \texttt{FXMLLoader}-Klasse durchgeführt. Das Beispiel aus \autoref{lst:example_javafxapp} ist als FXML-Datei in \autoref{lst:example_fxmllayouting} zu erkennen.
+Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung auch per FXML zu erstellen. Eine Prävention von Boilerplate-Code kann durch das Auslagern von häufig verwendeten JavaFX-Komponenten in externe FXML-Dateien erfolgen \cite{Kruk2018}. Das Verwenden von solchen Dateien sorgt für eine bessere Trennung von Controllern und Logik im Sinne des z.B. \ac{mvc}-Entwurfsmusters \cite{Juneau2013} und durch die hohe Konfigurierbarkeit sind für eine eventuelle Veröffentlichung der Applikation wichtige Konzepte wie die Internationalisierung, leichter umzusetzen \cite{Steyer2014}. Durch das Parsen und Aufbauen des Szenengraphen zur Laufzeit des Programms ist eine Verwendung von FXML-Dateien jedoch langsamer als benötigte Komponenten direkt im Java Quelltext zu deklarieren. Fast alle JavaFX-Nodes können ohne Weiteres in XML-Elementen verwendet und angepasst werden. Außerdem ist es möglich, direkt eine manuell erstellte Controller-Klasse mit einer FXML-Datei zu assoziieren. Das Laden einer FXML-Datei und das darauffolgende Aufbauen des Szenengraphen wird durch die \texttt{FXMLLoader}-Klasse durchgeführt. Das Layouting-Beispiel aus \autoref{lst:example_javafxapp} ist als eine funktionsgleiche FXML Variante in \autoref{lst:example_fxmllayouting} zu erkennen. Das Laden der Datei wird durch das Instanziieren eines neuen \texttt{FXMLLoader} Objekts, wie in \autoref{lst:example_fxmlloading} dargestellt, ermöglicht.
 
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- FXML Layouting.}, captionpos=b, label=lst:example_fxmllayouting, language=XML]
@@ -74,9 +95,16 @@ Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung
 	</Pane>
 	\end{lstlisting}
 \end{figure}
-\add{example with controller}
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- FXML Ladeprozess.}, captionpos=b, label=lst:example_fxmlloading]
+Pane load(String fxmlPath) throws IOException {
+	return new FXMLLoader(getClass().getResource(fxmlPath)).load();
+}
+	\end{lstlisting}
+\end{figure}
+\noindent Um eine Controller-Klasse mit der FXML-Datei zu assozieren, kann Wurzelelement dieser durch das \texttt{fx:controller} Attribut erweitert werden. Der Name des Controllers ist hierbei der voll qualifizierte Klassenname. Neben externen FXML-Dateien können auch externe \ac{css}-Dateien für das Design des Layouts verwendet werden. In \autoref{appendix:controllerbased_javafx_application} ist ein vollständig kompilierbares JavaFX-Programm welches aus einem Controller, einer FXML-Datei sowie einer CSS-Datei aufgebaut ist zu finden.
 \subsection{Scene-Builder}
-
+\add{add if needed}
 \section{Java-Annotationen}
 \label{java_annotationen}
 \noindent Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\

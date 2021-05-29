@@ -48,7 +48,16 @@
 	morekeywords={@interface},
 	showlines=true,
 	moredelim=[il][\textcolor{pgrey}]{##},
-	escapeinside={(@}{@)}
+	escapeinside={(@}{@)},
+	literate=%
+	{Ö}{{\"O}}1
+	{Ä}{{\"A}}1
+	{Ü}{{\"U}}1
+	{ß}{{\ss}}1
+	{ü}{{\"u}}1
+	{ä}{{\"a}}1
+	{ö}{{\"o}}1
+	{~}{{\textasciitilde}}1
 }
 
 \definecolor{Maroon}{rgb}{0.5,0,0}
@@ -70,6 +79,27 @@
 	breaklines=false,
 	captionpos=b,
 	morekeywords={xmlns}
+}
+
+\definecolor{lightgray}{rgb}{0.95, 0.95, 0.95}
+\definecolor{darkgray}{rgb}{0.4, 0.4, 0.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+\definecolor{cssorange}{rgb}{1, 0.588, 0.207}
+
+\lstdefinelanguage{CSS}{
+	otherkeywords={-fx-background-color},
+	sensitive=true,
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]",
+	moredelim=[s][\bfseries\color{cssorange}]{\#}{\ },
+	identifierstyle=\color{black},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywordstyle=\color{greenCode}\bfseries,
+	stringstyle=\color{ocherCode}\ttfamily,
+	commentstyle=\color{darkgray}\ttfamily,
 }
 
 \newcommand{\inlinecode}[2]{\lstinline[language=#1]$#2$}
@@ -172,9 +202,13 @@
 
 % Zusammenfassung erstellen
 \begin{abstract}
-	\input{Sonstiges/Zusammenfassung.tex}
 	\input{Sonstiges/Abstract.tex}
+	\add{Remove empty page}
 \end{abstract}
+\begin{abstract}
+	\input{Sonstiges/Zusammenfassung.tex}
+\end{abstract}
+	
 % Inhaltsverzeichnis erstellen
 \tableofcontents
 
@@ -189,8 +223,7 @@
 \input{Kapitel/Fazit.tex}
 
 \begin{appendix}
-\chapter{Appendix 1}
-\chapter{Appendix 2}
+	\input{Anhang/Controllerbasierte JavaFX Anwendung.tex}
 \end{appendix}
 
 % Abkürzungsverzeichnis
@@ -210,6 +243,8 @@
 \bibliographystyle{geralpha}
 \bibliography{Bibliographie/Bibliographie}
 \add{Switch to newest JLS}
+\add{Check unused sources}
+\add{Fix url display line wrapping}
 \listoftodos[Notes]
 
 % Index ausgeben
