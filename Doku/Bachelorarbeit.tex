@@ -18,6 +18,95 @@
 \usepackage{xargs}
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \usepackage{acronym}
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{adjustbox}
+\usepackage{refcheck}
+
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
+
+\lstset{frame=tb,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\bfseries\color[HTML]{CC7832},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=false,
+	breakatwhitespace=true,
+	tabsize=3,
+	morekeywords={@interface},
+	showlines=true,
+	moredelim=[il][\textcolor{pgrey}]{##},
+	escapeinside={(@}{@)},
+	literate=%
+	{Ö}{{\"O}}1
+	{Ä}{{\"A}}1
+	{Ü}{{\"U}}1
+	{ß}{{\ss}}1
+	{ü}{{\"u}}1
+	{ä}{{\"a}}1
+	{ö}{{\"o}}1
+	{~}{{\textasciitilde}}1
+}
+
+\definecolor{Maroon}{rgb}{0.5,0,0}
+\definecolor{Darkgreen}{rgb}{0,0.5,0}
+
+\lstdefinelanguage{XML} {
+	basicstyle=\ttfamily\footnotesize,
+	morestring=[b]",
+	morecomment=[s]{<?}{?>},
+	morecomment=[s]{<!--}{-->},
+	commentstyle=\color{Darkgreen},
+	moredelim=[s][\color{black}]{>}{<},
+	stringstyle=\color{blue},
+	identifierstyle=\color{Maroon},
+	keywordstyle=\color{red},
+	numbers=none,
+	tabsize=2,
+	rulecolor=\color{black},
+	breaklines=false,
+	captionpos=b,
+	morekeywords={xmlns}
+}
+
+\definecolor{lightgray}{rgb}{0.95, 0.95, 0.95}
+\definecolor{darkgray}{rgb}{0.4, 0.4, 0.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+\definecolor{cssorange}{rgb}{1, 0.588, 0.207}
+
+\lstdefinelanguage{CSS}{
+	otherkeywords={-fx-background-color},
+	sensitive=true,
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]",
+	moredelim=[s][\bfseries\color{cssorange}]{\#}{\ },
+	identifierstyle=\color{black},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywordstyle=\color{greenCode}\bfseries,
+	stringstyle=\color{ocherCode}\ttfamily,
+	commentstyle=\color{darkgray}\ttfamily,
+}
+
+\newcommand{\inlinecode}[2]{\lstinline[language=#1]$#2$}
+
+\renewcommand{\lstlistingname}{Code}
+\renewcommand*{\lstlistlistingname}{Quellcodeverzeichnis}
 
 % Abstände bei Trennzeichen für Zahlen korrekt machen
 \mathcode`,="013B
@@ -26,6 +115,26 @@
 % Tex ist kein Zeichenprogramm...
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata,shapes,topaths}
+
+\usetikzlibrary{decorations.text,calc,bending}
+\newcommand{\tikzmark}[2]{%
+	\tikz[overlay,remember picture] \node[text=black,
+	inner sep=2pt] (#1) {#2};}
+\newcommand{\VerticalShiftForArrows}{0.0em,+2.6ex}%
+\newcommand{\VerticalShiftForBar}{0.0em,+2.0ex}%
+\newcommand{\Stub}{0.0em,-0.6ex}%
+\newcommand{\DrawOverBar}[3][]{%
+	\coordinate (top left)  at ($(#2)       +(\VerticalShiftForBar)$);
+	\coordinate (start)     at ($(top left) +(\Stub)$);
+	\coordinate (top right) at ($(#3)       +(\VerticalShiftForBar)$);
+	\coordinate (end)       at ($(top right)+(\Stub)$);
+	\draw [#1] (start) -- (top left) -- (top right) -- (end);
+}%
+\newcommand{\DrawArrow}[4][]{%
+	\coordinate (Start Mid) at ($(#2Left)!0.5!(#2Right) + (\VerticalShiftForArrows)$);
+	\coordinate (End Mid) at ($(#3)+(#4)$);
+	\draw[-stealth, thick, #1] (Start Mid) to (End Mid);
+}
 
 % Vorlage - Obere Linie, Seitenzahlen
 \usepackage{scrlayer-scrpage}
@@ -94,9 +203,13 @@
 
 % Zusammenfassung erstellen
 \begin{abstract}
-	\input{Sonstiges/Zusammenfassung.tex}
 	\input{Sonstiges/Abstract.tex}
+	\add{Remove empty page}
 \end{abstract}
+\begin{abstract}
+	\input{Sonstiges/Zusammenfassung.tex}
+\end{abstract}
+	
 % Inhaltsverzeichnis erstellen
 \tableofcontents
 
@@ -111,12 +224,14 @@
 \input{Kapitel/Fazit.tex}
 
 \begin{appendix}
-\chapter{Appendix 1}
-\chapter{Appendix 2}
+	\input{Anhang/Controllerbasierte JavaFX Anwendung.tex}
 \end{appendix}
 
 % Abkürzungsverzeichnis
 \include{Sonstiges/Abkürzungsverzeichnis}
+
+% Codeverzeichnis
+\lstlistoflistings
 
 % Abbildungsverzeichnis
 \listoffigures
@@ -128,7 +243,9 @@
 \nocite{*}
 \bibliographystyle{geralpha}
 \bibliography{Bibliographie/Bibliographie}
-
+\add{Switch to newest JLS}
+\add{Check unused sources}
+\add{Fix url display line wrapping}
 \listoftodos[Notes]
 
 % Index ausgeben
