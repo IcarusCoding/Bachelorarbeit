@@ -1,13 +1,23 @@
 \chapter{Stand der Technik}
 \label{stand_der_technik}
-
-\add{Intro}
+Im diesem Kapitel werden aktuelle Konzepte und Implementierungen der Annotationsprogrammierung zur Vereinfachung des Entwicklungsprozesses einer Anwendung dargelegt. Obwohl der primäre Fokus dabei auf der JavaFX- und der generellen Java-Umgebung gelegt wird, werden dennoch auch Bibliotheken und mögliche Strukturen aus anderen Programmiersprachen herangezogen.
+\add{complete intro}
 
 \section{Aktuelle Verwendung von Annotationen}
 \label{aktuelle_verwendung_von_annotationen}
+\add{Intro wie in github wiki}
+\add{structure}
 
-\add{Intro}
-
+\subsection{Annotationen in anderen Programmiersprachen}
+Neben den Java-Annotationen, welche in \autoref{java_annotationen} vorgestellt und erklärt wurden, werden Annotationen auch in vielen anderen Programmiersprachen genutzt. 
+\subsubsection{Verwendung in Python}
+\label{verwendung_in_python}
+Python ist eine dynamisch typisierte Sprache und validiert somit den Typen einer Variablen zur Laufzeit des Programms \cite{Tratt2009}, kann aber durch das Verwenden von Funktionsannotationen, Meta-Daten zu Parametern, Variablen und Funktionsrückgabewerten hinzufügen, um so den gewünschten Typen anzudeuten \cite{Rossum2014, Winter2006}. Diese Annotationen werden zwar vom Python-Interpreter ignoriert, können aber durch Softwaresysteme von Drittanbietern wie \texttt{mypy} zur statischen Typisierung verwendet werden. Nach einer Studie von Khan et al., welche 210 auf Python basierende GitHub-Projekte auf typbezogene Fehler untersuchte, konnten 15\% der gefundenen Mängel, durch \texttt{mypy} verhindert werden \cite{Khan2021}.
+Einige Entwicklungsumgebungen wie PyCharm sind außerdem in der Lage, Warnungen bei eventuellen Verletzungen der Typempfehlungen von Annotationen anzuzeigen \cite{Rother2017}. Das Verwenden von derartigen Annotationen kann somit durchaus die Fehleranfälligkeit von Programmcodeelementen sinken -- wenn auch nur implizit durch externe Bibliotheken oder Entwicklungsumgebungen.
+\add{maybe add code example}
+\subsubsection{Verwendung in \texorpdfstring{\csharpbold}{C\#} und .NET}
+In \csharp ... \cite{Albahari2019}
+\label{verwendung_in_c_sharp_dot_net}
 \subsection{JavaFX}
 \label{aktuelle_verwendung_von_annotationen_javafx}
 
