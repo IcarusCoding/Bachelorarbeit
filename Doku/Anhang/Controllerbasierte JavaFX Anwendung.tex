@@ -1,0 +1,77 @@
+\chapter{Controllerbasierte JavaFX-Anwendung}
+\label{appendix:controllerbased_javafx_application}
+\begin{figure}
+	\begin{lstlisting}[caption={Anwendungscode.}, captionpos=b, nolol]
+package de.testpackage;
+		
+import javafx.application.Application;
+		
+public static final class TestApplication extends Application {
+			
+	public static void main(String[] args) {
+		Application.launch(args);
+	}
+			
+	private Pane loadFXML(URL fxmlPath) throws IOException {
+		return new FXMLLoader(fxmlPath).load();
+	}
+			
+	@Override
+	public void start(Stage primaryStage) {
+		URL fxmlPath = this.getClass().getResource("test.fxml");
+		Pane pane = null;
+		try {
+			pane = this.loadFXML(fxmlPath);
+		} catch(IOException ex) {
+			// error handling
+			return;
+		}
+		Scene scene = new Scene(pane, 500, 500);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+			
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}
+	\begin{lstlisting}[caption={Beispielcontroller.}, captionpos=b, nolol]
+package de.testpackage;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+
+public final class TestController {
+
+	#@FXML
+	private Button testBtn;
+
+	#@FXML
+	private void onTestBtnClick() {
+		// do something
+	}
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}
+	\begin{lstlisting}[caption={FXML-Layout.}, captionpos=b, nolol, language=XML]
+<?xml version="1.0" encoding="UTF-8"?>
+	
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+	
+<Pane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+	  fx:controller="de.testpackage.TestController"
+	  stylesheets="test.css">
+	<Button fx:id="testBtn" onAction="#onTestBtnClick">TestButton</Button>
+</Pane>
+	\end{lstlisting}
+\end{figure}
+\begin{figure}
+	\begin{lstlisting}[caption={CSS-Design.}, captionpos=b, nolol, language=CSS]
+#testBtn {
+	-fx-background-color: red;
+}
+	\end{lstlisting}
+\end{figure}
