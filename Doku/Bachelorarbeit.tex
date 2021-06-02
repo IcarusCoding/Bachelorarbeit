@@ -23,6 +23,12 @@
 \usepackage{float}
 \usepackage{adjustbox}
 \usepackage{refcheck}
+\usepackage{ulem}
+
+\makeatletter
+\def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
+\font\sixly=lasy6
+\makeatother
 
 \newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}}
 

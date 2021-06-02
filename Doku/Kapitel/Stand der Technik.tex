@@ -13,31 +13,52 @@
 \label{verwendung_im_umfeld_von_java}
 Nach dem Einführen von Annotationen in Java vor sechs Jahren haben sich viele Bibliotheken etabliert, welche fast vollständig oder teilweise auf dieses Konzept setzen. Eine Studie aus dem Jahre 2011, welche 106 Systeme auf die Nutzung von Annotationen untersuchte, stellte fest, dass 41 dieser keine einzige aufwiesen \cite{Rocha2011}. Acht Jahre später wurde eine ähnliche Studie veröffentlicht, welche 1094 populäre Systeme untersucht hat und feststellte, dass jedes dieser Systeme mindestens eine Annotationen enthält \cite{Yu2019}. Auch wenn bei beiden Studien nicht dieselben Systeme getestet worden sind, ist dennoch ein klarer Trend nach oben zu erkennen. Dazu wurden eine Vielzahl an Werken publiziert, welche mithilfe von Annotationen, vorhandene Java-Konzepte vereinfachen und erweitern sollen.\\
 Beispielsweise wurde ein System entwickelt, welches durch Semantikinformationen von annotierten JavaDoc-Elementen, das Refactoring automatisiert und den Entwickler auf das Nutzen von Entwurfsmustern und etwaigen Refactoring-Operationen hinweisen soll \cite{Meffert2006}. Des Weiteren werden Annotationen im Kontext der automatischen Nebenläufigkeit \cite{Danelutto2007}, dem Erstellen von Parsern für Programmiersprachen \cite{Porubaen2009} und der Dokumentation sowie der Erzeugung von Quelltext genutzt \cite{Sulir2016, Miroslav2009}.
+Im Folgenden werden Beispiele gegeben, welche die Entwicklung durch die Verwendung von Annotationen, aktiv vereinfachen:
+\subsubsection{JavaSE Umgebung}
+Die am häufigsten genutzte durch das \ac{jdk} vordefinierte Annotation (siehe \autoref{java_annotationen_definition}), ist die Quelltextannotation \texttt{@Override} \cite{Rocha2011}, welche wie im Folgenden gezeigt, eine Bugprävention ermöglicht. Will der Entwickler eine Methode einer Superklasse überschreiben und übernimmt nicht ebendiese Methodendeklaration, sondern überlädt diese fälschlicherweise, so handelt es sich häufig dennoch um vollständig validen Quelltext, welcher aber unter Umständen zu einem ungewollten Verhalten führt. Wird aber die \texttt{@Override} Annotation in solchen Fällen über die zu überschreibenden Methoden geschrieben, so wird immer ein Kompilierfehler erzeugt.
+
+\begin{figure}[H]
+	\noindent
+	\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+		\begin{lstlisting}[caption=Beispiel -- Interfacedeklaration., captionpos=b, label=lst:decl_interface]
+interface Test {
+
+	default void t(int... i) {}
+
+}
+
+		\end{lstlisting}
+	\end{adjustbox}\hfill
+	\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+		\begin{lstlisting}[caption=Beispiel -- Kompilierfehler., captionpos=b, label=lst:compiler_error]
+class TestClass implements Test {
+
+	(@\textcolor{pgrey}{\errorunderline{@Override}\tikzmark{ovr}{}}@)
+	public void t(int i) {}
+	(@
+		\begin{tikzpicture}[overlay,remember picture]
+			\node[draw](error) at (4.5,1.2) {Kompilierfehler};
+			\draw[-stealth, thick, red, in=-180, out=20] (ovr) to (error);
+		\end{tikzpicture}
+	@)
+}
+		\end{lstlisting}
+	\end{adjustbox}
+\end{figure}
+
+\subsubsection{JavaFX Umgebung}
+In JavaFX direkt werden nur wenige Annotationen verwendet, welche Teil der öffentlichen API sind. Dazu gehört \texttt{@FXML}, welche für das automatische Setzen von Feldern oder für die Identifikation von Methoden für EventHandler benötigt wird \cite{Anderson2019}. Der Entwickler kann somit Events, welche durch JavaFX-Komponenten ausgelöst werden, per FXML-Datei mit Methoden im selben Controller verbinden. Dazu wurden Bibliotheken wie Afterburner.fx\footnote{\url{https://github.com/AdamBien/afterburner.fx}} entwickelt, welche durch \texttt{@Inject}, das \ac{ioc} Programmierparadigma durch Abhängigkeitsinjektion realisiert oder das von CERN entwickelte ExtJFX\footnote{\url{https://github.com/extjfx/extjfx}}, welches \texttt{@RunInFxThread} nutzt, um Unittests auf dem JavaFX-Thread auszuführen. 
 
 \subsection{Annotationen in anderen Programmiersprachen}
 Neben den Java-Annotationen, welche in \autoref{java_annotationen} erklärt und in \autoref{verwendung_im_umfeld_von_java} vorgestellt wurden, werden Annotationen auch in vielen anderen Programmiersprachen genutzt. 
 \subsubsection{Verwendung in Python}
 \label{verwendung_in_python}
 Python ist eine dynamisch typisierte Sprache und validiert somit den Typen einer Variablen zur Laufzeit des Programms \cite{Tratt2009}, kann aber durch das Verwenden von Funktionsannotationen, Meta-Daten zu Parametern, Variablen und Funktionsrückgabewerten hinzufügen, um so den gewünschten Typen anzudeuten \cite{Rossum2014, Winter2006}. Diese Annotationen werden zwar vom Python-Interpreter ignoriert, können aber durch Softwaresysteme von Drittanbietern wie \texttt{mypy} zur statischen Typisierung verwendet werden. Nach einer Studie von Khan et al., welche 210 auf Python basierende GitHub-Projekte auf typbezogene Fehler untersuchte, konnten 15\% der gefundenen Mängel, durch \texttt{mypy} verhindert werden \cite{Khan2021}.
-Einige Entwicklungsumgebungen wie PyCharm sind außerdem in der Lage, Warnungen bei eventuellen Verletzungen der Typempfehlungen von Annotationen anzuzeigen \cite{Rother2017}. Das Verwenden von derartigen Annotationen kann somit durchaus die Fehleranfälligkeit von Programmcodeelementen sinken -- wenn auch nur implizit durch externe Bibliotheken oder Entwicklungsumgebungen.
+Einige Entwicklungsumgebungen wie PyCharm sind außerdem in der Lage, Warnungen bei eventuellen Verletzungen der Typempfehlungen von Annotationen anzuzeigen \cite{Rother2017}. Das Verwenden von derartigen Annotationen kann somit durchaus die Fehleranfälligkeit von Programmcodeelementen in Python sinken -- wenn auch nur implizit durch externe Bibliotheken oder Entwicklungsumgebungen.
 \add{maybe add code example}
 \subsubsection{Verwendung in \texorpdfstring{\csharpbold}{C\#} und .NET}
 In \csharp{} wird das Hinzufügen von Meta-Informationen zu bestehenden Programmelementen durch Attribute realisiert \cite{Albahari2019}. Mithilfe dieser Attribute können dann beispielsweise Klassen als serialisierbar deklariert werden oder Methoden und Funktionen für nicht verwaltete \acp{dll} erreichbar gemacht werden. Es ist, ähnlich wie in Java, auch möglich, eigene Attribute zu erstellen und diese zu unterschiedlichen Phasen wie zur Kompilierzeit oder Laufzeit auszuwerten. Durch die einfache Nutzung der Attribute wurde beispielsweise eine Erweiterung der grundlegenden \csharp-Sprache entwickelt, welche ein Parallelisieren von sequentiellen Programmausschnitten ermöglicht \cite{Cazzola2005}. 
 \label{verwendung_in_c_sharp_dot_net}
-\subsection{JavaFX}
-\label{aktuelle_verwendung_von_annotationen_javafx}
-
-\add{JavaFX Beispiele}
-
-\subsection{Android}
-\label{aktuelle_verwendung_von_annotationen_android}
-
-\add{Android Beispiele}
-
-\subsection{JavaX}
-\label{aktuelle_verwendung_von_annotationen_javax}
-
-\add{JavaX Beispiele (z.B. JAXB)}
 
 \section{Maßnahmen zur Simplifizierung des Entwicklungsprozesses}
 \label{maßnahmen_zur_simplifizierung_des_entwicklungsprozesses}

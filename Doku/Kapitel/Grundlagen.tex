@@ -81,11 +81,11 @@ JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster bas
 	Button btn = new Button("Test");
 	// ChangeListener für den Schaltflächentext
 	btn.textProperty().addListener((obs, oVal, nVal) -> {
-	System.out.println(nVal);
+		System.out.println(nVal);
 	});	
 	// EventHandler für die Schaltflächenaktivierung
 	btn.setOnAction(e -> {
-	System.out.println("Clicked!");
+		System.out.println("Clicked!");
 	})
 	\end{lstlisting}
 \end{figure}
@@ -147,7 +147,7 @@ Dennoch zeigt eine Studie aus dem Jahre 2019, welche 1094 quelloffene GitHub-Pro
 \subsection{Syntax}
 \label{java_annotationen_anwendung}
 \add{lst design}
-\addchap{use lstnewenvironment}
+\add{use lstnewenvironment}
 \noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays aus den vorherigen Typen. Außerdem ist es möglich, Attributen einen voreingestellten Wert mittels des Schlüsselwortes \texttt{default} zuzuweisen \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
 \begin{description}
 	\item \textbf{Normal Annotations} sind ganz normal deklarierte Annotationen, bei welchen die Attribute mittels Aufzählung in Klammern übergeben werden.
