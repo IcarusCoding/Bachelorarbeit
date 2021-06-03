@@ -17,6 +17,7 @@
 \addvspace {10\p@ }
 \contentsline {lstlisting}{\numberline {3.1}Beispiel -- Interfacedeklaration.}{18}{lstlisting.3.1}%
 \contentsline {lstlisting}{\numberline {3.2}Beispiel -- Kompilierfehler.}{18}{lstlisting.3.2}%
+\contentsline {lstlisting}{\numberline {3.3}Beispiel -- Lombok POJO.}{19}{lstlisting.3.3}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
