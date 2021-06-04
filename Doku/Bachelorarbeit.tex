@@ -17,13 +17,14 @@
 \usepackage{xcolor}
 \usepackage{xargs}
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
-\usepackage{acronym}
 \usepackage{courier}
+\usepackage{acronym}
 \usepackage{listings}
 \usepackage{float}
 \usepackage{adjustbox}
 \usepackage{refcheck}
 \usepackage[normalem]{ulem}
+
 
 \makeatletter
 \def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
@@ -71,7 +72,9 @@
 \definecolor{Darkgreen}{rgb}{0,0.5,0}
 
 \lstdefinelanguage{XML} {
-	basicstyle=\ttfamily\footnotesize,
+	basicstyle=\small\ttfamily,
+	aboveskip=3mm,
+	belowskip=3mm,
 	morestring=[b]",
 	morecomment=[s]{<?}{?>},
 	morecomment=[s]{<!--}{-->},
