@@ -17,12 +17,19 @@
 \usepackage{xcolor}
 \usepackage{xargs}
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
-\usepackage{acronym}
 \usepackage{courier}
+\usepackage{acronym}
 \usepackage{listings}
 \usepackage{float}
 \usepackage{adjustbox}
 \usepackage{refcheck}
+\usepackage[normalem]{ulem}
+
+
+\makeatletter
+\def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
+\font\sixly=lasy6
+\makeatother
 
 \newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}}
 
@@ -65,7 +72,9 @@
 \definecolor{Darkgreen}{rgb}{0,0.5,0}
 
 \lstdefinelanguage{XML} {
-	basicstyle=\ttfamily\footnotesize,
+	basicstyle=\small\ttfamily,
+	aboveskip=3mm,
+	belowskip=3mm,
 	morestring=[b]",
 	morecomment=[s]{<?}{?>},
 	morecomment=[s]{<!--}{-->},
@@ -179,6 +188,9 @@
 	\or Dezember% 12
 	\fi}
 
+\newcommand{\csharpbold}{$\mathbf{C^\text{\#}}$}
+\newcommand{\csharp}{$C^\text{\#}$}
+
 \title{\Titel}
 \author{\Name}
 \date{\today}
@@ -246,6 +258,8 @@
 \add{Switch to newest JLS}
 \add{Check unused sources}
 \add{Fix url display line wrapping}
+\add{crossref for @InBook to get valid booktitle}
+\add{fix inconsistencies with author names}
 \listoftodos[Notes]
 
 % Index ausgeben

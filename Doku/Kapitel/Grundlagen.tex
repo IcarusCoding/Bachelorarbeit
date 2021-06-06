@@ -2,6 +2,7 @@
 \chapter{Grundlagen}
 \label{grundlagen}
 \add{Correction}
+\add{urls in footnotes}
 \noindent In diesem Kapitel werden die theoretischen Grundlagen von essentiellen Komponenten dieser Arbeit erläutert. Dazu wird die Relevanz von Entwurfsmustern justifiziert und auf zwei bedeutende Muster näher eingegangen. Diese sind sowohl erforderlich für die folgenden Kapitel als auch für das Verständnis der softwaretechnischen Prinzipien von JavaFX.\\
 Danach wird die JavaFX-Bibliothek vorgestellt und fundamentale Konzepte wie beispielsweise die auf der \ac{xml} basierende Layouting-Sprache erläutert.\\
 Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und die Möglichkeiten der eigentlichen Auswertung dieser skizziert. Komplexe Konzepte werden dabei durch visuelle Beispiele wie Quelltextausschnitte\footnote{Die dargestellten Quelltextausschnitte sind aufgrund der Simplizität nicht immer kompilierbar, da irrelevante Programmkonstrukte wie Importe von Klassen nicht für ein Verständnis des dargestellten Kontextes benötigt werden.} oder \ac{uml}-Klassendiagramme untermauert und möglicherweise vereinfacht.
@@ -80,11 +81,11 @@ JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster bas
 	Button btn = new Button("Test");
 	// ChangeListener für den Schaltflächentext
 	btn.textProperty().addListener((obs, oVal, nVal) -> {
-	System.out.println(nVal);
+		System.out.println(nVal);
 	});	
 	// EventHandler für die Schaltflächenaktivierung
 	btn.setOnAction(e -> {
-	System.out.println("Clicked!");
+		System.out.println("Clicked!");
 	})
 	\end{lstlisting}
 \end{figure}
@@ -93,6 +94,7 @@ Des Weiteren unterstützt JavaFX ein Event-System, welches anhand von verschiede
 
 \subsection{Layouting: FXML vs. Quelltext}
 Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung auch per FXML zu erstellen. Eine Prävention von Boilerplate-Code kann durch das Auslagern von häufig verwendeten JavaFX-Komponenten in externe FXML-Dateien erfolgen \cite{Kruk2018}. Das Verwenden von solchen Dateien sorgt für eine bessere Trennung von Controllern und Logik im Sinne des z.B. \ac{mvc}-Entwurfsmusters \cite{Juneau2013} und durch die hohe Konfigurierbarkeit sind für eine eventuelle Veröffentlichung der Applikation wichtige Konzepte wie die Internationalisierung, leichter umzusetzen \cite{Steyer2014}. Durch das Parsen und Aufbauen des Szenengraphen zur Laufzeit des Programms ist eine Verwendung von FXML-Dateien jedoch langsamer als benötigte Komponenten direkt im Java Quelltext zu deklarieren. Fast alle JavaFX-Nodes können ohne Weiteres in XML-Elementen verwendet und angepasst werden. Außerdem ist es möglich, direkt eine manuell erstellte Controller-Klasse mit einer FXML-Datei zu assoziieren. Das Laden einer FXML-Datei und das darauffolgende Aufbauen des Szenengraphen wird durch die \texttt{FXMLLoader}-Klasse durchgeführt. Das Layouting-Beispiel aus \autoref{lst:example_javafxapp} ist als eine funktionsgleiche FXML Variante in \autoref{lst:example_fxmllayouting} zu erkennen. Das Laden der Datei wird durch das Instanziieren eines neuen \texttt{FXMLLoader} Objekts, wie in \autoref{lst:example_fxmlloading} dargestellt, ermöglicht.
+\noindent Um eine Controller-Klasse mit der FXML-Datei zu assozieren, kann Wurzelelement dieser durch das \texttt{fx:controller} Attribut erweitert werden. Der Name des Controllers ist hierbei der voll qualifizierte Klassenname. Neben externen FXML-Dateien können auch externe \ac{css}-Dateien für das Design des Layouts verwendet werden. In \autoref{appendix:controllerbased_javafx_application} ist ein vollständig kompilierbares JavaFX-Programm welches aus einem Controller, einer FXML-Datei sowie einer CSS-Datei aufgebaut ist zu finden.
 
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- FXML Layouting.}, captionpos=b, label=lst:example_fxmllayouting, language=XML]
@@ -102,18 +104,18 @@ Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung
 	<?import javafx.scene.control.Button?>
 	
 	<Pane xmlns="http://javafx.com/javafx">
-		<Button>TestButton</Button>
+	<Button>TestButton</Button>
 	</Pane>
 	\end{lstlisting}
 \end{figure}
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- FXML Ladeprozess.}, captionpos=b, label=lst:example_fxmlloading]
-Pane load(String fxmlPath) throws IOException {
+	Pane load(String fxmlPath) throws IOException {
 	return new FXMLLoader(getClass().getResource(fxmlPath)).load();
-}
+	}
 	\end{lstlisting}
 \end{figure}
-\noindent Um eine Controller-Klasse mit der FXML-Datei zu assozieren, kann Wurzelelement dieser durch das \texttt{fx:controller} Attribut erweitert werden. Der Name des Controllers ist hierbei der voll qualifizierte Klassenname. Neben externen FXML-Dateien können auch externe \ac{css}-Dateien für das Design des Layouts verwendet werden. In \autoref{appendix:controllerbased_javafx_application} ist ein vollständig kompilierbares JavaFX-Programm welches aus einem Controller, einer FXML-Datei sowie einer CSS-Datei aufgebaut ist zu finden.
+
 \section{Java-Annotationen}
 \label{java_annotationen}
 \noindent Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
@@ -142,10 +144,11 @@ Es handelt sich bei Annotationen in Java um spezialisierte Schnittstellen bei we
 	\end{lstlisting}
 \end{figure}
 \noindent Aufgrund der besonders einfachen Syntax und dem vergleichsweise geringen Aufwand, ist ein steigender Trend der Nutzung von Java-Annotationen in Open-Source Anwendungen zu erkennen. Werden Annotationen jedoch übermäßig verwendet, so kann es schnell zu Quelltext-Verschmutzung kommen, was im Kontext der Annotationsprogrammierung auch \glqq annotation hell\grqq{} (dt. Annotationshölle) genannt wird. Annotationen erreichen dann das Gegenteil des gewünschten Zwecks -- Statt den Entwicklungsprozess vereinfachend zu unterstützen, wird der Quelltext schwer nachvollziehbar und wirkt unstrukturiert und unübersichtlich.\\
-Dennoch zeigt eine Studie aus dem Jahre 2011, welche 1094 quelloffene GitHub-Projekte auf die Verwendung von Annotationen untersucht hat, dass javabasierte Anwendungen und Bibliotheken, bei aktiver Nutzung von Annotationen, eine geringere Fehleranfälligkeit aufweisen \cite{Rocha2011}.
+Dennoch zeigt eine Studie aus dem Jahre 2019, welche 1094 quelloffene GitHub-Projekte auf die Verwendung von Annotationen untersucht hat, dass javabasierte Anwendungen und Bibliotheken, bei aktiver Nutzung von Annotationen, eine geringere Fehleranfälligkeit aufweisen \cite{Yu2019}.
 \subsection{Syntax}
-\label{java_annotationen_anwendung}
+\label{java_annotationen_syntax}
 \add{lst design}
+\add{use lstnewenvironment}
 \noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays aus den vorherigen Typen. Außerdem ist es möglich, Attributen einen voreingestellten Wert mittels des Schlüsselwortes \texttt{default} zuzuweisen \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
 \begin{description}
 	\item \textbf{Normal Annotations} sind ganz normal deklarierte Annotationen, bei welchen die Attribute mittels Aufzählung in Klammern übergeben werden.
