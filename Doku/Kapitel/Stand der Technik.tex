@@ -1,44 +1,118 @@
 \chapter{Stand der Technik}
 \label{stand_der_technik}
+\noindent In diesem Kapitel werden aktuelle Konzepte und Implementierungen der Annotationsprogrammierung zur Vereinfachung des Entwicklungsprozesses einer Anwendung dargelegt. Obwohl der primäre Fokus dabei auf der JavaFX- und der generellen Java-Umgebung gelegt wird, werden dennoch auch Bibliotheken und mögliche Strukturen aus anderen Programmiersprachen herangezogen.
 
-\add{Intro}
+\section{Annotationen im Umfeld von JavaSE/JavaEE/JavaFX}
+\label{verwendung_im_umfeld_von_java}
+Nach dem Einführen von Annotationen in Java vor sechs Jahren haben sich viele Bibliotheken etabliert, welche fast vollständig oder teilweise auf dieses Konzept setzen. Eine Studie aus dem Jahre 2011, welche 106 Systeme auf die Nutzung von Annotationen untersuchte, stellte fest, dass 41 dieser keine einzige aufwiesen \cite{Rocha2011}. Acht Jahre später wurde eine ähnliche Studie veröffentlicht, welche 1094 populäre Systeme untersucht hat und feststellte, dass jedes dieser Systeme mindestens eine Annotationen enthält \cite{Yu2019}. Auch wenn bei beiden Studien nicht dieselben Systeme getestet worden sind, ist dennoch ein klarer Trend nach oben zu erkennen. Dazu wurden eine Vielzahl an Werken publiziert, welche mithilfe von Annotationen, vorhandene Java-Konzepte vereinfachen und erweitern sollen.\\
+Beispielsweise wurde ein System entwickelt, welches durch Semantikinformationen von annotierten JavaDoc-Elementen, das Refactoring automatisiert und den Entwickler auf das Nutzen von Entwurfsmustern und etwaige Refactoring-Operationen hinweisen soll \cite{Meffert2006}. Des Weiteren werden Annotationen im Kontext der automatischen Nebenläufigkeit \cite{Danelutto2007}, dem Erstellen von Parsern für Programmiersprachen \cite{Porubaen2009} und der Dokumentation sowie der Erzeugung von Quelltext genutzt \cite{Sulir2016, Miroslav2009}.
+Im Folgenden werden Beispiele gegeben, welche die Entwicklung durch die Verwendung von Annotationen, aktiv vereinfachen:
+\subsection{JavaSE Umgebung und externe Bibliotheken}
+\label{verwendung_im_umfeld_von_java_se}
+Die am häufigsten genutzte durch das \ac{jdk} vordefinierte Annotation (siehe \autoref{java_annotationen_definition}), ist die Quelltextannotation \texttt{@Override} \cite{Rocha2011}, welche für eine Bugprävention genutzt werden kann. Will der Entwickler beispielsweise eine Methode einer Superklasse überschreiben und übernimmt nicht ebendiese Methodendeklaration, sondern überlädt diese fälschlicherweise, so handelt es sich häufig dennoch um vollständig validen Quelltext, welcher aber unter Umständen zu einem ungewollten Verhalten führt. Wird aber die \texttt{@Override} Annotation in solchen Fällen über die zu überschreibenden Methoden geschrieben, so wird immer ein Kompilierfehler erzeugt. Ein Beispiel, welches dieses Szenario verbildlicht ist in \autoref{lst:decl_interface} und \autoref{lst:compiler_error} dargestellt.
 
-\section{Aktuelle Verwendung von Annotationen}
-\label{aktuelle_verwendung_von_annotationen}
+\begin{figure}[H]
+	\noindent
+	\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+		\begin{lstlisting}[caption=Beispiel -- Interfacedeklaration., captionpos=b, label=lst:decl_interface]
+interface Test {
 
-\add{Intro}
+	default void t(int... i) {}
 
-\subsection{JavaFX}
-\label{aktuelle_verwendung_von_annotationen_javafx}
+}
 
-\add{JavaFX Beispiele}
+		\end{lstlisting}
+	\end{adjustbox}\hfill
+	\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+		\begin{lstlisting}[caption=Beispiel -- Kompilierfehler., captionpos=b, label=lst:compiler_error]
+class TestClass implements Test {
 
-\subsection{Android}
-\label{aktuelle_verwendung_von_annotationen_android}
+	(@\textcolor{pgrey}{\errorunderline{@Override}\tikzmark{ovr}{}}@)
+	public void t(int i) {}
+	(@
+		\begin{tikzpicture}[overlay,remember picture]
+			\node[draw](error) at (4.5,1.2) {Kompilierfehler};
+			\draw[-stealth, thick, red, in=-180, out=20] (ovr) to (error);
+		\end{tikzpicture}
+	@)
+}
+		\end{lstlisting}
+	\end{adjustbox}
+\end{figure}
 
-\add{Android Beispiele}
+\noindent Durch das Nutzen von externen Bibliotheken können weitere Funktionalitäten durch Annotationen hinzugefügt werden. Wie in \autoref{java_annotationen_syntax} ausführlich erklärt, können neue Klassen durch Annotationsprozessoren zur Kompilierzeit erstellt und wiederholende Quelltextausschnitte wie Getter und Setter, dadurch automatisch generiert werden. Basierend auf diesen Möglichkeiten, wurde das Projekt Lombok\footnote{Project Lombok: \url{https://projectlombok.org}} konstituiert, welches das Ziel verfolgt, den Entwicklungsprozess durch das Erstellen von Boilerplate-Code mithilfe einer ausschließlichen Nutzung von Annotationen zu erleichtern. Lombok ist in der Lage die obligatorischen \inlinecode{java}{equals()}- und \inlinecode{java}{hashCode()}-Methoden zu erstellen, was nicht nur in einer hohen Zeiteinsparung resultiert, sondern auch mögliche Bugs bei dem manuellen Implementieren dieser Methoden verhindert. In \autoref{lst:lombok_example} ist ein POJO zu erkennen, bei welchem der Konstruktor, alle Getter und die \inlinecode{java}{equals()}-, \inlinecode{java}{hashCode()}- und \inlinecode{java}{toString()}-Methoden automatisch generiert werden.\\
+Auch Software-Plattformen für mobile Endgeräte wie Android\footnote{Android: \url{https://www.android.com}} setzen auf Annotationstechnologien: Damit das Minimierungs-/Optimierungs-Tool von Android keine fälschlicherweise als unbenutzt erkannten Klassen beim Build-Vorgang entfernt, kann die \texttt{@Keep}-Annotation verwendet werden. Dazukommend kann die Erweiterung \texttt{support-annotations}\footnote{Support-Annotations: \url{https://developer.android.com/studio/write/annotations}} einem Android-Projekt hinzugefügt werden, um beispielsweise zu überprüfen, ob Methoden in einem bestimmten Thread ausgeführt werden, ob Einschränkungen für Methoden- oder Konstruktorparameter eingehalten werden und ob bestimmte Berechtigungen für das Ausführen von Methoden vorhanden sind.
 
-\subsection{JavaX}
-\label{aktuelle_verwendung_von_annotationen_javax}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- Lombok POJO., captionpos=b, label=lst:lombok_example]
+	#@Getter
+	#@Setter
+	#@ToString
+	#@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+	#@RequiredArgsConstructor
+	public static final class Player {
 
-\add{JavaX Beispiele (z.B. JAXB)}
+		#@EqualsAndHashCode.Include
+		private final UUID id;
+		private final String name;
+		private final Date regDate;
 
-\section{Maßnahmen zur Simplifizierung des Entwicklungsprozesses}
-\label{maßnahmen_zur_simplifizierung_des_entwicklungsprozesses}
+	}
+	\end{lstlisting}
+\end{figure}
 
-\add{Intro}
+\subsection{JavaEE/JakartaEE Umgebung}
+\label{verwendung_im_umfeld_von_java_ee}
+Auch bei der Entwicklung von auf Java basierten Enterprise-Anwendungen werden Annotationen verwendet. Die JakartaEE Spezifikation der Version 9\footnote{JakartaEE 9: \url{https://jakarta.ee/specifications/platform/9/apidocs/}} bietet verschiedene Bibliotheken, welche mithilfe von Annotationen verschiedene Prozesse erleichtern können. Beispielsweise existiert die \ac{jaxb} Programmierschnittstelle, welche das Binden von \ac{xml} Dokumenten und Java Objekten ermöglicht -- Ein Java Objekt kann dann durch ein \ac{xml} Dokument repräsentiert und zur Laufzeit des Programms daraus erstellt werden (und vice versa). Wird zu der eigentlichen \ac{jaxb} Bibliothek noch die Erweiterung aus dem \texttt{jakarta.xml.bind.annotation} Paket genutzt, so ist es möglich die vorher genannte Bindung vollständig durch die Nutzung von Annotationen zu realisieren. Ein Beispiel für die Repräsentation eines Java Objektes durch eine \ac{xml} Datei ist in \autoref{lst:example_xml} und \autoref{lst:example_java} abgebildet.
 
-\subsection{Workflow Optimierung}
-\label{maßnahmen_zur_simplifizierung_des_entwicklungsprozesses_workflow}
+\begin{figure}[H]
+	\noindent
+	\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+		\begin{lstlisting}[caption=Repräsentation als XML Datei., captionpos=b, language=XML, label=lst:example_xml]
+	
+<?xml version="1.0"?>
 
-\add{Workflow Optimierung}
+<Cat id="1">
+	<color>Brown</color>
+	<age>4</age>
+</Cat>	
 
-\subsection{Vereinfachung durch gesteigerte Übersichtlichkeit}
-\label{maßnahmen_zur_simplifizierung_des_entwicklungsprozesses_übersichtichkeit}
+	
+		\end{lstlisting}
+	\end{adjustbox}\hfill
+	\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+		\begin{lstlisting}[caption=Repräsentation als Java Objekt., captionpos=b, label=lst:example_java]
+#@XMLRootElement
+public class Cat {
 
-\add{Vereinfachung durch gesteigerte Übersichtlichkeit}
+	#@XMLAttribute
+	public int id;
+	
+	public String color;
+	public int age;
+}
+		\end{lstlisting}
+	\end{adjustbox}
+\end{figure}
 
-\subsection{Fazit}
-\label{maßnahmen_zur_simplifizierung_des_entwicklungsprozesses_fazit}
+\subsection{JavaFX Umgebung}
+\label{verwendung_im_umfeld_von_java_fx}
+In JavaFX direkt werden nur wenige Annotationen verwendet, welche Teil der öffentlichen API sind. Dazu gehört \texttt{@FXML}, welche für das automatische Setzen von Feldern oder für die Identifikation von Methoden für EventHandler benötigt wird \cite{Anderson2019}. Der Entwickler kann somit Events, welche durch JavaFX-Komponenten ausgelöst werden, per FXML-Datei mit Methoden im selben Controller verbinden. Dazu wurden Bibliotheken wie Afterburner.fx\footnote{Afterburner.fx: \url{https://github.com/AdamBien/afterburner.fx}} entwickelt, welche durch \texttt{@Inject}, das \ac{ioc} Programmierparadigma durch Abhängigkeitsinjektion realisiert oder das von CERN entwickelte ExtJFX\footnote{ExtJFK: \url{https://github.com/extjfx/extjfx}}, welches \texttt{@RunInFxThread} nutzt, um Unittests auf dem JavaFX-Thread auszuführen. 
 
-\add{Fazit}
+\section{Annotationen in anderen Programmiersprachen}
+\label{verwendung_in_anderen_sprachen}
+Neben den Java-Annotationen, welche in \autoref{java_annotationen} erklärt und in \autoref{verwendung_im_umfeld_von_java} vorgestellt wurden, werden Annotationen auch in vielen anderen Programmiersprachen genutzt. In den folgenden Abschnitten wird explizit auf das Annotationskonzept in Python und \csharp eingegangen.
+\subsection{Verwendung in Python}
+\label{verwendung_in_python}
+Python ist eine dynamisch typisierte Sprache und validiert somit den Typen einer Variablen zur Laufzeit des Programms \cite{Tratt2009}, kann aber durch das Verwenden von Funktionsannotationen, Meta-Daten zu Parametern, Variablen und Funktionsrückgabewerten hinzufügen, um so den gewünschten Typen anzudeuten \cite{Rossum2014, Winter2006}. Diese Annotationen werden zwar vom Python-Interpreter ignoriert, können aber durch Softwaresysteme von Drittanbietern wie \texttt{mypy} zur statischen Typisierung verwendet werden. Nach einer Studie von Khan et al., welche 210 auf Python basierende GitHub-Projekte auf typbezogene Fehler untersuchte, konnten 15\% der gefundenen Mängel, durch \texttt{mypy} verhindert werden \cite{Khan2021}.
+Einige Entwicklungsumgebungen wie PyCharm sind außerdem in der Lage, Warnungen bei eventuellen Verletzungen der Typempfehlungen von Annotationen anzuzeigen \cite{Rother2017}. Das Verwenden von derartigen Annotationen kann somit durchaus die Fehleranfälligkeit von Programmcodeelementen in Python sinken -- wenn auch nur implizit durch externe Bibliotheken oder Entwicklungsumgebungen.
+\add{maybe add code example}
+\subsection{Verwendung in \texorpdfstring{\csharpbold}{C\#} und .NET}
+\label{verwendung_in_c_sharp_dot_net}
+In \csharp{} wird das Hinzufügen von Meta-Informationen zu bestehenden Programmelementen durch Attribute realisiert \cite{Albahari2019}. Mithilfe dieser Attribute können dann beispielsweise Klassen als serialisierbar deklariert werden oder Methoden und Funktionen für nicht verwaltete \acp{dll} erreichbar gemacht werden. Es ist, ähnlich wie in Java, auch möglich, eigene Attribute zu erstellen und diese zu unterschiedlichen Phasen wie zur Kompilierzeit oder Laufzeit auszuwerten. Durch die einfache Nutzung der Attribute wurde beispielsweise eine Erweiterung der grundlegenden \csharp-Sprache entwickelt, welche ein Parallelisieren von sequentiellen Programmausschnitten ermöglicht \cite{Cazzola2005}. 
+
+\section{Fazit}
+\label{ms_fazit}
+Annotationen haben in den meisten Fällen einen positiven Einfluss auf die Entwicklung von beliebigen Anwendungen. Annotationen sind keine universelle Sprachstruktur wie Schleifen und bedingte Anweisungen, werden aber immer öfter in Programmiersprachen eingesetzt. Sie sorgen, wenn nicht übermäßig verwendet, für übersichtlichere und kompaktere Klassen, was wiederum in einem besseren Verständnis des Quelltextes resultiert. Einige Bibliotheken verfolgen das Ziel dem Entwickler eine große  Zeiteinsparung durch einen gewissen Grad an Automation zu ermöglichen. Dabei wird repetitiver oder fehleranfälliger Quelltext vollständig oder teilweise automatisch generiert und auf das Einhalten von bekannten Entwurfsmustern und Sprachkonventionen geachtet. Komplexe Prozesse wie das Parsen von \ac{xml} Dateien, Abhängigkeitsinjektion oder objektrelationale Abbildungen in relationale Datenbanken können durch Annotationen vereinfacht werden. Dennoch existieren keine annotationsbasierten Bibliotheken für die aktuellste Java-Version (16), welche explizit einen vereinfachenden Einfluss auf den Entwicklungsprozess von auf JavaFX aufbauenden Applikationen nehmen und dabei quelloffen und frei verfügbar sind. JavaFX wird in den meisten Fällen durch Features erweitert, welche vorher in der Form noch nicht in der eigentlichen Bibliothek vorhanden sind. Dazu zählt beispielsweise ExtJFX, welche im Kern eine auf JUnit\footnote{JUnit 5: \url{https://junit.org/junit5/}} aufbauende Testumgebung für grafische Benutzeroberflächen ist. Ein System welches auf eine Vereinfachung oder Automatisierung von komplizierten JavaFX Funktionen (Controller-Verwaltung, Properties und Bindings, Animationen, ...) durch Annotationen abzielt ist nicht vorhanden.\\
+Eine Erweiterung des \ac{xml}-Schemas für die Struktur einer FXML-Datei, um beispielsweise die Beziehung zwischen mehreren Controllern auszudrücken ist aufgrund der restriktiven Implementierung der \texttt{FXMLLoader}-Klasse nur schwer umzusetzen. Daraus resultiert, dass die Nutzung von eigenen Annotationen welche wie \texttt{@FXML}, eine Interaktion zwischen in der FXML-Datei definierten Elemente und der eigentlichen Controller-Klasse ermöglichen, mit den Bordmitteln von JavaFX nicht möglich ist.
+
