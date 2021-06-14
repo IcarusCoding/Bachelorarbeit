@@ -3,9 +3,9 @@
 \label{grundlagen}
 \add{Correction}
 \add{urls in footnotes}
-\noindent In diesem Kapitel werden die theoretischen Grundlagen von essentiellen Komponenten dieser Arbeit erläutert. Dazu wird die Relevanz von Entwurfsmustern justifiziert und auf zwei bedeutende Muster näher eingegangen. Diese sind sowohl erforderlich für die folgenden Kapitel als auch für das Verständnis der softwaretechnischen Prinzipien von JavaFX.\\
+\noindent In diesem Kapitel werden die theoretischen Grundlagen von essentiellen Komponenten dieser Arbeit erläutert. Dazu wird die Relevanz von Entwurfsmustern erklärt und auf zwei bedeutende Muster näher eingegangen. Diese sind sowohl erforderlich für die folgenden Kapitel als auch für das Verständnis der softwaretechnischen Prinzipien von JavaFX.\\
 Danach wird die JavaFX-Bibliothek vorgestellt und fundamentale Konzepte wie beispielsweise die auf der \ac{xml} basierende Layouting-Sprache erläutert.\\
-Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und die Möglichkeiten der eigentlichen Auswertung dieser skizziert. Komplexe Konzepte werden dabei durch visuelle Beispiele wie Quelltextausschnitte\footnote{Die dargestellten Quelltextausschnitte sind aufgrund der Simplizität nicht immer kompilierbar, da irrelevante Programmkonstrukte wie Importe von Klassen nicht für ein Verständnis des dargestellten Kontextes benötigt werden.} oder \ac{uml}-Klassendiagramme untermauert und möglicherweise vereinfacht.
+Abschließend wird das generelle Annotationenkonzept in der Informatik mit speziellen Fokus auf die Programmiersprache Java erklärt. Dabei werden die verschiedenen Annotationstypen näher beschrieben und die Möglichkeiten der eigentlichen Auswertung dieser skizziert. Komplexe Konzepte werden dabei durch visuelle Beispiele wie Quelltextausschnitte\footnote{Die dargestellten Quelltextausschnitte sind aufgrund der Simplizität nicht immer kompilierbar, da irrelevante Programmkonstrukte wie Importe von Klassen nicht für ein Verständnis des dargestellten Kontextes benötigt werden.} oder \ac{uml}-Klassendiagramme untermauert und möglicherweise vereinfacht. 
 
 \section{Entwurfsmuster}
 \label{entwurfsmuster}
@@ -25,15 +25,16 @@ Das Beobachter Entwurfsmuster ist ein essentieller Bestandteil von vielen auf de
 	\item Die \texttt{\textbf{KonkretesSubjekt}} Komponente ist die konkrete Implementierung der Subjekt Schnittstelle und ist fähig, einen internen Zustand zu verwalten, sowie bei einer Änderung von diesem, alle registrierten Beobachter zu informieren.
 	\item Ein \texttt{\textbf{KonkreterBeobachter}} besitzt eine Referenz auf das zu beobachtende Subjekt und seinen internen Zustand. Bei einer Aktualisierung des Subjektzustands, wird auch der interne Zustand des konkreten Beobachters aktualisiert.
 \end{description}
+\newpage
 \subsection{MVC}
-Das \ac{mvc} Entwurfsmuster ist ein de facto Standard der objektorientierten Programmierung \cite{Deacon1995}, welches für eine Trennung von grafischer Oberfläche, Eingaben des Benutzers und dem eigentlichen Anwendungsmodell sorgt \cite{Burbeck1992}. Hält eine Anwendung diese strikte Trennung ein, so genügt sie dem softwaretechnischen \ac{soc} Prinzip \cite{Grant2014}, woraus wiederum der Wartungsprozess vereinfacht und die Testbarkeit erhöht wird.
+Das \ac{mvc} Entwurfsmuster\footnote{Je nach Interpretation, kann es sich bei dem \ac{mvc} Muster auch um ein Architekturmuster handeln, bei welchem Model, View und Controller als Schichten einer Architektur gesehen werden und nicht direkt als beispielsweise Klassen implementiert werden.} ist ein de facto Standard der objektorientierten Programmierung \cite{Deacon1995}, welches für eine Trennung von grafischer Oberfläche, Eingaben des Benutzers und dem eigentlichen Anwendungsmodell sorgt \cite{Burbeck1992}. Hält eine Anwendung diese strikte Trennung ein, so genügt sie dem softwaretechnischen \ac{soc} Prinzip \cite{Grant2014}, woraus wiederum der Wartungsprozess vereinfacht und die Testbarkeit erhöht wird.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth-2cm]{Abbildungen/MVC Pattern.png}
-	\caption{Diagramm -- MVC-Entwurfsmuster}
+	\caption[Diagramm -- MVC-Entwurfsmuster]{Diagramm -- MVC-Entwurfsmuster: Die blauen Pfeile stellen indirekte Beziehungen dar, welche meist durch die Nutzung eines Eventsystems auf Basis des Beobachter Musters implementiert werden.}
 	\label{fig:mvc_pattern}
 \end{figure}
-\noindent Die vom \ac{mvc} Muster vorgegebene Struktur ist, wie in \autoref{fig:mvc_pattern} zu sehen, in drei Komponenten unterteilt \cite{Deacon1995}:
+\noindent Die vom \ac{mvc} Muster klassische Struktur\footnote{In der Literatur sind viele Interpretationen des \ac{mvc} Musters beschrieben. Eine strikte Unterteilung der drei Komponenten ist jedoch immer vorhanden.} ist, wie in \autoref{fig:mvc_pattern} zu sehen, in drei Komponenten unterteilt \cite{Deacon1995}:
 \begin{description}
 	\item Das \texttt{\textbf{Model}} beinhaltet alle Klassen welche für die Logik und die Datenhaltung der Anwendung verantwortlich sind und ist vollständig unabhängig vom View.
 	\item Der \texttt{\textbf{View}} stellt die Anwendung dar, ermöglicht eine Interaktion mit diesem und ist in den meisten Applikationen äquivalent zu einer grafischen Benutzeroberfläche.
@@ -42,24 +43,23 @@ Das \ac{mvc} Entwurfsmuster ist ein de facto Standard der objektorientierten Pro
 \section{JavaFX}
 \label{javafx}
 \noindent JavaFX ist eine auf Java basierte, quelloffene Bibliothek für das Entwickeln von grafischen Benutzerschnittstellen für Client Applikationen. Im Vergleich zum Vorgänger GUI-Toolkit Java-Swing, bietet JavaFX ein modernes, zeitgemäßes Design der allgemeinen Benutzeroberfläche sowie den dort enthaltenen Schaltflächen und Komponenten \cite{Sharan2015}. Kombiniert mit den objektorientierten Konzepten von Java, ist JavaFX in der Lage auch komplexe nebenläufige Anwendungen mit vielen Abhängigkeiten darzustellen und aufgrund der Plattformunabhängigkeit auch ohne viele Restriktionen in allen bekannten Betriebssystemen einsetzbar.\\
-Dazu ist JavaFX auch weitgehend konform mit bekannten Entwurfsmustern der Softwareentwicklung wie beispielsweise dem \ac{mvc}- oder dem Beobachter-Muster, weshalb implementierte Anwendung selbst bei vielen \ac{loc}, eine grundsätzlich hohe Strukturiertheit auf Quelltextebene aufweisen. Das grafische Layout kann dabei nicht ausschließlich durch Java-Quelltext sondern auch mittels der an die \ac{xml} angelehnte Markup-Sprache FXML erstellt werden. Letzteres kann durch externe Tools wie dem Scene-Builder enorm vereinfacht werden \cite{Vos2018}.
+Dazu ist JavaFX auch weitgehend konform mit bekannten Entwurfsmustern der Softwareentwicklung wie beispielsweise dem \ac{mvc}\footnote{Die Beschreibung des \ac{mvc} Musters aus \autoref{fig:mvc_pattern} ist nicht vollständig auf die JavaFX Situation anzuwenden, da der  \texttt{View} meistens in eine FXML-Datei ausgelagert wird und deshalb nicht unbedingt mit dem \texttt{Model} interagiert.}- oder dem Beobachter-Muster, weshalb implementierte Anwendung selbst bei vielen \ac{loc}, eine grundsätzlich hohe Strukturiertheit auf Quelltextebene aufweisen. Durch die Verwendung von Properties und Bindings (siehe \autoref{properties_und_bindings}) ist es auch möglich das \ac{mvvp} Muster zu nutzen. Das grafische Layout kann dabei nicht ausschließlich durch Java-Quelltext sondern auch mittels der an die \ac{xml} angelehnte Markup-Sprache FXML erstellt werden. Letzteres kann durch externe Tools wie dem Scene-Builder enorm vereinfacht werden \cite{Vos2018}.
 
 \subsection{Aufbau und Szenengraph}
 \label{javafx_szenengraph}
 Damit eine JavaFX-Anwendung als solche identifiziert werden kann, muss die Hauptklasse von der \texttt{Application}-Klasse erben. Die Namensgebung der Klassen, welche für die Struktur bzw. den Aufbau einer JavaFX-Anwendung zuständig sind, basiert auf Begriffe der Theaterumgebung \cite{Anderson2019}:
 \begin{description}
-	\item Die \textbf{\texttt{Stage}} Klasse repräsentiert ein Anwendungsfenster, welches das Design des Fensterlayouts des aktuell genutzten Betriebssystems nutzt. Eine \texttt{Stage} ist teilweise modifizierbar, so können beispielsweise die Standardschaltflächen in der Titelleiste entfernt order deaktiviert werden. Werden mehrere Fenster benötigt, so können nach dem Initialisieren der Haupt-\texttt{Stage} durch die JavaFX-Plattform, manuell Weitere hinzugefügt werden.
+	\item Die \textbf{\texttt{Stage}} Klasse repräsentiert ein Anwendungsfenster, welches das Design des Fensterlayouts des aktuell genutzten Betriebssystems nutzt. Eine \texttt{Stage} ist teilweise modifizierbar, so können beispielsweise die Standardschaltflächen in der Titelleiste entfernt oder deaktiviert werden. Werden mehrere Fenster benötigt, so können nach dem Initialisieren der Haupt-\texttt{Stage} durch die JavaFX-Plattform, manuell weitere hinzugefügt werden.
 	\item Die \textbf{\texttt{Scene}} Klasse ist für das Layout und die Darstellung von vorhandenen oder selbsterstellten JavaFX-Komponenten verantwortlich. Jede Komponente, welche durch eine \texttt{Scene}-Instanz angezeigt und verwaltet werden soll, wird in einer hierarchisch angeordneten, objektorientierten Datenstruktur eingefügt, welche in der Computergrafik als Szenengraph bekannt ist \cite{Hughes2013}. Jeder \texttt{Stage} muss zwangsläufig eine \texttt{Scene} zugewiesen werden.
 	\item Die \textbf{\texttt{Node}} Klasse ist eine darstellbare Komponente im Szenengraphen wie beispielsweise eine Schaltfläche oder ein Containerelement. \texttt{Node} Instanzen im Szenengraph können Kindelemente enthalten und maximal einem Elternelement zugeordnet sein. Der Szenengraph ähnelt somit einer Baumstruktur mit einer Wurzel und einem oder mehreren Blättern. Damit eine \texttt{Node}-Instanz Kindelemente besitzen darf, muss diese immer von der abstrakten \texttt{Parent}-Klasse erben. Das Layouting und die Positionierung im lokalen Koordinatensystem wird bei vorhandenen Kindelementen immer durch das Elternelement kontrolliert. Jede darzustellende Komponente muss von der \texttt{Node}-Klasse erben \cite{Juneau2013}.
 \end{description}
-Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche das Zusammenspiel der oben genannten Konzepte und Klassen widerspiegelt, ist in \autoref{lst:example_javafxapp} dargestellt.
-\add{maybe beautify with fancy arrows}
+Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche das Zusammenspiel der oben genannten Konzepte und Klassen widerspiegelt, ist in \autoref{lst:example_javafxapp} dargestellt.\\
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- Minimale JavaFX-Anwendung.}, captionpos=b, label=lst:example_javafxapp]
 		public class TestApplication extends Application {
 			
 			public static void main(String[] args) {
-				Application.launch(args);
+				Application.(@\tikzmark{entryLeft}{}@)launch(args)(@\tikzmark{entryRight}{}@);
 			}
 			
 			@Override
@@ -70,13 +70,26 @@ Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche 
 				primaryStage.setScene(scene);
 				primaryStage.show();
 			}
-		
+		(@
+		\begin{tikzpicture}[overlay,remember picture]
+			\renewcommand{\VerticalShiftForBar}{0em, -1.5ex}
+			\renewcommand{\Stub}{0em, 0.6ex}
+			\DrawOverBar[-, red, thick]{entryLeft.north}{entryRight.north}
+			\node[draw] (entrypoint) at (8.3, 4.3) {Einstiegspunkt};
+			\renewcommand{\VerticalShiftForArrows}{0, -1ex}
+			\DrawArrow[red, in=180, out=-45]{entry}{entrypoint}{-4.55em, 0}
+			\Circled{1}{0.45, 2.4}
+			\Circled{2}{0.45, 1.35}
+		\end{tikzpicture}
+		@)
 		}
 	\end{lstlisting}
+	Nach der Initialisierung der JavaFX Anwendung wird in \CircledStandalone{1} das Wurzelelement des Szenengraphen erstellt und um eine \texttt{Button} Instanz erweitert. Dieses wird dann in \CircledStandalone{2} zu einem \texttt{Scene} Objekt hinzugefügt, welche wiederum als Szene der \texttt{primaryStage} dient. Das Beispiel wird mit dem Anzeigen der Stage beendet.
 \end{figure}
 \subsection{Properties und Bindings}
-JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster basierende API, welche es dem Programmierer ermöglicht, eine synchronisierende Beziehung zwischen zwei oder mehr Variablen zu erstellen. Wird eine Variable in einer solchen Beziehung geändert, so wird automatisch auch die Andere geändert \cite{Hommel2013}. Dabei ist es auch möglich, Event Listener für eigene oder durch von JavaFX-Nodes automatisch erzeugte Properties zu registrieren. Soll beispielsweise Quelltext ausgeführt werden, wenn eine Änderung eines Wertes einer Property festgestellt wird, so kann dies mit dem Erstellen einer \texttt{ChangeListener}-Instanz durchgeführt werden \cite{Gao2019}. 
-\begin{figure}[H]
+\label{properties_und_bindings}
+JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster basierende API, welche es dem Programmierer ermöglicht, eine synchronisierende Beziehung zwischen zwei oder mehr Variablen zu erstellen. Wird eine Variable in einer solchen Beziehung geändert, so wird automatisch auch die andere geändert \cite{Hommel2013}. Dabei ist es auch möglich, Event Listener für eigene oder durch von JavaFX-Nodes automatisch erzeugte Properties zu registrieren. Soll beispielsweise Quelltext ausgeführt werden, wenn eine Änderung eines Wertes einer Property festgestellt wird, so kann dies mit dem Erstellen einer \texttt{ChangeListener}-Instanz durchgeführt werden \cite{Gao2019}. 
+\begin{figure}
 	\begin{lstlisting}[caption=Beispiel -- ChangeListener \& EventHandler., captionpos=b, label=lst:property_example]
 	Button btn = new Button("Test");
 	// ChangeListener für den Schaltflächentext
@@ -94,7 +107,7 @@ Des Weiteren unterstützt JavaFX ein Event-System, welches anhand von verschiede
 
 \subsection{Layouting: FXML vs. Quelltext}
 Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung auch per FXML zu erstellen. Eine Prävention von Boilerplate-Code kann durch das Auslagern von häufig verwendeten JavaFX-Komponenten in externe FXML-Dateien erfolgen \cite{Kruk2018}. Das Verwenden von solchen Dateien sorgt für eine bessere Trennung von Controllern und Logik im Sinne des z.B. \ac{mvc}-Entwurfsmusters \cite{Juneau2013} und durch die hohe Konfigurierbarkeit sind für eine eventuelle Veröffentlichung der Applikation wichtige Konzepte wie die Internationalisierung, leichter umzusetzen \cite{Steyer2014}. Durch das Parsen und Aufbauen des Szenengraphen zur Laufzeit des Programms ist eine Verwendung von FXML-Dateien jedoch langsamer als benötigte Komponenten direkt im Java Quelltext zu deklarieren. Fast alle JavaFX-Nodes können ohne Weiteres in XML-Elementen verwendet und angepasst werden. Außerdem ist es möglich, direkt eine manuell erstellte Controller-Klasse mit einer FXML-Datei zu assoziieren. Das Laden einer FXML-Datei und das darauffolgende Aufbauen des Szenengraphen wird durch die \texttt{FXMLLoader}-Klasse durchgeführt. Das Layouting-Beispiel aus \autoref{lst:example_javafxapp} ist als eine funktionsgleiche FXML Variante in \autoref{lst:example_fxmllayouting} zu erkennen. Das Laden der Datei wird durch das Instanziieren eines neuen \texttt{FXMLLoader} Objekts, wie in \autoref{lst:example_fxmlloading} dargestellt, ermöglicht.
-\noindent Um eine Controller-Klasse mit der FXML-Datei zu assozieren, kann Wurzelelement dieser durch das \texttt{fx:controller} Attribut erweitert werden. Der Name des Controllers ist hierbei der voll qualifizierte Klassenname. Neben externen FXML-Dateien können auch externe \ac{css}-Dateien für das Design des Layouts verwendet werden. In \autoref{appendix:controllerbased_javafx_application} ist ein vollständig kompilierbares JavaFX-Programm welches aus einem Controller, einer FXML-Datei sowie einer CSS-Datei aufgebaut ist zu finden.
+\noindent Um eine Controller-Klasse mit der FXML-Datei zu assozieren, kann das Wurzelelement dieser durch das \texttt{fx:controller} Attribut erweitert werden. Der Name des Controllers ist hierbei der voll qualifizierte Klassenname. Neben externen FXML-Dateien können auch externe \ac{css}-Dateien für das Design des Layouts verwendet werden. In \autoref{appendix:controllerbased_javafx_application} ist ein vollständig kompilierbares JavaFX-Programm welches aus einem Controller, einer FXML-Datei sowie einer CSS-Datei aufgebaut ist zu finden.
 
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- FXML Layouting.}, captionpos=b, label=lst:example_fxmllayouting, language=XML]
@@ -110,20 +123,21 @@ Wie in der Einleitung schon angedeutet, ist es möglich das Layout der Anwendung
 \end{figure}
 \begin{figure}[H]
 	\begin{lstlisting}[caption={Beispiel -- FXML Ladeprozess.}, captionpos=b, label=lst:example_fxmlloading]
-	Pane load(String fxmlPath) throws IOException {
+Pane load(String fxmlPath) throws IOException {
 	return new FXMLLoader(getClass().getResource(fxmlPath)).load();
-	}
+}
 	\end{lstlisting}
 \end{figure}
 
 \section{Java-Annotationen}
 \label{java_annotationen}
-\noindent Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutichkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
+\noindent Annotationen sind in der Sprachwissenschaft eine Möglichkeit einen vorhandenen Text mit Anmerkungen zu versehen für beispielsweise Disambiguierung, also das Eliminieren von Mehrdeutigkeiten eines Wortes oder für das Erklären von komplexen Textabschnitten. Sie geben dem Leser Zusatzinformationen um Sachverhalte einfacher darzustellen und sorgen dadurch für ein schnelleres bzw. besseres Verständnis des Textes. Dabei sind solche Anmerkungen kein Hauptbestandteil von Texten sondern dienen ausschließlich als Ergänzung.\\
 In der Informatik sind Annotationen ebenfalls nur ein deskriptives Strukturkonzept, welche es dem Entwickler ermöglicht, verschiedenen strukturellen Elementen der Programmierung (wie Felder oder Klassen), Metadaten zuzuweisen \cite{Yu2019}. Das Nutzen von Annotationen in Anwendungen ist aufgrund ihrer meist simpel gehaltenen Syntax auch für Programmiereinsteiger vorteilhaft und durch ihre Anpassungsfähigkeit und Flexibilität sind sie in vielen Bibliotheken und Programmiersprachen vertreten.
 \subsection{Definition}
 \label{java_annotationen_definition}
-\add{Move footnote to first occurence}
-\noindent Annotationen \footnote{Wenn in der Arbeit über Annotationen gesprochen wird, ist immer von Java-Annotationen auszugehen (außer anders angegeben)} wurden mit Java 5 (2014) in die Sprache eingeführt und werden seitdem immer häufiger für verschiedene Aspekte der Programmierung genutzt \cite{Rocha2011}. Mit ihnen kann eine Steuerung des Compilers erfolgen, eine Verarbeitung der Metadaten zu Kompilierzeit durchgeführt werden oder das Verhalten von Anwendungen zu Laufzeit modifiziert oder gelenkt werden \cite{Yu2019}. Aufgrund der Tatsache, dass es sich nur um rein deskriptive Metadaten handelt, ist es Annotationen nicht direkt möglich mit existierendem Quelltext zu interagieren.  Möglichkeiten zur Verarbeitung dieser Metadaten werden in Sektion \ref{java_annotation_laufzeitauswertung} vorgestellt. Neben den von Java vordefinierten Annotationen wie z.B. \texttt{@Override} für das Überschreiben von vererbten Methoden oder \texttt{@SuppressWarnings} für das Unterdrücken von Compilerwarnungen, können auch eigene Annotationen deklariert werden.\\
+\add{Move commented footnote to first occurence (in intro)}
+%\footnote{Wenn in der Arbeit über Annotationen gesprochen wird, ist immer von %Java-Annotationen auszugehen (außer anders angegeben)} 
+\noindent Annotationen wurden mit Java 5 (2014) in die Sprache eingeführt und werden seitdem immer häufiger für verschiedene Aspekte der Programmierung genutzt \cite{Rocha2011}. Mit ihnen kann eine Steuerung des Compilers erfolgen, eine Verarbeitung der Metadaten zu Kompilierzeit durchgeführt werden oder das Verhalten von Anwendungen zur Laufzeit modifiziert oder gelenkt werden \cite{Yu2019}. Aufgrund der Tatsache, dass es sich nur um rein deskriptive Metadaten handelt, ist es Annotationen nicht direkt möglich mit existierendem Quelltext zu interagieren.  Möglichkeiten zur Verarbeitung dieser Metadaten werden in Sektion \ref{java_annotation_laufzeitauswertung} vorgestellt. Neben den von Java vordefinierten Annotationen wie z.B. \texttt{@Override} für das Überschreiben von vererbten Methoden oder \texttt{@SuppressWarnings} für das Unterdrücken von Compilerwarnungen, können auch eigene Annotationen deklariert werden.\\
 Es handelt sich bei Annotationen in Java um spezialisierte Schnittstellen bei welchen das \texttt{interface}-Schlüsselwort durch ein \texttt{@}-Zeichen Präfix zu \texttt{@interface} erweitert wird \cite{Gosling2005}. Außerdem ist es Annotationen nicht erlaubt wie bei normalen Schnittstellendefinitionen das Schlüsselwort \texttt{extends} für eine Vererbung zu verwenden, da die Superschnittstelle implizit vom Compiler auf die \texttt{Annotation} Klasse des \texttt{java.lang.annotation} Pakets gesetzt wird \cite{Oracle2017}. Ein Beispiel einer  Annotationsdefinition ist in \autoref{lst:annotation_definition} dargestellt.
 \begin{figure}[H]
 	\centering
@@ -149,7 +163,7 @@ Dennoch zeigt eine Studie aus dem Jahre 2019, welche 1094 quelloffene GitHub-Pro
 \label{java_annotationen_syntax}
 \add{lst design}
 \add{use lstnewenvironment}
-\noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar -- So ist es beispielsweise nicht möglich ein Attribut vom Typen \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays aus den vorherigen Typen. Außerdem ist es möglich, Attributen einen voreingestellten Wert mittels des Schlüsselwortes \texttt{default} zuzuweisen \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
+\noindent Annotationen können Attribute besitzen, welche bei Kompilierzeit bzw. Laufzeit ausgelesen werden können. Die Typen dieser Attribute sind nicht vollständig frei wählbar. So ist es beispielsweise nicht möglich ein Attribut vom Typ \texttt{Object} in einer Annotation zu kapseln, ohne einen Kompilierfehler auszulösen. Erlaubt sind alle primitiven bzw. atomaren Datentypen und Instanzen der \texttt{String}-, \texttt{Class}- und \texttt{Enum}-Klasse sowie eindimensionale Arrays aus den vorherigen Typen. Außerdem ist es möglich, Attributen einen voreingestellten Wert mittels des Schlüsselwortes \texttt{default} zuzuweisen \cite{Gosling2005}. Annotationen müssen in einer der folgenden Syntaxen benutzt werden:
 \begin{description}
 	\item \textbf{Normal Annotations} sind ganz normal deklarierte Annotationen, bei welchen die Attribute mittels Aufzählung in Klammern übergeben werden.
 	\begin{figure}[H]
@@ -192,6 +206,7 @@ public class TestEntity {
 			\end{lstlisting}
 		\end{adjustbox}
 	\end{figure}
+\newpage
 	\item \textbf{Marker Annotations} sind ebenfalls eine Kurzform der normalen Annotationen mit keinen oder nur default Attributen.
 	\begin{figure}[H]
 		\noindent
@@ -243,9 +258,7 @@ public class TestEntity {
 	@)
 	\end{lstlisting}
 \end{figure}
-
-\add{Add compile time annotation processing if used in this thesis}
-\subsection{Auswertung von Laufzeit-Annotationen}
+\subsection{Auswertung von Annotationen zur Laufzeit}
 \label{java_annotation_laufzeitauswertung}
 Für eine Auswertung von Laufzeit-Annotationen, muss zwangsläufig die Reflection-API von Java genutzt werden. Wenn eine Programmiersprache eine Form von Reflection (dt. Spiegelung) aufweist, so ist es möglich Attribute, Logikfluss und andere Eigenschaften während der Laufzeit zu ändern. In objektorientierten Sprachen wie Java wird diese \glqq computational reflection\grqq{} genutzt, um die Möglichkeit einer Selbstbeobachtung der eigenen Sprachelemente zu schaffen \cite{Li2017}. Die API ermöglicht somit beispielsweise das Auslesen von Laufzeit-Annotationen und deren deklarierte Attribute oder das dynamische Instanziieren von Klassen \cite{Forman2004}. Jedes Java-Element der Reflection API (Feld, Methode, Klasse, ...), welches annotierbar ist, wird durch die Vererbung der \texttt{AnnotatedElement}-Klasse als solches klassifiziert \cite{Schildt2019}. Damit nun alle vorhandenen Annotation ausgelesen werden können, kann die Methode \inlinecode{java}{AnnotatedElement#getDeclaredAnnotations} aufgerufen werden \cite{Pigula2015}. Das Lesen der Attribute der in \autoref{lst:full_annotation_example} vordefinierten Annotation ist in \autoref{lst:annotation_processing_example} zu erkennen.
 \begin{figure}[H]
@@ -255,5 +268,23 @@ Für eine Auswertung von Laufzeit-Annotationen, muss zwangsläufig die Reflectio
 	    int id = e.id();
 	    int priority = e.priority();
     }
+	\end{lstlisting}
+\end{figure}
+\subsection{Auswertung von Annotationen zur Kompilierzeit}
+Das Auswerten von Annotationen zur Kompilierzeit kann mithilfe der Annotation-Processing API seit Java 6 durchgeführt werden. Annotationsprozessoren müssen von der \texttt{AbstractProcessor} Klasse erben und durch META-INF Metadaten mit der \texttt{ServiceLoader} Klasse registriert werden. Annotationsprozessoren müssen im Java Archiv-Format vorliegen und werden automatisch durch \texttt{javac} erkannt, wenn diese im Build-Pfad der eigentlichen Applikation präsent sind. Durch die Nutzung der von Google entwickelten AutoService\footnote{Google AutoService: \url{https://github.com/google/auto/tree/master/service}} Bibliothek müssen benötigte Metadaten nicht manuell im META-INF Ordner des Java Archivs hinterlegt werden, sondern werden automatisch erstellt, verwaltet und bei Bedarf aktualisiert. Die Struktur eines Annotationsprozessors mit der AutoService Bibliothek ist in \autoref{lst:annotation_processor_example} dargestellt und verarbeitet alle gefundenen Annotationen aufgrund des Wildcard-Zeichens in der \texttt{@SupportedAnnotationTypes} Annotation. Das Erstellen von Klassen mithilfe der von Java zur Verfügung gestellten APIs ist ein aufwendiger Prozess, da Quelltext manuell durch zum Beispiel \texttt{PrintWriter} Instanzen generiert werden müssen. Außerdem ist es nicht möglich bereits vorhandene Klassen zu modifizieren. Ein Hinzufügen von Methoden und Feldern ist ausgeschlossen und der generelle Overhead beim Verwaltungs- und Erstellungsprozess ist nicht nur für den Entwickler zeitaufwändig, da der Anwender ebenfalls die verwendeten Annotationsprozessoren registrieren müssen. Letzteres kann durch das Verwenden von Build-Management-Tools wie Apache Maven\footnote{Apache Maven: \url{https://maven.apache.org}} verhindert werden und die Quelltextgeneration kann durch externe Bibliotheken wie JavaPoet\footnote{JavaPoet: \url{https://github.com/square/javapoet}} deutlich erleichtert werden. Damit bereits vorhandene Klassen modifiziert oder erweitert werden können, muss eine Form der Bytecode Manipulation genutzt werden. Dazu kann beispielsweise die ASM\footnote{ASM: \url{https://asm.ow2.io}} Bibliothek genutzt werden, welche es dem Entwickler ermöglicht existierende Klassen, Methoden oder Felder vollständig zu verändern \cite{Kuleshov2007}.
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- Annotationsprozessor.}, captionpos=b, label=lst:annotation_processor_example]
+#@SupportedAnnotationTypes("*")
+#@AutoService(Processor.class)
+public class TestProcessor extends AbstractProcessor {
+	
+	#@Override
+	public boolean process(Set<? extends TypeElement> elems,
+		RoundEnvironment env) {
+		// ...
+		return true;
+	}
+	
+}
 	\end{lstlisting}
 \end{figure}

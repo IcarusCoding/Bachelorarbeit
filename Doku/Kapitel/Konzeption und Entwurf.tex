@@ -1,28 +1,41 @@
 \chapter{Konzeption und Entwurf}
 \label{konzeption_und_entwurf}
+In diesem Kapitel werden mögliche Probleme bei der Entwicklung sowie bei der Nutzung von JavaFX Anwendungen identifiziert. Dabei wird ein besonderer Fokus auf das Finden von Architekturmängeln, fehlenden Funktionalitäten und verbesserungswürdigen Techniken gelegt. Um eine Fehleranfälligkeit zu reduzieren, sollen komplexe und sich häufig wiederholende Quelltextbausteine automatisch erstellt oder durch Annotationen vereinfacht werden. Die vollständige Substitution eines aufwendige Prozesses ist dabei ebenfalls möglich. Probleme, Vereinfachungen oder Verbesserungen sollen durch das Untersuchen von vorhandenen, quelloffenen JavaFX-Projekten und Bibliotheken gefunden werden. Auch sollen Ideen und Konzepte zusammengetragen werden, welche auf JavaFX anwendbar sind, jedoch nur in anderen Bibliotheken und Frameworks aufzufinden sind. \\
+Bei der Problemanalyse wird stets das Ziel verfolgt, das Entwickeln mit JavaFX zu vereinfachen -- besonders für noch unerfahrene Entwickler. Danach wird eine Anforderungsanalyse durchgeführt, mit welcher systematisch funktionale sowie nichtfunktionale Anforderungen auf der Basis der gefundenen Probleme erstellt werden. \\
+Auf die Anforderungserhebung folgt die Konzeption des benötigten Systems und der zugrundeliegenden Architektur. Essentielle Komponenten werden mit \ac{uml} Diagrammen entworfen und im Detail erläutert. Bei der Existenz verschiedener Lösungsstrategien für ein Problem, wird jede Strategie einzeln beleuchtet und nach Kriterien wie Sinnhaftigkeit und Machbarkeit entschieden, welche für das System am besten geeignet ist. Wichtige Richtlinien wie die angestrebte Softwarequalität werden ebenfalls beschrieben.
 
-\add{Intro}
+\section{Identifikation von Problemen und komplexen Strukturen in der JavaFX Entwicklung}
+\label{problemanalyse}
+\add{08.06}
 
 \section{Anforderungsanalyse}
 \label{anforderungsanalyse}
-
-\add{Intro (https://de.wikipedia.org/wiki/Software\_Requirements\_Specification ?)}
+In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:
+\begin{description}
+	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen.
+	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden.
+\end{description}
+\add{format of requirements}
 
 \subsection{Funktionale Anforderungen}
 \label{anforderungsanalyse_funktional}
+Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben alle gewünschten Funktionen des Endproduktes.
+\add{09.06}
 
 \add{Funktionale Anforderungen als Unterpunkte}
 \subsubsection{...}
 
 \subsection{Nichtfunktionale Anforderungen}
 \label{anforderungsanalyse_nichtfunktional}
+Im Folgenden werden alle nichtfunktionalen Anforderungen definiert. Sie beschreiben Qualitätseigenschaften an das System wie Möglichkeiten der Erweiterbarkeit und Wartbarkeit und spezifizieren Maßstäbe, welche zur Laufzeit der Anwendung eingehalten werden müssen. Darunter gehören beispielsweise die effiziente Ressourcennutzung, die Korrektheit des Systems sowie ein gewisser Grad an Zuverlässigkeit.
+\add{09.06}
 
 \add{Nichtfunktionale Anforderungen als Unterpunkte}
 \subsubsection{...}
 
 \section{Konzept und Modellierung}
 \label{konzept_und_modellierung}
-
+\add{10.06-13.06}
 \add{Intro}
 
 \subsection{Designentscheidungen}

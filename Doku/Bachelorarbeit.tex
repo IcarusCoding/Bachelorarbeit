@@ -145,6 +145,13 @@
 	\draw[-stealth, thick, #1] (Start Mid) to (End Mid);
 }
 
+\newcommand*\CircledStandalone[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=0.9pt] (char) {#1};}}
+
+\newcommand{\Circled}[2]{%
+	\node[shape=circle,draw,inner sep=0.9pt] at (#2) (char) {#1};
+}
+
 % Vorlage - Obere Linie, Seitenzahlen
 \usepackage{scrlayer-scrpage}
 \pagestyle{scrheadings}
@@ -226,7 +233,7 @@
 \tableofcontents
 
 \pagenumbering{arabic} % Seitenzahlen umstellen
-
+\add{Fix layouting: remove all \\newpage occurences, fix space above and below figures, fix invalid spacing due to the overuse of the [H] figure float}
 \input{Kapitel/Einleitung.tex}
 \input{Kapitel/Grundlagen.tex}
 \input{Kapitel/Stand der Technik.tex}
