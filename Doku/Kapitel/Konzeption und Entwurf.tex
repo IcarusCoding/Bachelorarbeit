@@ -5,8 +5,31 @@ Bei der Problemanalyse wird stets das Ziel verfolgt, das Entwickeln mit JavaFX z
 Auf die Anforderungserhebung folgt die Konzeption des benötigten Systems und der zugrundeliegenden Architektur. Essentielle Komponenten werden mit \ac{uml} Diagrammen entworfen und im Detail erläutert. Bei der Existenz verschiedener Lösungsstrategien für ein Problem, wird jede Strategie einzeln beleuchtet und nach Kriterien wie Sinnhaftigkeit und Machbarkeit entschieden, welche für das System am besten geeignet ist. Wichtige Richtlinien wie die angestrebte Softwarequalität werden ebenfalls beschrieben.
 
 \section{Identifikation von Problemen und komplexen Strukturen in der JavaFX Entwicklung}
+\sectionmark{Identifikation von Problemen}
 \label{problemanalyse}
-\add{08.06}
+Im Folgenden werden generelle Probleme bei der Entwicklung von JavaFX Anwendungen identifiziert. Dazu gehören Mechanismen welche aufgrund ihrer Komplexität nicht für Anfänger geeignet sind oder von erfahrenen Entwicklern häufig genutzt und somit möglicherweise vereinfacht werden können. Obwohl dabei Annotationen als Basis für eine Vereinfachung dienen, wird auch das Erstellen von zusätzlichen Klassen oder dem Entwickeln von Erweiterungen für existierenden JavaFX Konzepte als Alternative für diese Zielerreichung in Betracht gezogen. Die Lösungen der gefundenen Probleme werden in einer Anforderungsanalyse durch funktionale und nichtfunktionale Anforderungen in \autoref{anforderungsanalyse} gelöst.
+\subsection{Internationalisierung und Lokalisierung}
+In der Informatik, speziell in der Softwareentwicklung, ist die Internationalisierung ein wichtiger Bestandteil einen Softwareproduktes, bei welchen die Entwickler die Software so gestalten, dass diese ohne viel Aufwand für andere internationale Märkte mit anderen Kulturen und Sprachen verfügbar gemacht werden kann \cite{Reineke2005}. Dabei wird beispielsweise eine einfache Schnittstelle für das Verwenden von verschiedenen Sprachen entwickelt, welche das Übersetzen von vorhandenen Textfeldern und anderen textbasierte Elementen in grafischen Benutzeroberflächen, Konfigurationsdateien oder Konsolenausgaben ermöglicht. Die Schnittstelle wird dabei so entwickelt, dass ohne eine Änderung des Quelltextes, neue Sprachen hinzugefügt werden können. Die Lokalisierung beschreibt dann unter Anderem die Übersetzung von den eben genannten Elementen.\\
+Dieses Konzept kann durch die von Java bereitgestellte \texttt{ResourceBundle} Klasse realisiert werden \cite{Deitsch2001}. Bei der Verwendung eines solchen \texttt{ResourceBundle}s wird jedem zu übersetzenden Element ein Schlüssel zugeordnet und nach Konvention, in einer \texttt{.properties} Datei gespeichert. Wenn eine neue Sprache im Laufe des Lokalisierungsprozesses hinzugefügt werden soll, so muss jeweils eine neue \texttt{.properties} Datei angelegt werden. JavaFX ermöglicht das manuelle Spezifizieren einer vordefinierten \texttt{ResourceBundle} Instanz bei dem Laden einer FXML Datei durch einen \texttt{FXMLLoader}.
+In der zu ladenden FXML Datei müssen hartcodierte Textelemente durch den jeweiligen Schlüssel aus der \texttt{.properties} Datei, wie in \autoref{lst:fxmlkey} gezeigt, ersetzt werden.
+\begin{figure}[H]
+	\noindent
+	\begin{adjustbox}{minipage=[t]{.45\linewidth},gstore totalheight=\heightone,margin=\fboxsep+\fboxrule}
+		\begin{lstlisting}
+## Properties Datei
+login.user = Benutzername
+		\end{lstlisting}
+	\end{adjustbox}\hfill
+	\begin{adjustbox}{minipage=[t][\heightone]{0.5\linewidth}}
+		\begin{lstlisting}[language=XML]
+<!-- FXML Datei -->
+<Label text="%login.username"/>
+		\end{lstlisting}
+	\end{adjustbox}
+	\captionof{lstlisting}{Nutzung des Schlüssels in einer FXML Datei.}
+	\label{lst:fxmlkey}
+\end{figure}
+\noindent Das Problem bei dieser Art der Übersetzung ist, dass eine Änderung der Sprache zur Laufzeit des Programms nicht dynamisch möglich ist. Die FXML Datei bzw. der dazugehörige Controller muss nach einer Sprachänderung durch beispielsweise eine Schaltfläche oder ein Dropdown-Menü durch einen FXML-Loader neu geladen werden, damit eventuelle Änderungen übernommen werden können. Das dynamische Ändern der Sprache zur Laufzeit ist nur mit einem Modifizierung des Ladeprozesses von FXML Dateien durch eine eigene Version des \texttt{FXMLLoader}s oder durch eine vom \texttt{FXMLLoader} unabhängige Implementierung durch Properties und Bindings möglich. Die erste Variante sorgt für ein automatisches Binden der nötigen Properties und die Letztere für ein manuelles Binden wenn nötig, weshalb eine Fusion beider Möglichkeiten in eine hohe Anpassbarkeit des Systems resultiert. Außerdem ist es auf diese Weise möglich, verschiedene Bindings zu aktualisieren, falls ein bestimmtes Event auftritt, welches eine Änderung des übersetzten Textes hervorruft. Parameterisierte Schlüssel aus der \texttt{.properties} Datei können somit automatisch an die parameterverändernden Events gebunden werden.
 
 \section{Anforderungsanalyse}
 \label{anforderungsanalyse}
