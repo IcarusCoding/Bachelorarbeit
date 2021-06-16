@@ -1,6 +1,6 @@
 \chapter{Konzeption und Entwurf}
 \label{konzeption_und_entwurf}
-In diesem Kapitel werden mögliche Probleme bei der Entwicklung sowie bei der Nutzung von JavaFX Anwendungen identifiziert. Dabei wird ein besonderer Fokus auf das Finden von Architekturmängeln, fehlenden Funktionalitäten und verbesserungswürdigen Techniken gelegt. Um eine Fehleranfälligkeit zu reduzieren, sollen komplexe und sich häufig wiederholende Quelltextbausteine automatisch erstellt oder durch Annotationen vereinfacht werden. Die vollständige Substitution eines aufwendige Prozesses ist dabei ebenfalls möglich. Probleme, Vereinfachungen oder Verbesserungen sollen durch das Untersuchen von vorhandenen, quelloffenen JavaFX-Projekten und Bibliotheken gefunden werden. Auch sollen Ideen und Konzepte zusammengetragen werden, welche auf JavaFX anwendbar sind, jedoch nur in anderen Bibliotheken und Frameworks aufzufinden sind. \\
+In diesem Kapitel werden mögliche Probleme bei der Entwicklung sowie bei der Nutzung von JavaFX Anwendungen identifiziert. Dabei wird ein besonderer Fokus auf das Finden von Architekturmängeln, fehlenden Funktionalitäten und verbesserungswürdigen Techniken gelegt. Um eine Fehleranfälligkeit zu reduzieren, sollen komplexe und sich häufig wiederholende Quelltextbausteine automatisch erstellt oder durch Annotationen vereinfacht werden. Die vollständige Substitution eines aufwendigen Prozesses ist dabei ebenfalls möglich. Probleme, Vereinfachungen oder Verbesserungen sollen durch das Untersuchen von vorhandenen, quelloffenen JavaFX-Projekten und Bibliotheken gefunden werden. Auch sollen Ideen und Konzepte zusammengetragen werden, welche auf JavaFX anwendbar sind, jedoch nur in anderen Bibliotheken und Frameworks aufzufinden sind. \\
 Bei der Problemanalyse wird stets das Ziel verfolgt, das Entwickeln mit JavaFX zu vereinfachen -- besonders für noch unerfahrene Entwickler. Danach wird eine Anforderungsanalyse durchgeführt, mit welcher systematisch funktionale sowie nichtfunktionale Anforderungen auf der Basis der gefundenen Probleme erstellt werden. \\
 Auf die Anforderungserhebung folgt die Konzeption des benötigten Systems und der zugrundeliegenden Architektur. Essentielle Komponenten werden mit \ac{uml} Diagrammen entworfen und im Detail erläutert. Bei der Existenz verschiedener Lösungsstrategien für ein Problem, wird jede Strategie einzeln beleuchtet und nach Kriterien wie Sinnhaftigkeit und Machbarkeit entschieden, welche für das System am besten geeignet ist. Wichtige Richtlinien wie die angestrebte Softwarequalität werden ebenfalls beschrieben.
 
@@ -30,7 +30,52 @@ login.user = Benutzername
 	\label{lst:fxmlkey}
 \end{figure}
 \noindent Das Problem bei dieser Art der Übersetzung ist, dass eine Änderung der Sprache zur Laufzeit des Programms nicht dynamisch möglich ist. Die FXML Datei bzw. der dazugehörige Controller muss nach einer Sprachänderung durch beispielsweise eine Schaltfläche oder ein Dropdown-Menü durch einen FXML-Loader neu geladen werden, damit eventuelle Änderungen übernommen werden können. Das dynamische Ändern der Sprache zur Laufzeit ist nur mit einem Modifizierung des Ladeprozesses von FXML Dateien durch eine eigene Version des \texttt{FXMLLoader}s oder durch eine vom \texttt{FXMLLoader} unabhängige Implementierung durch Properties und Bindings möglich. Die erste Variante sorgt für ein automatisches Binden der nötigen Properties und die Letztere für ein manuelles Binden wenn nötig, weshalb eine Fusion beider Möglichkeiten in eine hohe Anpassbarkeit des Systems resultiert. Außerdem ist es auf diese Weise möglich, verschiedene Bindings zu aktualisieren, falls ein bestimmtes Event auftritt, welches eine Änderung des übersetzten Textes hervorruft. Parameterisierte Schlüssel aus der \texttt{.properties} Datei können somit automatisch an die parameterverändernden Events gebunden werden.
-
+\subsection{Abhängigkeitsinjektion für Controller}
+Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit des Programms bestimmt und zur Verfügung gestellt. Meist konfiguriert der Entwickler mithilfe einer externen Bibliothek die Bereitstellung der Abhängigkeiten in einer Konfigurationsdatei oder Konfigurationsklasse. Bei dem Nutzen einer Art von Abhängigkeitsinjektion ist die eigentliche Implementierung der Abhängigkeiten durch die abhängigen Objekte nicht bekannt. Diese kennen nur die Schnittstellen, weshalb ein Auswechseln der Schnittstellenimplementierung durch eine Änderung der jeweiligen Konfigurationsdatei/Konfigurationsklasse möglich ist. Durch diese explizite Trennung von Schnittstelle und Implementierung ist eine lose Kopplung der Komponenten gewährleistet, was wiederum zu einer hohen Flexibilität und zu einer hohen Wartbarkeit sowie Testbarkeit führt. Eine Injektion ist dabei durch Felder (Feldinjektion), Konstruktoren (Konstruktorinjektion) oder Setter (Setterinjektion) möglich. Die Funktionalität einer Injektion von Abhängigkeiten in einen Controller ist nicht direkt in JavaFX enthalten, kann aber durch das Verwenden von zum Beispiel Afterburner.fx\footref{ft:afterburner} hinzugefügt werden. Eine Unterstützung von etablierten externen Bibliotheken zur Realisierung des Abhängigkeitsinjektionsmusters wie Spring\footnote{Spring: \url{https://spring.io}}, Dagger\footnote{Dagger: \url{https://dagger.dev}} oder Guice\footnote{Guice: \url{https://github.com/google/guice}} ist dadurch jedoch nicht gegeben. Aufgrund der Tatsache, dass alle drei genannten Bibliotheken mit der \texttt{jakarta.inject.Inject} Annotation\add{validate}, eine grundlegende Abhängigkeitsinjektion bereitstellen, kann ebendiese Annotation für eine Injektion innerhalb von Controllern verwendet werden. Ein Beispiel eines Controllers mit verschiedenen injizierten Diensten ist in \autoref{lst:controllerinjection} zu erkennen.
+\begin{figure}[H]
+	\centering
+	\begin{lstlisting}[caption=Beispiel -- Controller mit injizierten Diensten., captionpos=b, label=lst:controllerinjection]
+	public class TestController {
+	
+		#@Inject
+		private IUserService userService;
+		
+		#@Inject
+		private IDatabaseService dbService;
+	
+	}
+	\end{lstlisting}
+\end{figure}
+\noindent Die Implementierungen sollen durch den Entwickler in der jeweiligen Konfigurationsdatei/Konfigurationsklasse den Schnittstellen zugeordnet werden können.
+\subsection{CSS Metadatengeneration}
+Ein wichtiger Bestandteil von JavaFX ist die Möglichkeit, das Aussehen und den Stil von einzelnen Komponenten wie Schaltflächen und Containerelementen durch die Verwendung von \ac{css} zu modifizieren. Werden eigene Komponenten erstellt oder bestehende Komponenten erweitert, so erlaubt JavaFX das Hinzufügen von eigenen \ac{css} Properties zu den jeweiligen Komponenten mithilfe von neuen Instanzen der \texttt{CssMetaData} Klasse. Für jede neue \ac{css} Property muss dabei eine neue \texttt{CssMetaData} Instanz erstellt werden, weshalb das Hinzufügen von vielen solcher Instanzen ein repetitiver Prozess mit vielen Boilerplate Quelltextfragmenten ist, welcher durchaus vereinfacht werden kann.
+\subsection{JavaFX Einstiegspunkt und Preloader}
+Damit eine JavaFX Applikation gestartet werden kann muss, wie in \autoref{javafx} beschrieben, 
+eine Klasse existieren, welche von der \texttt{Application} Klasse erbt. Müssen bestimmte performanceintensive Aufgaben wie das Laden von Sound-/Video- oder Bilddateien vor dem Start der eigentlichen Anwendungen ausgeführt werden, so kann dies in einer Klasse, welche von der \texttt{Preloader} Klasse erben muss, realisiert werden. Der \texttt{Preloader} ist dabei eine spezialisierte Form der \texttt{Application}, welche es dem Entwickler ermöglicht, Ressourcen zu laden und durch eventbasierte Statusaktualisierungen, dem Nutzer mitzuteilen. Damit ein \texttt{Preloader} mit einer standardmäßigen JavaFX Anwendung verbunden werden kann, muss statt \texttt{Platform\#launch}, die interne \texttt{PlatformImpl\#launchApplication} Methode genutzt werden. Das Verwalten der Aufgaben, welche vor dem Anwendungsstart durchgeführt werden müssen, soll vereinfacht werden, wobei insbesondere die vorhandenen Statusaktualisierungen  erweitert werden sollen. Auch die Initialisierung einer Applikationsklasse bzw. der benötigten \texttt{Stage} läuft in den meisten Fällen gleich ab und soll bei Bedarf vom Entwickler zu einem großen Teil automatisiert werden können.
+\subsection{Controller Lebenszyklus}
+Der Lebenszyklus von JavaFX Controllern ist in der aktuellen Ausführung für komplexe Systeme mit vielen Controllern ungeeignet, da dieser nur aus zwei Phasen besteht. Zuerst wird die Controllerklasse instanziiert und darauf folgt die Initialisierung der \texttt{@FXML} Felder und der Methodenaufruf einer vom Entwickler bereitgestellten \texttt{initialize} Methode. Damit mit fertig initialisierten \texttt{@FXML} Feldern gearbeitet werden kann, muss der dafür benötigte Quelltext immer in der \texttt{initialize} Methode definiert werden. Ein Beispiel für den Ablauf einer Controllerinstanziierung durch den \texttt{FXMLLoader} ist in \autoref{lst:controllerinstantiation} abgebildet. Der rudimentäre Lebenszyklus unterstützt dabei keine Methoden, welche beispielsweise bei einem Entfernen des Wurzelelements eines Controllers aus dem Szenengraphen ausgeführt wird um eventuell offene Ressourcen zu schließen und somit effektiv Ressourcenlecks zu verhindern. Ein vollständiger Lebenszyklus wie bei Activities in Android\footnote{https://developer.android.com/guide/components/activities/activity-lifecycle},ist praktisch nicht vorhanden.
+\begin{figure}[H]
+	\centering
+	\begin{lstlisting}[caption=Beispiel -- Instanziierungsablauf., captionpos=b, label=lst:controllerinstantiation]
+public class TestController {
+	
+	@FXML
+	private Label testLbl;
+	
+	public TestController() {
+		// Phase #1 - Controllerinstanziierung
+		// testLbl-Feld ist hier noch nicht initialisiert
+	}
+	
+	@FXML
+	private void initialize() {
+		// Phase #2 - Feldinjektion fertiggestellt
+		// testLbl-Feld ist initialisiert und kann verwendet werden
+	}
+	
+}
+	\end{lstlisting}
+\end{figure}
 \section{Anforderungsanalyse}
 \label{anforderungsanalyse}
 In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:

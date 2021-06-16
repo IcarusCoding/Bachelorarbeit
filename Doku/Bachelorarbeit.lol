@@ -23,6 +23,8 @@
 \contentsline {lstlisting}{\numberline {3.5}Repräsentation als Java Objekt.}{19}{lstlisting.3.5}%
 \addvspace {10\p@ }
 \contentsline {lstlisting}{\numberline {4.1}{\ignorespaces Nutzung des Schlüssels in einer FXML Datei.\relax }}{24}{figure.caption.47}%
+\contentsline {lstlisting}{\numberline {4.2}Beispiel -- Controller mit injizierten Diensten.}{25}{lstlisting.4.2}%
+\contentsline {lstlisting}{\numberline {4.3}Beispiel -- Instanziierungsablauf.}{27}{lstlisting.4.3}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
