@@ -81,20 +81,24 @@ public class TestController {
 \label{anforderungsanalyse}
 In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:
 \begin{description}
-	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen. Alle folgenden fundamentalen Anforderungen haben den [FA\#\#] Prefix, wobei \#\# durch die jeweilige Anforderungsnummer substituiert wird.
-	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden. Alle folgenden optionalen Anforderungen haben den [OA\#\#] Prefix, wobei \#\# durch die jeweilige Anforderungsnummer substituiert wird.
+	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen. Alle folgenden fundamentalen Anforderungen haben den [+A--\#\#] Prefix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
+	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden. Alle folgenden optionalen Anforderungen haben den (+A--\#\#) Prefix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
 \end{description}
 \add{format of requirements}
 
-% counter for fundamental requirements
+% counter for functional requirements
 \newcounter{fcounter}
 \setcounter{fcounter}{0}
-\DeclareRobustCommand{\freq}{\stepcounter{fcounter}[FA\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]\label{fa\arabic{fcounter}}}
+\newcommand*{\freq}[1]{%
+	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --}}%
+}
 
-% counter for optional requirements
-\newcounter{ocounter}
-\setcounter{ocounter}{0}
-\DeclareRobustCommand{\oreq}{\stepcounter{ocounter}[OA\ifnum\value{ocounter}<10 0\fi\arabic{ocounter}]\label{oa\arabic{ocounter}}}
+% counter for nonfunctional requirements
+\newcounter{ncounter}
+\setcounter{ncounter}{0}
+\newcommand*{\nreq}[1]{%
+	\protecting{\stepcounter{ncounter}\ifblank{#1}{[NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}]}{(NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}) Optional --}}%
+}
 
 \subsection{Funktionale Anforderungen}
 \label{anforderungsanalyse_funktional}
@@ -111,7 +115,6 @@ Die bereits existierenden Internationalisierungsmöglichkeiten sollen durch eine
 Werden externe Bibliotheken zur Abhängigkeitsinjektion genutzt, so sollen eventuelle Abhängigkeiten und Dienste automatisch in Controller injiziert werden. Die Nutzung etwaiger Bibliotheken und den dafür benötigten Konfigurationsdateien oder Konfigurationsklassen soll beim Start der Applikation spezifiziert werden können. Eine Unterstützung der Bibliotheken Dagger, Spring und Guice soll dem Entwickler ermöglicht werden.
 \subsubsection{\freq{} Automatische \ac{css} Metadaten Generation}
 Das Hinzufügen von \ac{css} Properties zu benutzerdefinierten JavaFX Komponenten durch den Entwickler soll durch das Nutzen von Annotationen erleichtert werden. Durch die automatische Generation dieser Metadaten, sollen eventuell auftretende repetitive Quelltextbausteine vermieden werden. Das Initialisieren der JavaFX Anwendung durch die zu entwickelnde Bibliothek soll in eine Durchsuchung des Klassenpfades nach solchen \ac{css} Metadaten Annotationen resultieren und die gefundenen Metadaten automatisch mit den durch die Annotation definierten Einstellungen instanziieren.
-\newpage
 \subsubsection{\freq{} Annotationsbasierte Controllerdefinition}
 Ein Controller soll als solcher erkannt werden, wenn dieser eine spezielle Annotation aufweist. Die Annotation muss dabei die Quelle der FXML und der \ac{css} Datei enthalten und weitere auf Controller bezogene Konfigurationsmöglichkeiten bereitstellen.
 \subsubsection{\freq{} Erweiterung des Controllerlebenszyklus}
@@ -127,21 +130,33 @@ Wenn mehrere Methoden mit denselben Lebenszyklusannotationen annotiert wurden, s
 \subsubsection{\freq{} Controllerverschachtelung und Supercontroller}
 Ist das Wurzelelement eines Controllers in einem durch einen weiteren Controller aufgespannten Teilbaum des Szenengraphen enthalten, so handelt es sich bei ersterem Controller um einen Subcontroller des Letzteren. Subcontroller sollen bei Phasenänderung des Lebenszyklus ihres Supercontrollers benachrichtigt werden. Beispielsweise soll der Subcontroller in die \texttt{OnHide} Zustand wechseln, wenn der Supercontroller in denselben Zustand wechselt. Diese Beziehung soll bei Möglichkeit automatisch ermittelt werden aber dennoch explizit durch den Entwickler bei der Controllerdefinition deklariert werden können.
 \subsubsection{\freq{} Gruppierung von ähnlichen Controllern}
-Ähnliche Controller sollen bei Definition, sogenannten Controllergruppen zugeordnet werden können. Eine Controllergruppe teilt sich dasselbe Wurzelelement, weshalb immer nur ein Controller einer Controllergruppe gleichzeitig aktiv sein kann. Ein Controller soll dabei nur einer Controllergruppe zuordenbar sein. Wechselt der aktive Controller einer Controllergruppe, so soll die Controllergruppe davon in Kenntnis gesetzt werden und eventuelle Phasenwechsel von betroffenen Controllern ausgelöst werden.
-\subsubsection{\freq{} Wechsel}
-\newpage
-% errorhandling + sharedresources
-\subsubsection{\oreq{} Annotationsvalidierung zur Kompilierzeit}
+Ähnliche Controller sollen bei Definition, sogenannten Controllergruppen zugeordnet werden können. Eine Controllergruppe teilt sich dasselbe Wurzelelement, weshalb immer nur ein Controller einer Controllergruppe gleichzeitig aktiv sein kann. Ein Controller soll dabei nur einer Controllergruppe zuordenbar sein. Wechselt der aktive Controller einer Controllergruppe, so soll die Controllergruppe davon in Kenntnis gesetzt werden und eventuelle Phasenwechsel von betroffenen Controllern ausgelöst werden. Verschachtelte Subcontroller sollen dabei zwischen einem Wechsel durch einen Supercontroller und einem selbst ausgelösten Wechsel differenzieren können.
+\subsubsection{\freq{} Zyklusprävention}
+Damit keine unendlichen Schleifen und Prozesse aus dem falsche Nutzen des Systems resultieren, muss eine Art von Zyklusdetektion bei der Verschachtelung von Controllern erfolgen. Beispielsweise darf Controller A nicht als Supercontroller von Controller B definiert sein, wenn B, den Controller A ebenfalls als Supercontroller definiert.
+\subsubsection{\freq{} Wechsel von Controllern}
+Das Wechseln von Controllern soll durch das vom Controller-System bereitgestellte Eventsystem ermöglicht werden. Ein manuelles Wechseln der Controller soll somit durch die Absendung eines Events durchführbar sein. Das automatische Wechseln eines Controllers soll durch vereinfachende Strukturen wie Annotationen über Schaltflächendefinitionen erleichtert werden. Der Entwickler soll den Wechsel durch die Angabe von Animationsparametern ästhetisch individualisieren können.
+\subsubsection{\freq{} Controller Preloading}
+Controller werden standardmäßig On-Demand geladen, also nur dann, wenn sie benötigt werden. Wenn der Entwickler einen Preloader definiert hat, dann soll das Erstellen und Initialisieren aller controllerrelevanten Elemente und Strukturen in dieser Preloading-Phase stattfinden können.
+\subsubsection{\freq{} Globale Fehlerbehandlung}
+Beim Start der Anwendung, sollen optionale Klassen zur globalen Fehlerbehandlung spezifiziert werden können. Wird eine solche Klasse nicht durch den Entwickler angegeben, so soll auf eine vom System bereitgestellte Klasse zur Fehlerbehandlung zurückgegriffen werden. Auftretende Fehler im Controllersystem, ob reflektiv bedingt oder nicht, sollen so an zentraler Stelle verwaltet und optional als Fehleranzeige auf dem Hauptcontroller angezeigt werden können.
+\subsubsection{\freq{} Geteilte Ressourcen}
+Controller sollen die Möglichkeit haben, bestimmte Felder mit anderen Controllern zu teilen. Geteilte Felder werden als solche identifiziert, wenn diese eine spezielle Annotation aufweisen. Das Controller-System soll dabei Referenzen von den jeweiligen Feldwerten erstellen und diese dann in Form von JavaFX Properties zur Verfügung zu stellen. Geteilte Ressourcen sollen dabei durch ihren Feldnamen oder optional durch einen Parameter der Annotation identifiziert werden. Der Annotationsparameter hat dabei immer eine höhere Priorität. Wird der Wert einer geteilten Ressource geändert, so soll sich diese Änderung in allen anderen Controllern mit ebendieser Ressource widerspiegeln.
+\subsubsection{\freq{} JavaFX Events durch Annotationen}
+Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, so soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welche den Annotationen als Parameter übergeben wird, aufweisen.
+\add{maybe add}
+% @Schedule
+\subsubsection{\freq{o} Annotationsvalidierung zur Kompilierzeit}
 Reflektive Operationen sind definitionsbedingt nur per Laufzeit der Anwendung ausführbar. Das Auslesen und Verarbeiten von annotierten Elementen und Annotationen im Allgemeinen durch reflektive Operationen kann somit nur zur Laufzeit erfolgen. Ob eine Annotation inkorrekte oder ungenügende Informationen enthält oder falsche Typen annotiert wurden ist dem Entwickler nur durch die Auslösung von Ausnahmen zur Laufzeit mitzuteilen. Beispielsweise ist es offensichtlich inkorrekt, ein Feld, welches einen JavaFX Container repräsentiert (z.B. \texttt{StackPane}), mit einer Annotation zu annotieren, welche für die Übersetzung von Komponenten verantwortlich ist. Das Überprüfen der Korrektheit der Annotationsnutzung soll nicht nur durch eine Laufzeitfehlerbehandlung sondern auch durch einen Annotationsprozessor zur Kompilierzeit durchgeführt werden. Eventuelle Fehlkonfigurationen werden somit bereits beim Kompiliervorgang entdeckt und dem Entwickler mitgeteilt.
 
 \subsection{Nichtfunktionale Anforderungen}
 \label{anforderungsanalyse_nichtfunktional}
 Im Folgenden werden alle nichtfunktionalen Anforderungen definiert. Sie beschreiben Qualitätseigenschaften an das System wie Möglichkeiten der Erweiterbarkeit und Wartbarkeit und spezifizieren Maßstäbe, welche zur Laufzeit der Anwendung eingehalten werden müssen. Darunter gehören beispielsweise die effiziente Ressourcennutzung, die Korrektheit des Systems sowie ein gewisser Grad an Zuverlässigkeit.
-\subsubsection{\freq{} Sicherstellung der Platformunabhängigkeit}
+\subsubsection{\nreq{} Sicherstellung der Platformunabhängigkeit}
+\subsubsection{\nreq{} Performance \& Effizienz}
+Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead minimal gehalten wird.
 
 \section{Konzept und Modellierung}
 \label{konzept_und_modellierung}
-\add{SONNTAG FERTIG}
 \add{Intro}
 
 \subsection{Designentscheidungen}
