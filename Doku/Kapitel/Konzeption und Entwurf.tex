@@ -54,7 +54,7 @@ Damit eine JavaFX Applikation gestartet werden kann muss, wie in \autoref{javafx
 eine Klasse existieren, welche von der \texttt{Application} Klasse erbt. Müssen bestimmte performanceintensive Aufgaben wie das Laden von Sound-/Video- oder Bilddateien vor dem Start der eigentlichen Anwendungen ausgeführt werden, so kann dies in einer Klasse, welche von der \texttt{Preloader} Klasse erben muss, realisiert werden. Der \texttt{Preloader} ist dabei eine spezialisierte Form der \texttt{Application}, welche es dem Entwickler ermöglicht, Ressourcen zu laden und durch eventbasierte Statusaktualisierungen, dem Nutzer mitzuteilen. Damit ein \texttt{Preloader} mit einer standardmäßigen JavaFX Anwendung verbunden werden kann, muss statt \texttt{Platform\#launch}, die interne \texttt{PlatformImpl\#launchApplication} Methode genutzt werden. Das Verwalten der Aufgaben, welche vor dem Anwendungsstart durchgeführt werden müssen, soll vereinfacht werden, wobei insbesondere die vorhandenen Statusaktualisierungen  erweitert werden sollen. Auch die Initialisierung einer Applikationsklasse bzw. der benötigten \texttt{Stage} läuft in den meisten Fällen gleich ab und soll bei Bedarf vom Entwickler zu einem großen Teil automatisiert werden können.
 \subsection{Controller Lebenszyklus}
 \label{controller_lebenszyklus}
-Der Lebenszyklus von JavaFX Controllern ist in der aktuellen Ausführung für komplexe Systeme mit vielen Controllern ungeeignet, da dieser nur aus zwei Phasen besteht. Zuerst wird die Controllerklasse instanziiert und darauf folgt die Initialisierung der \texttt{@FXML} Felder und der Methodenaufruf einer vom Entwickler bereitgestellten \texttt{initialize} Methode. Damit mit fertig initialisierten \texttt{@FXML} Feldern gearbeitet werden kann, muss der dafür benötigte Quelltext immer in der \texttt{initialize} Methode definiert werden. Ein Beispiel für den Ablauf einer Controllerinstanziierung durch den \texttt{FXMLLoader} ist in \autoref{lst:controllerinstantiation} abgebildet. Der rudimentäre Lebenszyklus unterstützt dabei keine Methoden, welche beispielsweise bei einem Entfernen des Wurzelelements eines Controllers aus dem Szenengraphen ausgeführt wird um eventuell offene Ressourcen zu schließen und somit effektiv Ressourcenlecks zu verhindern. Ein vollständiger Lebenszyklus wie bei Activities in Android\footnote{https://developer.android.com/guide/components/activities/activity-lifecycle},ist praktisch nicht vorhanden.
+Der Lebenszyklus von JavaFX Controllern ist in der aktuellen Ausführung für komplexe Systeme mit vielen Controllern ungeeignet, da dieser nur aus zwei Phasen besteht. Zuerst wird die Controllerklasse instanziiert und darauf folgt die Initialisierung der \texttt{@FXML} Felder und der Methodenaufruf einer vom Entwickler bereitgestellten \texttt{initialize} Methode. Damit mit fertig initialisierten \texttt{@FXML} Feldern gearbeitet werden kann, muss der dafür benötigte Quelltext immer in der \texttt{initialize} Methode definiert werden. Ein Beispiel für den Ablauf einer Controllerinstanziierung durch den \texttt{FXMLLoader} ist in \autoref{lst:controllerinstantiation} abgebildet. Der rudimentäre Lebenszyklus unterstützt dabei keine Methoden, welche beispielsweise bei einem Entfernen des Wurzelelements eines Controllers aus dem Szenengraphen ausgeführt wird um eventuell offene Ressourcen zu schließen und somit effektiv Ressourcenlecks zu verhindern. Ein vollständiger Lebenszyklus wie bei Activities in Android\footnote{\url{https://developer.android.com/guide/components/activities/activity-lifecycle}},ist praktisch nicht vorhanden.
 \begin{figure}[H]
 	\centering
 	\begin{lstlisting}[caption=Beispiel -- Instanziierungsablauf., captionpos=b, label=lst:controllerinstantiation]
@@ -81,10 +81,9 @@ public class TestController {
 \label{anforderungsanalyse}
 In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:
 \begin{description}
-	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen. Alle folgenden fundamentalen Anforderungen haben den [+A--\#\#] Prefix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
-	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden. Alle folgenden optionalen Anforderungen haben den (+A--\#\#) Prefix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
+	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen. Alle folgenden fundamentalen Anforderungen haben den [+A--\#\#] Präfix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
+	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden. Alle folgenden optionalen Anforderungen haben den (+A--\#\#) Präfix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
 \end{description}
-\add{format of requirements}
 
 % counter for functional requirements
 \newcounter{fcounter}
@@ -143,23 +142,65 @@ Beim Start der Anwendung, sollen optionale Klassen zur globalen Fehlerbehandlung
 Controller sollen die Möglichkeit haben, bestimmte Felder mit anderen Controllern zu teilen. Geteilte Felder werden als solche identifiziert, wenn diese eine spezielle Annotation aufweisen. Das Controller-System soll dabei Referenzen von den jeweiligen Feldwerten erstellen und diese dann in Form von JavaFX Properties zur Verfügung zu stellen. Geteilte Ressourcen sollen dabei durch ihren Feldnamen oder optional durch einen Parameter der Annotation identifiziert werden. Der Annotationsparameter hat dabei immer eine höhere Priorität. Wird der Wert einer geteilten Ressource geändert, so soll sich diese Änderung in allen anderen Controllern mit ebendieser Ressource widerspiegeln.
 \subsubsection{\freq{} JavaFX Events durch Annotationen}
 Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, so soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welche den Annotationen als Parameter übergeben wird, aufweisen.
-\add{maybe add}
-% @Schedule
+\subsubsection{\freq{o} Scheduling von Methoden}
+Controllerinterne Methoden sollen von Entwickler als sog. Scheduler definiert werden. Eine solche Methode wird dann in einem bestimmten Zeitintervall automatisch ausgeführt und gegebenenfalls wiederholt. Das Verhalten der Methode (wiederholend, zeitverzögert) kann durch Annotationsparameter kontrolliert werden.
+\subsubsection{\freq{o} JavaFX Application-Thread Forcierung}
+Einige Operationen auf Elemente des JavaFX Szenengraphen müssen auf dem JavaFX Application-Thread ausgeführt werden. Dazu gehört beispielsweise das aktive Ändern von renderbaren Elementen wie Textfeldinhalte oder Schaltflächen. Controllerinterne Methoden sollen auf dem JavaFX Application-Thread ausgeführt werden, wenn diese eine bestimmte Annotation aufweisen.
 \subsubsection{\freq{o} Annotationsvalidierung zur Kompilierzeit}
 Reflektive Operationen sind definitionsbedingt nur per Laufzeit der Anwendung ausführbar. Das Auslesen und Verarbeiten von annotierten Elementen und Annotationen im Allgemeinen durch reflektive Operationen kann somit nur zur Laufzeit erfolgen. Ob eine Annotation inkorrekte oder ungenügende Informationen enthält oder falsche Typen annotiert wurden ist dem Entwickler nur durch die Auslösung von Ausnahmen zur Laufzeit mitzuteilen. Beispielsweise ist es offensichtlich inkorrekt, ein Feld, welches einen JavaFX Container repräsentiert (z.B. \texttt{StackPane}), mit einer Annotation zu annotieren, welche für die Übersetzung von Komponenten verantwortlich ist. Das Überprüfen der Korrektheit der Annotationsnutzung soll nicht nur durch eine Laufzeitfehlerbehandlung sondern auch durch einen Annotationsprozessor zur Kompilierzeit durchgeführt werden. Eventuelle Fehlkonfigurationen werden somit bereits beim Kompiliervorgang entdeckt und dem Entwickler mitgeteilt.
 
 \subsection{Nichtfunktionale Anforderungen}
 \label{anforderungsanalyse_nichtfunktional}
 Im Folgenden werden alle nichtfunktionalen Anforderungen definiert. Sie beschreiben Qualitätseigenschaften an das System wie Möglichkeiten der Erweiterbarkeit und Wartbarkeit und spezifizieren Maßstäbe, welche zur Laufzeit der Anwendung eingehalten werden müssen. Darunter gehören beispielsweise die effiziente Ressourcennutzung, die Korrektheit des Systems sowie ein gewisser Grad an Zuverlässigkeit.
-\subsubsection{\nreq{} Sicherstellung der Platformunabhängigkeit}
+\subsubsection{\nreq{} Benutzerfreundlichkeit}
+Das Erstellen von JavaFX Anwendungen soll durch das Nutzen der zu entwickelnden Bibliothek erleichtert werden. Um diese Erleichterung sicherzustellen, müssen implementierte Komponenten ausreichend dokumentiert sein und intuitiv durch den Entwickler nutzbar gemacht werden. Komplexe und überflüssige Strukturen sollen vermieden werden. Jedes durch diese Bibliothek bereitgestellte konfigurierbare System, muss Standardparameter zur Konfiguration bereitstellen und bei Bedarf eine Konfigurationsänderung durch einen Entwickler zulassen.
 \subsubsection{\nreq{} Performance \& Effizienz}
-Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead minimal gehalten wird.
+Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead, minimal gehalten wird.
+\subsubsection{\nreq{} Wartbarkeit}
+Die Bibliothek soll ohne viel Aufwand an sich verändernde Anforderungen anpassbar sein. Dazu muss das System allgemein anerkannte, softwaretechnische und objektorientierte Prinzipien erfüllen.
+\subsubsection{\nreq{} Erweiterbarkeit}
+Die Architektur soll mit einer besonderen Fokussierung auf das Nutzen von Schnittstellen entwickelt werden. Annotationsbasierte Konzepte, welche nicht im Standardumfang der von der Bibliothek bereitgestellten Funktionalitäten enthalten sind, sollen ohne viel Aufwand durch externe Entwickler hinzugefügt werden können.
+\subsubsection{\nreq{} Softwarequalität}
+Eine hohe Softwarequalität ist ein essentieller Faktor für ein System, welches auch außerhalb der eigenen Entwicklungsumgebung genutzt werden soll. Andere Entwickler müssen mit einem geringen Zeitaufwand, einen Überblick über das System mit allen wichtigen Komponenten und deren Beziehung untereinander, gewinnen können. Um eine hohe Nachvollziehbarkeit zu gewährleisten, müssen etablierte Entwurfsmuster genutzt und auf komplexen Quelltext verzichtet werden. Klassen müssen gut strukturiert und leicht verständlich implementiert werden.
+\subsubsection{\nreq{} Lizenzierung}
+Die zu entwickelnde Bibliothek muss eine Konformität zu den von externen Bibliotheken genutzten Lizenzen aufweisen. Etwaige Lizenzverletzungen sind zu vermeiden.
 
 \section{Konzept und Modellierung}
 \label{konzept_und_modellierung}
-\add{Intro}
-
+Im Folgenden wird die, für das Erfüllen aller vorher genannten Anforderungen, benötigte Architektur konstruiert. Dabei werden ähnliche Systemanforderungen in Gruppen unterteilt und in Form von allgemeinen Zielen an das System zusammengefasst. Für jedes daraus resultierende Ziel, werden theoretische Implementierungsmöglichkeiten identifiziert, bei welchen benötigte Komponenten, die Beziehung zwischen den Komponenten und die eventuelle Nutzung von Entwurfsmuster ermittelt werden. Dabei wird besonders auf eine hochwertige Softwarequalität und Usability geachtet. Grundlegende, notwendige Entscheidungen wie die Namensgebung der Bibliothek und die Nutzung von externen Bibliotheken für eine effizientere und leichtere Implementierung werden ebenfalls getroffen. 
+\subsection{Ziele des Systems}
+Aus der Problemanalyse und der nachfolgenden Erhebung von funktionalen und nichtfunktionalen Anforderungen ergeben sich drei grundlegende Ziele des Systems:
+\begin{itemize}
+	\item Erstellung von auf Annotationen basierenden Vereinfachungen für anspruchsvolle Aspekte der JavaFX-Programmierung.
+	\item Erweiterung von bereits existierenden Funktionen wie die Lokalisierung und die Controllerverwaltung.
+	\item Hinzufügen von Funktionen, welche aktuell nicht im Funktionsumfang von JavaFX enthalten sind wie die Abhängigkeitsinjektion.
+\end{itemize}
+Alle Ziele sollen neuen Entwicklern den Einstieg in JavaFX erleichtern aber auch erfahrenen Entwicklern die Möglichkeit geben, effizienter mit JavaFX zu programmieren. Dazu müssen diese nicht unbedingt die vom System zu Verfügung gestellten Annotationen verwenden, sondern können auch die Utility Klassen und eventuell die vereinfachte Schnittstelle zur Java Reflection API nutzen.
 \subsection{Designentscheidungen}
 \label{konzept_und_modellierung_designentscheidungen}
-
-\subsection{...}
+Nachfolgend werden grundlegende Designentscheidungen der Softwarearchitektur und der Software als Ganzes dargelegt.
+\subsubsection{Namensgebung}
+Die zu entwickelnde Bibliothek benötigt einen Namen, welcher die Beziehung zu JavaFX verdeutlicht und gleichzeitig aufzeigt, dass die Vereinfachung und die Erweiterung von JavaFX Bausteinen und einzelnen Komponenten angestrebt wird und deshalb die oberste Priorität darstellt. Nachfolgend wird die Bibliothek als \textbf{\texttt{SimpliFX}} bezeichnet. \texttt{SimpliFX} ist dabei an das englische Wort \texttt{simplify} angelehnt, welches ins Deutsche übersetzt \texttt{vereinfachen} bzw. \texttt{simplifizieren} bedeutet. Damit die Verbindung zu Java\texttt{FX} untermauert wird, ist das \texttt{FY} Suffix durch das \texttt{FX} Suffix substituiert worden.
+\subsubsection{Modularisierung}
+Gute Softwaresysteme bestehen aus vielen Komponenten, welche jeweils auf eine einzelne Funktion spezialisiert sind. Einige dieser Komponenten funktionieren unabhängig von Anderen und können durch eine Dekomposition des Systems in unterschiedliche Module unterteilt werden. Eine modulare Softwarearchitektur folgt dem softwaretechnischen \ac{soc} Prinzip und resultiert in einer hohen Wartbarkeit sowie Erweiterbarkeit. Außerdem ermöglicht eine Modularisierung, dass einzelne Module aufgrund ihrer strikten Trennung einfacher ausgetauscht werden können.\\
+Häufig genutzte reflektive Operationen der Reflection API müssen durch eine einfache Schnittstelle für \texttt{SimpliFX} zugänglich gemacht werden. Diese Schnittstelle muss ein ordnungsgemäße Ausnahmebehandlung aufweisen, da das Nutzen der Reflection API sehr fehleranfällig ist und sehr effizient implementiert werden, da etwaige Operationen langsamer sind als Nutzen von herkömmlichen Java-Sprachfeatures. Diese Schnittstelle wird in einem von \texttt{SimpliFX} unabhängigen Apache Maven\footref{ft:maven} Modul ausgelagert. Auch die Testapplikationen, welche nach der Implementierung des eigentlichen Systems entwickelt werden und für die Evaluation von diesem dienen, werden in ein anderes Modul ausgelagert. Das Basissystem ist somit in einem dritten Modul zu finden und ist für die aus den Systemanforderungen resultierenden Funktionalitäten verantwortlich. Die verschiedenen Subsysteme werden dabei in Java-Pakete unterteilt.
+\subsubsection{Externe Bibliotheken}
+Externe Bibliotheken sind ein wichtiger Bestandteil von heutigen Anwendungen und können, aufgrund von Entwicklungsumgebungen wie IntelliJ IDEA\footnote{IntelliJ IDEA: \url{https://www.jetbrains.com/de-de/idea/}} oder Build-Management-Tools wie Apache Maven\footref{ft:maven} und Gradle\footnote{Gradle: \url{https://gradle.org}}, einfacher als je zuvor einem Projekt hinzugefügt werden. Externe Bibliotheken haben dabei meist den Vorteil, dass diese oft als quelloffene Projekte für jeden Entwickler einsehbar und nutzbar sind und deshalb, aufgrund der vielen Beiträge von anderen Entwicklern, meist keine Fehler aufweisen. 
+Auf der einen Seite ist das Nutzen von externen Bibliotheken, im Vergleich zum manuellen Erstellen der selben Funktionen, ein effektiver Weg um Zeit zu sparen und Bugs zu vermeiden. Auf der anderen Seite kann das Nutzen von vielen externen Bibliotheken, aufgrund der verschiedenen Softwarelizenzen für quelloffene Projekte, zu Problemen führen, da nicht alle Lizenzen eine Kompatibilität untereinander aufweisen. Für das Projekt werden nur Bibliotheken verwendet, welche unter X oder Y lizenziert wurden. Alle verwendeten externen Bibliotheken sind mit einer Kurzbeschreibung der Funktion und der jeweiligen Lizenz in \autoref{tab:external_libraries} dargestellt.
+\newcolumntype{C}[1]{%
+>{\vbox to 5ex\bgroup\vfill\centering}%
+p{#1}%
+<{\egroup}}
+\begin{table}
+	\centering
+	\begin{tabular}[t]{C{2cm}C{2cm}C{2cm}C{2cm}}
+		\hline
+		Bibliothek & Funktion & Version & Lizenz \tabularnewline
+		\hline
+		JavaFX & - & - & - \tabularnewline
+		ASM & - & - & - \tabularnewline
+		\hline
+	\end{tabular}
+	\caption{TODO}
+	\label{tab:external_libraries}
+\end{table}
