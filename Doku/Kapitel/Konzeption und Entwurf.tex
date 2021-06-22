@@ -77,6 +77,10 @@ public class TestController {
 }
 	\end{lstlisting}
 \end{figure}
+\subsection{Konfigurationsdateien}
+Eine persistente Speicherung von Anwendungskonfigurationen wie beispielsweise Logindaten oder Informationen für Serververbindungen ist wichtig für eine optimale Benutzerfreundlichkeit. Das Speichern von konfigurierbaren Einstellungen kann mit der Java Preferences API oder mit externen Bibliotheken wie GSON, für auf \ac{json} basierte Konfigurationsdateien oder \ac{jaxb}, für auf \ac{xml} basierte Dateien durchgeführt werden. Der Prozess des manuellen Erstellens einer Konfigurationsdatei und dem anschließenden Auslesen bzw. Modifizierung zur Laufzeit ist ein repetitiver Vorgang, welcher durch das Nutzen von Annotationen teilweise automatisiert werden kann.
+\subsection{Zustandsserialisierung von grafischen Oberflächen}
+Das Speichern des aktuellen Zustands einer grafischen Oberfläche mit den jeweiligen Elementen ist aktuell mit dem Funktionsumfang von JavaFX nicht ohne Weiteres umsetzbar. Der Zustand einer Anwendung setzt sich aus den aktuellen Konfiguration von interaktiven Elementen im Szenengraphen zusammen. Beispielsweise ist die Position eines Schiebereglers oder der aktuell ausgewählte Tab einer \texttt{TabPane} nicht insoweit serialisierbar, dass dieser Zustand beim Applikationsende gespeichert und bei einem erneuten Applikationsstart wiederhergestellt werden kann.
 \section{Anforderungsanalyse}
 \label{anforderungsanalyse}
 In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:
@@ -142,6 +146,10 @@ Beim Start der Anwendung, sollen optionale Klassen zur globalen Fehlerbehandlung
 Controller sollen die Möglichkeit haben, bestimmte Felder mit anderen Controllern zu teilen. Geteilte Felder werden als solche identifiziert, wenn diese eine spezielle Annotation aufweisen. Das Controller-System soll dabei Referenzen von den jeweiligen Feldwerten erstellen und diese dann in Form von JavaFX Properties zur Verfügung zu stellen. Geteilte Ressourcen sollen dabei durch ihren Feldnamen oder optional durch einen Parameter der Annotation identifiziert werden. Der Annotationsparameter hat dabei immer eine höhere Priorität. Wird der Wert einer geteilten Ressource geändert, so soll sich diese Änderung in allen anderen Controllern mit ebendieser Ressource widerspiegeln.
 \subsubsection{\freq{} JavaFX Events durch Annotationen}
 Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, so soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welche den Annotationen als Parameter übergeben wird, aufweisen.
+\subsubsection{\freq{} Generation von Konfigurationsdateien}
+Felder eines Controllers sollen bei der Controllererstellung, durch das Nutzen von automatisch oder manuell erstellten Konfigurationsdateien, gesetzt werden, falls diese eine spezielle Annotation aufweisen. Der Konfigurationsschlüssel kann durch einen Annotationsparameter festgelegt werden.
+\subsubsection{\freq{o} Serialisierung von JavaFX Komponenten}
+Die Position und die aktuelle Konfiguration von jedem JavaFX Element, welches im Szenengraphen präsent ist, soll bei einem Ende der Anwendung gespeichert werden und bei dem nächsten Start rekonstruiert werden. Dadurch bleibt der aktuelle Zustand der grafischen Oberfläche auch bei Anwendungsterminierung erhalten.
 \subsubsection{\freq{o} Scheduling von Methoden}
 Controllerinterne Methoden sollen von Entwickler als sog. Scheduler definiert werden. Eine solche Methode wird dann in einem bestimmten Zeitintervall automatisch ausgeführt und gegebenenfalls wiederholt. Das Verhalten der Methode (wiederholend, zeitverzögert) kann durch Annotationsparameter kontrolliert werden.
 \subsubsection{\freq{o} JavaFX Application-Thread Forcierung}
@@ -176,9 +184,9 @@ Aus der Problemanalyse und der nachfolgenden Erhebung von funktionalen und nicht
 	\item Hinzufügen von Funktionen, welche aktuell nicht im Funktionsumfang von JavaFX enthalten sind wie die Abhängigkeitsinjektion.
 \end{itemize}
 Alle Ziele sollen neuen Entwicklern den Einstieg in JavaFX erleichtern aber auch erfahrenen Entwicklern die Möglichkeit geben, effizienter mit JavaFX zu programmieren. Dazu müssen diese nicht unbedingt die vom System zu Verfügung gestellten Annotationen verwenden, sondern können auch die Utility Klassen und eventuell die vereinfachte Schnittstelle zur Java Reflection API nutzen.
-\subsection{Designentscheidungen}
+\subsection{Rahmenbedingungen und Designentscheidungen}
 \label{konzept_und_modellierung_designentscheidungen}
-Nachfolgend werden grundlegende Designentscheidungen der Softwarearchitektur und der Software als Ganzes dargelegt.
+Nachfolgend werden grundlegende Designentscheidungen der Softwarearchitektur und Rahmenbedingungen für die Entwicklung der Software als Ganzes dargelegt.
 \subsubsection{Namensgebung}
 Die zu entwickelnde Bibliothek benötigt einen Namen, welcher die Beziehung zu JavaFX verdeutlicht und gleichzeitig aufzeigt, dass die Vereinfachung und die Erweiterung von JavaFX Bausteinen und einzelnen Komponenten angestrebt wird und deshalb die oberste Priorität darstellt. Nachfolgend wird die Bibliothek als \textbf{\texttt{SimpliFX}} bezeichnet. \texttt{SimpliFX} ist dabei an das englische Wort \texttt{simplify} angelehnt, welches ins Deutsche übersetzt \texttt{vereinfachen} bzw. \texttt{simplifizieren} bedeutet. Damit die Verbindung zu Java\texttt{FX} untermauert wird, ist das \texttt{FY} Suffix durch das \texttt{FX} Suffix substituiert worden.
 \subsubsection{Modularisierung}
@@ -191,16 +199,18 @@ Auf der einen Seite ist das Nutzen von externen Bibliotheken, im Vergleich zum m
 >{\vbox to 5ex\bgroup\vfill\centering}%
 p{#1}%
 <{\egroup}}
-\begin{table}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\begin{table}[H]
 	\centering
-	\begin{tabular}[t]{C{2cm}C{2cm}C{2cm}C{2cm}}
+	\renewcommand*{\arraystretch}{1.3}
+	\begin{tabular}{P{0.1\textwidth}p{0.55\textwidth}P{0.1\textwidth}P{0.1\textwidth}}
 		\hline
-		Bibliothek & Funktion & Version & Lizenz \tabularnewline
+		\multicolumn{1}{c}{Bibliothek} & \multicolumn{1}{c}{Funktion} & \multicolumn{1}{c}{Version} & \multicolumn{1}{c}{Lizenz} \\
 		\hline
-		JavaFX & - & - & - \tabularnewline
-		ASM & - & - & - \tabularnewline
+		JavaFX & Ermöglicht die Erstellung von Java Applikationen mit grafischen Oberflächen & 16 & GPLv2\tablefootnote{GPLv2 mit Linking Exception: \url{https://openjdk.java.net/legal/gplv2+ce.html}} \\
+		ASM & Erlaubt die Modifikation von Java-Bytecode & 9.1 & BSD\tablefootnote{3-Clause BSD: \url{https://asm.ow2.io/license.html}} \\
 		\hline
 	\end{tabular}
-	\caption{TODO}
+	\caption{Verwendete Externe Bibliotheken.}
 	\label{tab:external_libraries}
 \end{table}
