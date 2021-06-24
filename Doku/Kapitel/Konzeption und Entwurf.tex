@@ -93,18 +93,24 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 \newcounter{fcounter}
 \setcounter{fcounter}{0}
 \newcommand*{\freq}[1]{%
-	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --}}%
+	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --\label{freq\arabic{fcounter}}}}%
 }
 
 % counter for nonfunctional requirements
 \newcounter{ncounter}
 \setcounter{ncounter}{0}
 \newcommand*{\nreq}[1]{%
-	\protecting{\stepcounter{ncounter}\ifblank{#1}{[NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}]}{(NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}) Optional --}}%
+	\protecting{\stepcounter{ncounter}\ifblank{#1}{[NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}]}{(NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}) Optional --}\label{nreq\arabic{ncounter}}}%
 }
 
 \subsection{Funktionale Anforderungen}
 \label{anforderungsanalyse_funktional}
+
+\renewcommand\thesubsubsection{KAT/%
+	\ifnum\value{subsubsection}<100 0\fi
+	\ifnum\value{subsubsection}<10 0\fi
+	\arabic{subsubsection}}
+
 Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben alle gewünschten Funktionen des Endproduktes.
 \subsubsection{\freq{} Ermitteln und Konfiguration des JavaFX-Einstiegspunktes}
 Der Erstellen einer Applikationsklasse sowie eines optionalen Preloaders soll automatisch stattfinden, da der Erstellungsprozess von auf JavaFX basierten Anwendungen in den meisten Fällen ähnlich oder identisch ist. Das Definieren dieser Elemente soll mithilfe von Annotationen geschehen und durch das Absuchen des Klassenpfades durch die entwickelte Bibliothek gefunden werden. Alternativ soll der Entwickler die Möglichkeit haben, den Einstiegspunkt sowie den Preloader explizit zu spezifizieren, falls eine automatische Identifikation nicht erwünscht oder benötigt ist. Die vordefinierten Einstiegspunkte sollen eine Standardkonfiguration der Applikation und der zugrunde liegenden \texttt{Stage} Instanz bereitstellen, welche durch den Entwickler bei Bedarf auch manuell überschrieben werden kann. Dieses Überschreiben soll durch die Nutzung des Erbauer-Entwurfsmusters oder durch Annotationen erfolgen. Die Standardkonfiguration umfasst grundsätzliche Applikationseigenschaften wie den Titel, die Fenstergröße oder Designelemente wie den \texttt{StageStyle} und die benötigten Titelleistenschaltflächen.
@@ -214,3 +220,65 @@ p{#1}%
 	\caption{Verwendete Externe Bibliotheken.}
 	\label{tab:external_libraries}
 \end{table}
+\subsection{Benötigte Schnittstellen}
+Für eine optimale und effiziente Implementierung von \texttt{SimpliFX}, müssen einige Java Schnittstellen durch Eigene vereinfacht oder Schnittstellen für nicht vorhandene Funktionen hinzugefügt werden. Fast jede der aufgestellten Anforderungen benötigt für Teilfunktionen die Reflection API. Diese ist relativ fehleranfällig und nahezu alle reflektiven Operationen können Ausnahmen erzeugen, weshalb ein vereinfachender Zugang zu ebendieser API wünschenswert ist. Außerdem müssen Subsysteme entwickelt werden um beispielsweise nach \autoref{freq1} bestimmte annotierte Klassen aus dem Klassenpfad zur Laufzeit der Anwendung zu identifizieren.
+Im Folgenden werden die benötigten Subsysteme erläutert und die erforderlichen Komponenten mithilfe geeigneter Methoden modelliert. In Klassendiagrammen werden nur elementare Bestandteile der Klassen dargestellt und Funktionen wie Getter oder Setter, welche erst bei der eigentlichen Implementierung benötigt werden und für das Verständnis nicht relevant sind, werden weggelassen.
+\subsubsection{Schnittstelle: Reflection}
+Die Reflection Schnittstelle soll alle häufig genutzten reflektiven Operationen, wie das Aufrufen von Methoden, das Instanziieren von Klassen, den Zugriff auf Felder und das Auswerten mit Annotationen, an einem zentralen Ort ermöglichen. Reflektierbare Elemente sollen durch eigene Schnittstellen repräsentiert werden, welche, für diese relevante, Operationen zur Verfügung stellen. Diese spezialisierten Klassen werden im Folgenden \texttt{ReflectionScope}s genannt, welche grundlegende Konfigurationen und Funktionen für die Modifikation des zu betrachteten Elementes bereitstellt. Alle \texttt{ReflectionScope}s sind mit ihrer jeweiligen Funktionalität in \autoref{tab:reflection_scopes} aufgelistet und detailliert als UML Klassendiagramme in \autoref{fig:reflection_scopes} dargestellt. Außerdem ist der Wechsel von \texttt{ReflectionScope}s möglich. So ist es beispielsweise möglich von einer \texttt{ClassReflection} über einen gefundenen Konstruktor zu einer \texttt{ConstructorReflection} Instanz zu wechseln.
+\begin{table}[H]
+	\centering
+	\renewcommand*{\arraystretch}{1.3}
+	\begin{tabular}{|p{0.35\textwidth}|p{0.55\textwidth}|}
+		\hline
+		ReflectionScope & Funktion\\
+		\hline
+		\texttt{ClassReflection} & Stellt Funktionen zum Finden von Methoden und Konstruktoren basierend auf modifizierbaren Filtern zur Verfügung.\\
+		\hline
+		\texttt{ConstructorReflection} & Ermöglicht das Erstellen von Klassen durch den repräsentierten Konstruktor.\\
+		\hline
+		\texttt{InstanceReflection} & Ermöglicht die Modifizierung von bereits instanziierten Objekten durch bspw. das Finden von Methoden oder Feldern.\\
+		\hline
+		\texttt{MethodReflection} & Erlaubt das Aufrufen von Methoden mit ihren jeweiligen Parametern.\\
+		\hline
+		\texttt{FieldReflection} & Stellt Funktionen zum Setzen und zum Auslesen von Feldern zur Verfügung.\\
+		\hline
+	\end{tabular}
+	\caption{Alle benötigten \texttt{ReflectionScope}s.}
+	\label{tab:reflection_scopes}
+\end{table}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/ReflectionScopes.png}
+	\caption{Diagramm -- \texttt{ReflectionScopes}}
+	\label{fig:reflection_scopes}
+\end{figure}
+\noindent Aus den Klassendiagrammen ist schlusszufolgern, dass alle häufig genutzten reflektiven Operationen durch die Verwendung von Method Chaining, also der Hintereinanderausführung von Methoden, welche Operationen auf dem Objekt ausführen und es dabei zurückgeben, möglich sind. \add{Maybe move to implementation chapter}Ein theoretisches Anwendungsbeispiel der Reflection Schnittstelle ist in \autoref{lst:example_reflection_usage} dargestellt. Dabei wird eine Instanz der \texttt{Test} Klasse mit einem \texttt{Integer} Konstruktorparameter erstellt, welcher als Objektattribut in der Instanz gespeichert wird und mithilfe einer \texttt{InstanceReflection} daraufhin modifiziert wird.
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- Verwendung der Reflection Schnittstelle.}, captionpos=b, label=lst:example_reflection_usage]
+// Klassendefinition
+public static class Test {
+
+	private int test;
+
+	public Test(int test) {
+		this.test = test;
+	}
+
+}
+// Instanziierung und Feldzugriff
+InstanceReflection i = Reflection.reflect(Test.class)
+		.findConstructor(int.class).instantiate(10);
+FieldReflection f = i.reflectField("test").forceAccess();
+f.set(42);
+System.out.println(f.get()); // 42
+	\end{lstlisting}
+\end{figure}
+\subsubsection{Schnittstelle: Klassenpfad}
+Damit die Automatisierungsmaßnahmen nach \autoref{freq1} und \autoref{freq5} zum Finden von speziell annotierten Elementen möglich sind, muss eine Art von Klassenpfad-Scanner implementiert werden. Dabei werden alle Klassen, welche in den durch \texttt{Classloader} Instanzen bereitgestellten Klassenpfaden gefunden werden, nach den jeweiligen Annotationen gefiltert (siehe \autoref{fig:classpath_scanprocess}). Das Finden aller Klassen im Klassenpfad muss sowohl für normale Dateisysteme als auch für Applikationen, welche in Java Archiven gepackt worden sind, möglich sein. Um Klassen auf beispielsweise Annotationen zu filtern darf, aufgrund von möglichen Sicherheitsrisiken und Performanceproblemen, kein \texttt{Class} Objekt mittels \texttt{Class\#forName} erstellt werden. Dadurch soll verhindert werden, dass eventuelle \texttt{static}-Blöcke ausgeführt werden. Das Scannen einer Klasse, ohne den \texttt{static}-Block auszuführen, kann durch die ASM Bibliothek\footref{ft:asm}, mithilfe des Besucher Entwurfsmusters erfolgen. Außerdem muss der Scanprozess eine gewisse Konfigurierbarkeit aufweisen, da manuell \texttt{Classloader} Instanzen zum Scanprozess hinzugefügt werden sollen und um eine optimale Performance zu gewährleisten, soll ein initialer Paketname oder Teilstring eines Paketes angegeben werden können, damit nicht benötigte Klassen, schon im Scanprozess ignoriert werden. Ergebnisse des Scans müssen in einem Cache zwischengespeichert werden, damit nicht jeder Filtervorgang den Klassenpfad erneut scannen muss und somit unnötigerweise einen Performance-Hotspot kreiert.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/Klassenpfad Scanprozess.png}
+	\caption{Diagramm -- Klassenpfad-Scanprozess.}
+	\label{fig:classpath_scanprocess}
+\end{figure}
+\subsubsection{Schnittstelle: Lokalisierung}
