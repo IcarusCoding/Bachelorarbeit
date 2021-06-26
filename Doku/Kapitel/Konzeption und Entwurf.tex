@@ -175,11 +175,11 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 \begin{freq}{Geteilte Ressourcen}
 	Controller sollen die Möglichkeit haben, bestimmte Felder mit anderen Controllern zu teilen. Geteilte Felder werden als solche identifiziert, wenn diese eine spezielle Annotation aufweisen. Das Controller-System soll dabei Referenzen von den jeweiligen Feldwerten erstellen und diese dann in Form von JavaFX Properties zur Verfügung zu stellen. Geteilte Ressourcen sollen dabei durch ihren Feldnamen oder optional durch einen Parameter der Annotation identifiziert werden. Der Annotationsparameter hat dabei immer eine höhere Priorität. Wird der Wert einer geteilten Ressource geändert, so soll sich diese Änderung in allen anderen Controllern mit ebendieser Ressource widerspiegeln.
 \end{freq}
-\begin{freq}{JavaFX Events durch Annotationen}
+\begin{freq}{Anpassbare Events durch Annotationen}
 	Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, so soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welche den Annotationen als Parameter übergeben wird, aufweisen.
 \end{freq}
-\begin{freq}{Generation von Konfigurationsdateien}
-	Felder eines Controllers sollen bei der Controllererstellung, durch das Nutzen von automatisch oder manuell erstellten Konfigurationsdateien, gesetzt werden, falls diese eine spezielle Annotation aufweisen. Der Konfigurationsschlüssel kann durch einen Annotationsparameter festgelegt werden.
+\begin{freq}{Konfigurationsdateien}
+	Felder eines Controllers sollen bei der Controllererstellung, durch das Nutzen von automatisch oder manuell erstellten Konfigurationsdateien, gesetzt werden, falls diese eine spezielle Annotation aufweisen. Der Konfigurationsschlüssel kann durch einen Annotationsparameter festgelegt werden. Standardwerte sollen optional spezifiziert werden können.
 \end{freq}
 \begin{freq}[o]{Serialisierung von JavaFX Komponenten}
 	Die Position und die aktuelle Konfiguration von jedem JavaFX Element, welches im Szenengraphen präsent ist, soll bei einem Ende der Anwendung gespeichert werden und bei dem nächsten Start rekonstruiert werden. Dadurch bleibt der aktuelle Zustand der grafischen Oberfläche auch bei Anwendungsterminierung erhalten.
@@ -309,7 +309,7 @@ Damit die Automatisierungsmaßnahmen für \autoref{freq1} und \autoref{freq5} zu
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{Abbildungen/Klassenpfad Scanprozess.png}
-	\caption{Diagramm -- Klassenpfad-Scanprozess.}
+	\caption{Diagramm -- Klassenpfad-Scanprozess für Klassendateien.}
 	\label{fig:classpath_scanprocess}
 \end{figure}
 \subsubsection{Schnittstelle: Lokalisierung/Internationalisierung}
@@ -322,31 +322,94 @@ Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref
 \end{figure}
 \noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird.
 \add{TODO: Complete everything below here}
-\subsubsection{Schnittstelle: SimpliFXLoader}
-
+\subsubsection{Schnittstelle: \texttt{SimpliFX} Einstiegspunkt}
+\subsection{Controller System}
+\subsection{Abhängigkeitsinjektion}
 \subsection{Annotationen}
 Im Folgenden werden alle benötigten Annotationen mit ihren jeweiligen Parametern definiert und auf die zu implementierende Funktionalität sowie mögliche Restriktionen eingegangen. Dabei wird explizit angegeben, welche Parameter keinen \texttt{default} Wert besitzen und aufgrund dessen vom Entwickler manuell angegeben werden müssen.
 \subsubsection{Annotation: @ApplicationEntryPoint}
+Soll eine Anwendung mit \texttt{SimpliFX} verwendet werden, so muss eine Klasse existieren, welche als Einstiegspunkt fungieren soll und die \texttt{@ApplicationEntryPoint} Annotation aufweisen. Der einzige Parameter ist notwendig und muss die Klasse des Hauptcontrollers beinhalten.
 \subsubsection{Annotation: @PreloaderEntryPoint}
-\subsubsection{Annotation: @SimpliFXConfiguration}
+Die \texttt{@PreloaderEntryPoint} Annotation besitzt ähnliche Funktionalitäten wie die \texttt{@ApplicationEntryPoint} Annotation, nur das kein Parameter angegeben werden kann und nicht der Anwendungseinstiegspunkt definiert wird, sondern der Einstiegspunkt für einen Preloader. 
 \subsubsection{Annotation: @ConfigurationSource}
+Mit der Java Properties-API kompatible Konfigurationsdateien können durch das Nutzen der \texttt{@ConfigurationSource} Annotation automatisch geladen und dem annotierten Properties-Feld zugewiesen werden. Die Annotation hat einen optionalen Parameter, welcher den Namen der Konfigurationsdatei bzw. den Pfad zu dieser enthält. Ist kein Pfad angegeben, so wird, je nach Klassenpfadscan-Einstellung, der Klassenpfad nach einer Datei mit einem Namen, welcher dem des annotierten Feldes entspricht, durchsucht. Jedes Element aus einer Konfigurationsdatei, welche auf diesem Wege geladen worden ist, kann durch die \texttt{@ConfigValue} Annotation verwendet werden.
 \subsubsection{Annotation: @ConfigValue}
+Konfigurierbare Elemente können mit \texttt{@ConfigValue} annotiert werden. Der Konfigurationsschlüssel von in Form eines erforderlichen Parameters an die Annotation übergeben werden. Außerdem ist es möglich, einen optionalen Standardwert festzulegen, welcher dem jeweiligen annotierten Feld zugewiesen wird, wenn der angegebene Konfigurationsschlüssel in keiner Konfigurationsdatei gefunden werden kann. \texttt{SimpliFX} verwaltete
 \subsubsection{Annotation: @Controller}
+Ein \texttt{SimpliFX} kompatibler Controller muss die \texttt{@Controller} Annotation aufweisen und dabei mindestens den FXML Parameter gesetzt haben. Der FXML Parameter gibt den Pfad zur FXML Datei an, welcher für die Konstruktion des Controllers benötigt wird. Analog dazu kann optional eine \ac{css} Datei angegeben werden. Desweiteren ist die Angabe einer Controllergruppe möglich, um verschiedene Controller in Gruppen zu unterteilen.
 \subsubsection{Annotation: @EventHandler}
+Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Eventinformationen aufgerufen werden sollen, können mit der \texttt{@EventHandler} Annotation annotiert werden. Diese akzeptiert einen optionalen Prioritätsparameter, der für die Aufrufreihenfolge gleichartiger Methoden verantwortlich ist. Jede durch JavaFX ermöglichte Methode zum Abfangen von Events (\texttt{onAction}, \texttt{onClick}, ...), welche normalerweise mit \texttt{@FXML} annotiert wird, kann ebenfalls mit \texttt{@EventHandler} annotiert werden.
 \subsubsection{Annotation: @Localize und @LocalizeValue}
 Die \texttt{@Localize} Annotation kann in Controllern verwendet werden um Felder automatisch zu übersetzen. Bei annotierten Elementen muss es sich immer um JavaFX Komponenten handeln, welche eine Form von übersetzbarem Text darstellen können. Dazu gehören beispielsweise die \texttt{Button} und die \texttt{Label} Klasse. Textbasierte Properties und Bindings sind hiervon ausgeschlossen. Der Annotation muss mindestens der Übersetzungsschlüssel übergeben werden und dieser muss in einem von \texttt{SimpliFX} zugänglichen \texttt{ResourceBundle} enthalten sein. Dazu ist es möglich, explizit den Namen eines \texttt{ResourceBundle}s zu übergeben, von welchem eine eventuelle Übersetzung gewünscht ist. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden.
-\subsubsection{Annotation: @StyleProperty}
 \subsubsection{Annotation: @CssProperty}
+Felder, welche einen \texttt{Collection}-Typen aufweisen, können mit der \texttt{CssProperty} Annotation annotiert werden. Dadurch wird automatisch eine neue \texttt{CssMetaData} Instanz erstellt und der Liste hinzugefügt. Der Entwickler muss den Namen der neuen \ac{css} Property und die Konvertierungsklasse als Parameter angeben. Dazu ist es möglich, ein Feld anzugeben, welches an den konvertierten Wert der \ac{css} Property gebunden wird und somit in der jeweiligen Klasseninstanz verfügbar ist. Die Annotation kann mehrmals an einem Feld angebracht werden.
 \subsubsection{Annotation: @Inject}
-\subsubsection{Annotation: @EventEmitter}
+Alle durch \texttt{SimpliFX} unterstützen externen Bibliotheken zur Abhängigkeitsinjektion sind mit der von Java bereitgestellten \texttt{javax.annotation.Inject} Annotation kompatibel. 
+\add{Complete when more information of injection process}
+\subsubsection{Annotation: @EventEmitter und @EventReceiver}
+Die \texttt{@EventEmitter} Annotation verbindet das Auftreten von JavaFX-Events mit dem Aufruf von Methoden. Dabei werden Felder als EventEmitter deklariert und Methoden als EventReceiver. Ein notwendiger Parameter beider Annotationen ist ein gemeinsamer Identifikator, welcher die Beziehung zwischen Methode und Feld ermöglicht. Methoden müssen als Parameter die jeweilige JavaFX-Event Klasse als Parameter aufweisen.
 \subsubsection{Annotation: @FXThread}
+Methoden, welche mit \texttt{@FXThread} annotiert wurden, sollen bei Aufruf von durch \texttt{SimpliFX} verwaltete Objekte, auf dem Java Application Thread ausgeführt werden.
 \subsubsection{Annotation: @Shared}
+Objekte und Referenzen auf Objekte, welche geteilte Ressourcen darstellen sollen und somit beispielsweise zwischen Controllern geteilt werden sollen, können mit \texttt{@Shared} annotiert werden. Bei einer eventuellen Veränderung der Werte von geteilten Ressourcen, müssen offensichtlich alle Vorkommnisse dieser Ressource aktualisiert werden. Aufgrund dieser Eigenschaft können nur von \texttt{SimpliFX} bereitgestellte Klassen (z.B. eine SharedResource oder SharedReference Klasse), sowie aktualisierbare JavaFX Properties eine geteilte Ressource darstellen und somit mit \texttt{@Shared} als solche deklariert werden. Geteilte Ressourcen sollen anhand eines \texttt{String} Wertes eindeutig identifizierbar sein, welcher optional per Parameter an die Annotation weitergegeben werden.
+\subsubsection{Annotation: @StageConfig}
+Die \texttt{@StageConfig} Annotation muss den \texttt{SimpliFX} Einstiegspunkt annotieren und kann die JavaFX Hauptstage automatisch vorkonfigurieren. Mithilfe der Annotationsparameter kann der Titel, der \texttt{StageStyle}, das Vordergrund- und Skalierungsverhalten und das Symbol der Stage modifiziert werden.
+\subsubsection{Übersicht und Zusammenfassung}
+In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglichen Typ- oder Elementrestriktionen, Parametern und den zugrundeliegende funktionalen Anforderungen aufgelistet.
+\add{the javafx menu base class to eventemitter restrictions}
 \begin{table}[H]
 	\centering
 	\renewcommand*{\arraystretch}{1.3}
 	\begin{tabular}{|p{0.16\textwidth}|p{0.04\textwidth}|p{0.35\textwidth}|p{0.30\textwidth}|}
 		\hline
 		Name & Anf. & Parameter & Restriktionen \\
+		\hline
+		StageConfig & \ref{freq1} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Fenstertitel
+				\item \texttt{StageStyle}
+				\item Immer im Vordergrund
+				\item Symbolpfad
+				\item Skalierbarkeit
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Einstiegspunkt ist annotierbar
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Application-EntryPoint & \ref{freq1} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Hauptcontrollerklasse
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Klasse muss instanziierbar sein
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Preloader-EntryPoint & \ref{freq1} & -- & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Klasse muss instanziierbar sein
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		EventHandler & \ref{freq2} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Priorität
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Methoden
+			\end{itemize}
+		\end{minipage} \\
 		\hline
 		Localize & \ref{freq3} & 
 		\begin{minipage}[t]{\linewidth}
@@ -357,8 +420,7 @@ Die \texttt{@Localize} Annotation kann in Controllern verwendet werden um Felder
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Felder
-				\item Nur in Controllern
+				\item Nur lokalisierbare Felder
 			\end{itemize}
 		\end{minipage} \\
 		\hline
@@ -371,15 +433,107 @@ Die \texttt{@Localize} Annotation kann in Controllern verwendet werden um Felder
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Felder
-				\item Nur in Controllern
+				\item Nur Property-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Inject & \ref{freq4} & -- & -- \\
+		\hline
+		CssProperty & \ref{freq5} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item \ac{css} Property
+				\item Konvertierungsklasse
+				\item JavaFX-Property Feld
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Collection-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Controller & \ref{freq6},\ref{freq10} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item FXML Pfad
+				\item \ac{css} Pfad
+				\item Controllergruppe
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Klassen
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Shared & \ref{freq15} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Ressourcenidentifikator
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Property-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		EventEmitter & \ref{freq16} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Beziehungsidentifikator
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item ButtonBase-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		EventReceiver & \ref{freq16} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Beziehungsidentifikator
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Methoden
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		ConfigSource & \ref{freq17} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Pfad oder Name der Datei
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Properties-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		ConfigValue & \ref{freq17} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Konfigurationsschlüssel
+				\item Standardwert
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur String und primitive Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		FXThread & \ref{freq20} & -- & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Methoden
 			\end{itemize}
 		\end{minipage} \\
 		\hline
 	\end{tabular}
 \end{table}
-\subsection{\texttt{SimpliFX} Einstiegspunkt}
-Der Konstruktionsablauf aller Komponenten...
-Nach dem Starten der \texttt{SimpliFX} Anwendung, ...
-\subsection{Controller System}
-\subsection{Abhängigkeitsinjektion}
