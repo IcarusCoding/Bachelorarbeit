@@ -245,6 +245,7 @@ p{#1}%
 		\hline
 		JavaFX & Ermöglicht die Erstellung von Java Applikationen mit grafischen Oberflächen & 16 & GPLv2\tablefootnote{GPLv2 mit Classpath Exception: \url{https://openjdk.java.net/legal/gplv2+ce.html}} \\
 		ASM & Erlaubt die Modifikation von Java-Bytecode & 9.1 & BSD\tablefootnote{3-Clause BSD: \url{https://asm.ow2.io/license.html}} \\
+		... & ... & ... & ...\\
 		\hline
 	\end{tabular}
 	\caption{Verwendete Externe Bibliotheken.}
@@ -321,10 +322,19 @@ Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref
 	\label{fig:i18n_interface}
 \end{figure}
 \noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird.
-\add{TODO: Complete everything below here}
 \subsubsection{Schnittstelle: \texttt{SimpliFX} Einstiegspunkt}
+\texttt{SimpliFX} übernimmt die Konstruktion und das anschließende Verwalten der JavaFX-Anwendungsklasse. Essentielle Methoden, welche durch die Java \texttt{Application} Klasse zur Verfügung gestellt werden, können per Annotation an den spezifizierten Einstiegspunkt delegiert werden und sind somit nachfolgend für den Entwickler zugänglich (\autoref{freq2}). Der Entwickler kann, vor einem Start der Anwendung, \texttt{SimpliFX} konfigurieren und Eigenschaften wie das Verhalten des Klassenpfadscanners (global, paketlokal) modifizieren. Dazu ist es möglich, beim Start der Applikation, einen Einstiegspunkt für die Anwendung sowie für einen optionalen Preloader anzugeben. Der Startprozess für die Lokalisierung des Einstiegspunktes ist in \autoref{fig:entrypoint_search} als UML-Aktivitätsdiagramm dargestellt (ähnlich dazu wird ein Preloader identifiziert). Wird ein Einstiegspunkt gefunden, so wird dieser auf Korrektheit überprüft (Korrekte Annotationen und Parameter). Daraufhin beginnt die Initialisierung der JavaFX Platform, der Applikationsklasse, des Controllersystems und des Hauptcontrollers, die Konfiguration von der jeweiligen Bibliothek für Abhängigkeitsinjektion (falls angegeben) und das Laden von Konfigurations- und Sprachdateien.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth-2cm]{Abbildungen/Startprozess.png}
+	\caption{Diagramm -- Finden und Validierung des Einstiegspunktes.}
+	\label{fig:entrypoint_search}
+\end{figure}
 \subsection{Controller System}
-\subsection{Abhängigkeitsinjektion}
+\add{TODO: Complete}
+...
+...
+...
 \subsection{Annotationen}
 Im Folgenden werden alle benötigten Annotationen mit ihren jeweiligen Parametern definiert und auf die zu implementierende Funktionalität sowie mögliche Restriktionen eingegangen. Dabei wird explizit angegeben, welche Parameter keinen \texttt{default} Wert besitzen und aufgrund dessen vom Entwickler manuell angegeben werden müssen.
 \subsubsection{Annotation: @ApplicationEntryPoint}
