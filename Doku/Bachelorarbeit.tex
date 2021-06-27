@@ -27,7 +27,8 @@
 \usepackage{caption}
 \usepackage{etoolbox}
 \usepackage{array}
-
+\usepackage{tablefootnote}
+\usepackage{enumitem}
 
 \makeatletter
 \def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
@@ -44,7 +45,7 @@
 \lstset{frame=tb,
 	language=Java,
 	aboveskip=3mm,
-	belowskip=3mm,
+	belowskip=-0.2cm,
 	showstringspaces=false,
 	columns=flexible,
 	basicstyle={\small\ttfamily},
@@ -77,7 +78,7 @@
 \lstdefinelanguage{XML} {
 	basicstyle=\small\ttfamily,
 	aboveskip=3mm,
-	belowskip=3mm,
+	belowskip=-0.2cm,
 	morestring=[b]",
 	morecomment=[s]{<?}{?>},
 	morecomment=[s]{<!--}{-->},
@@ -103,6 +104,7 @@
 \lstdefinelanguage{CSS}{
 	otherkeywords={-fx-background-color},
 	sensitive=true,
+	belowskip=-0.2cm,
 	morecomment=[l]{//},
 	morecomment=[s]{/*}{*/},
 	morestring=[b]',
@@ -155,6 +157,12 @@
 	\node[shape=circle,draw,inner sep=0.9pt] at (#2) (char) {#1};
 }
 
+\newcommandx{\add}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+
+%Maybe remove in the future and fix properly
+\raggedbottom
+\captionsetup{belowskip=-0.2cm}
+
 % Vorlage - Obere Linie, Seitenzahlen
 \usepackage{scrlayer-scrpage}
 \pagestyle{scrheadings}
@@ -179,8 +187,6 @@
 \newcommand{\ErstGutachter}{Prof. Dr. Susanne Boll}
 \newcommand{\ZweitGutachter}{Dr.-Ing. Dietrich Boles}
 \newcommand{\ArbeitTyp}{Bachelorarbeit}
-
-\newcommandx{\add}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
 
 \newcommand{\MONTH}{%
 	\ifcase\the\month
