@@ -83,6 +83,29 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
         return this;
     }
 
+    /**
+     * Starts the reflection with a static {@link Method} as the entry point
+     *
+     * @param name     The name of the wanted {@link Method}
+     * @param argTypes The parameter types of the wanted {@link Method}
+     * @return A {@link MethodReflection} instance representing the entry point
+     * @throws IllegalArgumentException if no suitable method was found
+     */
+    public MethodReflection reflectMethod(String name, Class<?>... argTypes) {
+        if (argTypes == null) {
+            argTypes = new Class[0];
+        }
+        for (var method : super.reflectable.getDeclaredMethods()) {
+            if (!method.getName().equals(name) || method.getParameterCount() != argTypes.length) {
+                continue;
+            }
+            if (matchArguments(argTypes, method.getParameterTypes())) {
+                return Reflection.reflect(method, null);
+            }
+        }
+        throw new IllegalArgumentException("No suitable method found!");
+    }
+
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
         return super.reflectable.isAnnotationPresent(annotation);
