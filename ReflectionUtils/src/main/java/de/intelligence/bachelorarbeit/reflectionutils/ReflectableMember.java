@@ -39,6 +39,24 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
         this.accessor = accessor;
     }
 
+    /**
+     * Retrieves the current accessor
+     *
+     * @return The current accessor
+     */
+    public Object getAccessor() {
+        return this.accessor;
+    }
+
+    /**
+     * Retrieves the current accessor
+     *
+     * @return The type-inferred accessor
+     */
+    public <T> T getAccessorUnsafe() {
+        return (T) this.accessor;
+    }
+
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
         return super.reflectable.isAnnotationPresent(annotation);
