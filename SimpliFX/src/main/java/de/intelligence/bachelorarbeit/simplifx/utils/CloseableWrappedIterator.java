@@ -36,7 +36,6 @@ public final class CloseableWrappedIterator<T> implements CloseableIterator<T> {
     public T next() {
         T t = delegate.next();
         if (t == null) {
-            System.out.println("ERR");
             System.exit(-1);
         }
         return t;

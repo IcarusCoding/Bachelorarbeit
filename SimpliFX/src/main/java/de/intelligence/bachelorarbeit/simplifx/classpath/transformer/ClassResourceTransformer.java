@@ -18,7 +18,7 @@ public final class ClassResourceTransformer implements IResourceTypeTransformer<
             return new ClassReader(ctx.getRelativeURI().toString().replace(".class", "")
                     .replace('\\', '.').replace('/', '.'));
         } catch (IOException ex) {
-            throw new ClasspathDiscoveryException("Error while transforming: ", ex);
+            throw new ClasspathDiscoveryException("Error while transforming: " + ctx.getRelativeURI(), ex);
         }
     }
 

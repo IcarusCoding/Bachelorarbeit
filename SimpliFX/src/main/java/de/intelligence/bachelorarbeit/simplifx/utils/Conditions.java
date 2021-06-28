@@ -19,6 +19,31 @@ public final class Conditions {
         return t;
     }
 
+    public <T> T checkNull(T t, String message) {
+        if (t == null) {
+            throw new NullPointerException(message);
+        }
+        return t;
+    }
+
+    public void checkCondition(boolean condition) {
+        if (!condition) {
+            throw new IllegalArgumentException("Illegal argument specified.");
+        }
+    }
+
+    public void checkCondition(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static <T> void doIfNotNull(T t, Runnable action) {
+        if (t != null) {
+            action.run();
+        }
+    }
+
     public static <T> void doIfNotNull(T t, ExceptionRunnable action, Consumer<Exception> onException) {
         if (t != null) {
             try {

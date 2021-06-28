@@ -55,6 +55,12 @@
         </dependency>
 
         <dependency>
+            <groupId>de.intelligence</groupId>
+            <artifactId>reflection-utils</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>30.0-jre</version>

@@ -33,10 +33,10 @@ public final class FileDiscoverySource extends AbstractDiscoverySource {
                     Files.walk(Paths.get(super.sourceURL.toURI())).filter(Files::isRegularFile)
                             .map(p -> Conditions.nullOnException(() -> {
                                 final URI uri = p.toUri();
-                                return new ResourceContext(uri.toURL(), new URI(super.pathPrefix.isBlank() ? "" :
-                                        super.pathPrefix + Prefix.FILE_SEPARATOR + super.sourceURL.toURI()
-                                                .relativize(uri)
-                                                .toString()));
+                                return new ResourceContext(uri.toURL(), new URI((super.pathPrefix.isBlank() ? "" :
+                                        super.pathPrefix + Prefix.FILE_SEPARATOR) + super.sourceURL.toURI()
+                                        .relativize(uri)
+                                        .toString()));
                             })).iterator());
         } catch (IOException | URISyntaxException ex) {
             throw new ClasspathDiscoveryException("Failed to create iterator: ", ex);
