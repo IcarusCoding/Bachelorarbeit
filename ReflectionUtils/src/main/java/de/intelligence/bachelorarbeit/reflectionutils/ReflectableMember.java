@@ -3,6 +3,7 @@ package de.intelligence.bachelorarbeit.reflectionutils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+import java.util.Optional;
 
 /**
  * The {@link ReflectableMember} class is an abstract class for reflection scopes that perform reflection on {@link Member} level
@@ -63,8 +64,8 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
     }
 
     @Override
-    public <S extends Annotation> S getAnnotation(Class<S> annotation) {
-        return super.reflectable.getDeclaredAnnotation(annotation);
+    public <S extends Annotation> Optional<S> getAnnotation(Class<S> annotation) {
+        return Optional.ofNullable(super.reflectable.getDeclaredAnnotation(annotation));
     }
 
     @Override

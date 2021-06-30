@@ -3,9 +3,11 @@ package de.intelligence.bachelorarbeit.reflectionutils;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * The {@link ClassReflection} class provides methods to perform reflective operations on {@link Class} level.
@@ -30,7 +32,14 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
         }
     }
 
-    private static void iterateFields(Class<?> clazz, @Nullable Identifier<Field> identifier, Callback<Field> callback) {
+    private static void iterateConstructors(Class<?> clazz, @Nullable Identifier<Constructor<?>> identifier,
+                                            Callback<Constructor<?>> callback) {
+        Arrays.stream(clazz.getDeclaredConstructors()).filter(c -> identifier != null && identifier.check(c))
+                .forEach(callback::callback);
+    }
+
+    private static void iterateFields(Class<?> clazz, @Nullable Identifier<Field> identifier,
+                                      Callback<Field> callback) {
         Arrays.stream(clazz.getDeclaredFields()).filter(f -> identifier != null && identifier.check(f))
                 .forEach(callback::callback);
         if (clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class) {
@@ -68,6 +77,19 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
      */
     public ClassReflection iterateMethods(@Nullable Identifier<Method> identifier, Callback<Method> callback) {
         ClassReflection.iterateMethods(super.reflectable, identifier, callback);
+        return this;
+    }
+
+    /**
+     * Iterates constructors, filters them by an {@link Identifier} and executes a {@link Callback} on each of them
+     *
+     * @param identifier The constructor {@link Identifier}
+     * @param callback   The constructor {@link Callback}
+     * @return This instance
+     */
+    public ClassReflection iterateConstructors(@Nullable Identifier<Constructor<?>> identifier,
+                                               Callback<Constructor<?>> callback) {
+        ClassReflection.iterateConstructors(super.reflectable, identifier, callback);
         return this;
     }
 
@@ -112,8 +134,8 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
     }
 
     @Override
-    public <S extends Annotation> S getAnnotation(Class<S> annotation) {
-        return super.reflectable.getDeclaredAnnotation(annotation);
+    public <S extends Annotation> Optional<S> getAnnotation(Class<S> annotation) {
+        return Optional.ofNullable(super.reflectable.getDeclaredAnnotation(annotation));
     }
 
     @Override
