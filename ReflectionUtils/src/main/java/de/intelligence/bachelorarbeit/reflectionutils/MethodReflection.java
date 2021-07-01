@@ -37,7 +37,7 @@ public final class MethodReflection extends ReflectableMember<Method> {
     public Object invoke(Object... args) {
         return Reflection.makeAccessibleAndExecute(super.reflectable,
                 Modifier.isStatic(super.reflectable.getModifiers()) ? null : super.accessor, super.shouldForceAccess,
-                () -> super.reflectable.invoke(super.accessor, args));
+                super.handler, () -> super.reflectable.invoke(super.accessor, args));
     }
 
     @Override

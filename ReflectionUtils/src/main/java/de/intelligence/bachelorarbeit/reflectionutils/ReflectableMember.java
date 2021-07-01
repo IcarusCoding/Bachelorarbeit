@@ -10,18 +10,20 @@ import java.util.Optional;
  *
  * @author Deniz Groenhoff
  */
-abstract class ReflectableMember<T extends Member & AnnotatedElement> extends ReflectableScope<T> implements Annotatable {
+abstract class ReflectableMember<T extends Member & AnnotatedElement> extends ReflectableScope<T> implements Annotatable, ExceptionHandleable {
 
     protected boolean shouldForceAccess;
     protected Object accessor;
+    protected IReflectionExceptionHandler handler;
 
     protected ReflectableMember(T reflectable) {
-        super(reflectable);
+        this(reflectable, null);
     }
 
     protected ReflectableMember(T reflectable, Object accessor) {
         super(reflectable);
         this.accessor = accessor;
+        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
     /**
@@ -56,6 +58,13 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
      */
     public <T> T getAccessorUnsafe() {
         return (T) this.accessor;
+    }
+
+    @Override
+    public void setExceptionHandler(IReflectionExceptionHandler handler) {
+        if (handler != null) {
+            this.handler = handler;
+        }
     }
 
     @Override

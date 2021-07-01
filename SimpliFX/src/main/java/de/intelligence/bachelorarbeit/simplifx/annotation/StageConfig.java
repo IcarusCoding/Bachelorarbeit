@@ -21,4 +21,6 @@ public @interface StageConfig {
 
     boolean resizeable() default true;
 
+    boolean autoShow() default false;
+
 }

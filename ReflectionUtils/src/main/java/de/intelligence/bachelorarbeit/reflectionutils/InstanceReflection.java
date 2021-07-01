@@ -10,29 +10,37 @@ import java.util.Arrays;
  *
  * @author Deniz Groenhoff
  */
-public final class InstanceReflection extends ReflectableScope<Object> {
+public final class InstanceReflection extends ReflectableScope<Object> implements ExceptionHandleable {
+
+    private IReflectionExceptionHandler handler;
 
     InstanceReflection(Object instance) {
         super(instance);
+        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
-    private static void iterateMethods(Object accessor, @Nullable Identifier<MethodReflection> identifier, Callback<MethodReflection> callback) {
-        Arrays.stream(accessor.getClass().getDeclaredMethods()).map(m -> new MethodReflection(m, accessor))
+    private void iterateMethods(Object accessor, @Nullable Identifier<MethodReflection> identifier,
+                                Callback<MethodReflection> callback) {
+        Arrays.stream(accessor.getClass().getDeclaredMethods())
+                .map(m -> Reflection.setExceptionHandler(new MethodReflection(m, accessor), this.handler))
                 .filter(m -> identifier != null && identifier.check(m)).forEach(callback::callback);
         if (accessor.getClass().isInterface()) {
-            Arrays.stream(accessor.getClass().getInterfaces()).forEach(m -> iterateMethods(accessor.getClass(), identifier, callback));
+            Arrays.stream(accessor.getClass().getInterfaces())
+                    .forEach(m -> this.iterateMethods(accessor.getClass(), identifier, callback));
             return;
         }
         if (accessor.getClass().getSuperclass() != null && accessor.getClass().getSuperclass() != Object.class) {
-            iterateMethods(accessor.getClass().getSuperclass(), identifier, callback);
+            this.iterateMethods(accessor.getClass().getSuperclass(), identifier, callback);
         }
     }
 
-    private static void iterateFields(Object accessor, @Nullable Identifier<FieldReflection> identifier, Callback<FieldReflection> callback) {
-        Arrays.stream(accessor.getClass().getDeclaredFields()).map(f -> new FieldReflection(f, accessor))
+    private void iterateFields(Object accessor, @Nullable Identifier<FieldReflection> identifier,
+                               Callback<FieldReflection> callback) {
+        Arrays.stream(accessor.getClass().getDeclaredFields())
+                .map(f -> Reflection.setExceptionHandler(new FieldReflection(f, accessor), this.handler))
                 .filter(f -> identifier != null && identifier.check(f)).forEach(callback::callback);
         if (accessor.getClass().getSuperclass() != null && accessor.getClass().getSuperclass() != Object.class) {
-            InstanceReflection.iterateFields(accessor.getClass().getSuperclass(), identifier, callback);
+            this.iterateFields(accessor.getClass().getSuperclass(), identifier, callback);
         }
     }
 
@@ -53,7 +61,8 @@ public final class InstanceReflection extends ReflectableScope<Object> {
      * @return A {@link FieldReflection} instance representing the entry point
      */
     public FieldReflection reflectField(String name) {
-        return Reflection.reflect(Reflection.handleReflectiveExceptions(() -> super.reflectable.getClass().getDeclaredField(name)), super.reflectable);
+        return Reflection.reflect(Reflection.handleReflectiveExceptions(this.handler,
+                () -> super.reflectable.getClass().getDeclaredField(name)), super.reflectable);
     }
 
     /**
@@ -83,7 +92,7 @@ public final class InstanceReflection extends ReflectableScope<Object> {
                 continue;
             }
             if (matchArguments(argTypes, method.getParameterTypes())) {
-                return Reflection.reflect(method, super.reflectable);
+                return Reflection.setExceptionHandler(Reflection.reflect(method, super.reflectable), this.handler);
             }
         }
         throw new IllegalArgumentException("No suitable method found!");
@@ -98,7 +107,7 @@ public final class InstanceReflection extends ReflectableScope<Object> {
      * @return This instance
      */
     public InstanceReflection iterateMethods(@Nullable Identifier<MethodReflection> identifier, Callback<MethodReflection> callback) {
-        InstanceReflection.iterateMethods(super.reflectable, identifier, callback);
+        this.iterateMethods(super.reflectable, identifier, callback);
         return this;
     }
 
@@ -111,7 +120,7 @@ public final class InstanceReflection extends ReflectableScope<Object> {
      * @return This instance
      */
     public InstanceReflection iterateFields(@Nullable Identifier<FieldReflection> identifier, Callback<FieldReflection> callback) {
-        InstanceReflection.iterateFields(super.reflectable, identifier, callback);
+        this.iterateFields(super.reflectable, identifier, callback);
         return this;
     }
 
@@ -122,6 +131,11 @@ public final class InstanceReflection extends ReflectableScope<Object> {
      */
     public <T> T getReflectableUnsafe() {
         return Reflection.unsafeCast(super.reflectable);
+    }
+
+    @Override
+    public void setExceptionHandler(IReflectionExceptionHandler handler) {
+        this.handler = handler;
     }
 
 }

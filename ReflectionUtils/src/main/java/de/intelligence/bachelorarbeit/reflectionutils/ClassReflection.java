@@ -14,13 +14,17 @@ import java.util.Optional;
  *
  * @author Deniz Groenhoff
  */
-public final class ClassReflection extends ReflectableScope<Class<?>> implements Annotatable {
+public final class ClassReflection extends ReflectableScope<Class<?>> implements Annotatable, ExceptionHandleable {
+
+    private IReflectionExceptionHandler handler;
 
     ClassReflection(Class<?> clazz) {
         super(clazz);
+        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
-    private static void iterateMethods(Class<?> clazz, @Nullable Identifier<Method> identifier, Callback<Method> callback) {
+    private static void iterateMethods(Class<?> clazz, @Nullable Identifier<Method> identifier,
+                                       Callback<Method> callback) {
         Arrays.stream(clazz.getDeclaredMethods()).filter(m -> identifier != null && identifier.check(m))
                 .forEach(callback::callback);
         if (clazz.isInterface()) {
@@ -62,7 +66,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
                 continue;
             }
             if (matchArguments(argTypes, constructor.getParameterTypes())) {
-                return Reflection.reflect(constructor);
+                return Reflection.setExceptionHandler(Reflection.reflect(constructor), this.handler);
             }
         }
         throw new IllegalArgumentException("No suitable constructor found!");
@@ -122,7 +126,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
                 continue;
             }
             if (matchArguments(argTypes, method.getParameterTypes())) {
-                return Reflection.reflect(method, null);
+                return Reflection.setExceptionHandler(Reflection.reflect(method, null), this.handler);
             }
         }
         throw new IllegalArgumentException("No suitable method found!");
@@ -141,6 +145,13 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
     @Override
     public AnnotatedElement getAnnotatableElement() {
         return super.reflectable;
+    }
+
+    @Override
+    public void setExceptionHandler(IReflectionExceptionHandler handler) {
+        if (handler != null) {
+            this.handler = handler;
+        }
     }
 
 }

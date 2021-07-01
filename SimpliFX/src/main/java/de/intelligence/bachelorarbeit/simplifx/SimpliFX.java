@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 import com.sun.javafx.application.ParametersImpl;
 import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.stage.StageHelper;
+import com.sun.javafx.util.Logging;
 
+import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
@@ -27,10 +29,14 @@ import de.intelligence.bachelorarbeit.simplifx.application.DIConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
+import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.internaldi.Injector;
+import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
 public final class SimpliFX {
+
+    private static final SimpliFXLogger LOG = SimpliFXLogger.create(SimpliFX.class);
 
     private static IDiscoveryResult discoveryResult;
     private static ClasspathScanPolicy scanPolicy = ClasspathScanPolicy.GLOBAL;
@@ -62,7 +68,7 @@ public final class SimpliFX {
                     .findClassesAnnotatedBy(ApplicationEntryPoint.class).stream()
                     .filter(SimpliFX::validateClassType).findFirst();
             if (classOpt.isPresent()) {
-                launchImpl(classOpt.get());
+                SimpliFX.launch(classOpt.get());
                 return;
             }
         }
@@ -71,26 +77,45 @@ public final class SimpliFX {
 
     public static void launch(Class<?> applicationClass) {
         Conditions.checkNull(applicationClass, "Class cannot be null!");
-        Conditions.checkCondition(SimpliFX.validateClassType(applicationClass) && Reflection.reflect(applicationClass)
-                .isAnnotationPresent(ApplicationEntryPoint.class), "Invalid application class specified!");
-        launchImpl(applicationClass);
+        Conditions.checkCondition(SimpliFX.validateEntryPoint(applicationClass),
+                "Invalid application class specified!");
+        final ConstructorReflection conRef = Conditions
+                .nullOnException(() -> Reflection.reflect(applicationClass).findConstructor());
+        Conditions.checkNull(conRef, "Unable to locate default constructor!");
+        SimpliFX.launchImpl(conRef.forceAccess().instantiate().getReflectable());
     }
 
-    private static void launchImpl(Class<?> applicationClass) {
+    public static void launch(Object obj) {
+        Conditions.checkNull(obj, "Instance cannot be null!");
+        Conditions.checkCondition(SimpliFX.validateEntryPoint(obj.getClass()),
+                "Invalid application instance specified!");
+        SimpliFX.launchImpl(obj);
+    }
+
+    private static void launchImpl(Object applicationListener) {
+        Logging.getJavaFXLogger().disableLogging();
         SimpliFX.globalInjector = new Injector(new DIConfig());
+        final Class<?> applicationClass = applicationListener.getClass();
         // ready to launch
         System.out.println(new String(SimpliFXConstants.BANNER));
         System.out.println("READY: " + applicationClass);
-        // TODO init application
 
-        final Application impl = SimpliFX.globalInjector.get(Application.class);
-        Launcher l = new Launcher(applicationClass);
+        final Application appImpl = SimpliFX.globalInjector.get(Application.class);
+        SimpliFX.globalInjector.get(IEventEmitter.class).register(applicationListener);
+        final Thread fxLauncherThread = new Thread(() -> {
+            Launcher l = new Launcher(applicationClass);
+            try {
+                l.launchApplication(appImpl, null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "SimpliFX Launcher Thread");
+        fxLauncherThread.start();
         try {
-            l.launchApplication(impl, null, null);
-        } catch (Exception e) {
+            fxLauncherThread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         // TODO find preloader
         // TODO init all subsystems -> create main controller & controller system, custom fxml loader, ...
     }
@@ -122,6 +147,11 @@ public final class SimpliFX {
     private static boolean validateClassType(Class<?> clazz) {
         return (Modifier.isStatic(clazz.getModifiers()) || clazz.getEnclosingClass() == null)
                 && !Modifier.isAbstract(clazz.getModifiers()) && !clazz.isEnum();
+    }
+
+    private static boolean validateEntryPoint(Class<?> clazz) {
+        return SimpliFX.validateClassType(clazz) && Reflection.reflect(clazz)
+                .isAnnotationPresent(ApplicationEntryPoint.class);
     }
 
     private static final class Launcher {
@@ -182,16 +212,26 @@ public final class SimpliFX {
                 stage.setTitle(config.title());
                 stage.initStyle(config.style());
                 stage.setAlwaysOnTop(config.alwaysTop());
+                boolean iconError = false;
                 if (!config.iconPath().isBlank()) {
                     try (InputStream stream = applicationClass.getResourceAsStream(config.iconPath())) {
                         if (stream != null) {
                             stage.getIcons().add(new Image(stream));
+                        } else {
+                            iconError = true;
                         }
-                    } catch (IOException e) {
-                        //TODO handle
+                    } catch (IOException ignored) {
+                        iconError = true;
                     }
                 }
+                if (iconError) {
+                    LOG.warn("Could not load application icon from {}.");
+                }
                 stage.setResizable(config.resizeable());
+                stage.setOnCloseRequest(w -> PlatformImpl.exit());
+                if (config.autoShow()) {
+                    stage.show();
+                }
             });
             return stage;
         }

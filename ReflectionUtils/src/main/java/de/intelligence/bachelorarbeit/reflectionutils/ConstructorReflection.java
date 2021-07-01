@@ -20,7 +20,7 @@ public final class ConstructorReflection extends ReflectableMember<Constructor<?
      * @return The instantiated object encapsulated in an {@link InstanceReflection}
      */
     public InstanceReflection instantiate(Object... args) {
-        return new InstanceReflection(instantiateAndGet(args));
+        return Reflection.setExceptionHandler(new InstanceReflection(instantiateAndGet(args)), super.handler);
     }
 
     /**
@@ -40,7 +40,7 @@ public final class ConstructorReflection extends ReflectableMember<Constructor<?
      * @return The instantiated object
      */
     public Object instantiateAndGet(Object... args) {
-        return Reflection.makeAccessibleAndExecute(super.reflectable, null, super.shouldForceAccess,
+        return Reflection.makeAccessibleAndExecute(super.reflectable, null, super.shouldForceAccess, super.handler,
                 () -> super.reflectable.newInstance(args));
     }
 
