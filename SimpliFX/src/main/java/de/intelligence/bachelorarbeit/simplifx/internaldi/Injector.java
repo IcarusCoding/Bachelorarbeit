@@ -1,11 +1,10 @@
 package de.intelligence.bachelorarbeit.simplifx.internaldi;
 
+import javax.inject.Inject;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import jakarta.inject.Inject;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.exception.InjectorException;

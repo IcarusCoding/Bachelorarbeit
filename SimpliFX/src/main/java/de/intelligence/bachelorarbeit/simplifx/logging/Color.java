@@ -10,7 +10,15 @@ public enum Color {
     BLUE("\u001B[34m"),
     PURPLE("\u001B[35m"),
     CYAN("\u001B[36m"),
-    WHITE("\u001B[37m");
+    WHITE("\u001B[37m"),
+    GRAY("\u001B[90m"),
+    BRED("\u001B[91m"),
+    BGREEN("\u001B[92m"),
+    BYELLOW("\u001B[93m"),
+    BBLUE("\u001B[94m"),
+    BMAGENTA("\u001B[95m"),
+    BCYAN("\u001B[96m"),
+    BWHITE("\u001B[97m");
 
     private final String color;
 
@@ -19,11 +27,6 @@ public enum Color {
     }
 
     public String getColor() {
-        return this.color;
-    }
-
-    @Override
-    public String toString() {
         return this.color;
     }
 

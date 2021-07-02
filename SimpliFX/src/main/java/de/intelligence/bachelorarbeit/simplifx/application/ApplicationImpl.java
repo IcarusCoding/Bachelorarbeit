@@ -1,9 +1,10 @@
 package de.intelligence.bachelorarbeit.simplifx.application;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import javafx.application.Application;
 import javafx.stage.Stage;
-
-import jakarta.inject.Inject;
 
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
@@ -15,23 +16,23 @@ public final class ApplicationImpl extends Application {
     private final IEventEmitter emitter;
 
     @Inject
-    public ApplicationImpl(IEventEmitter emitter) {
+    public ApplicationImpl(@Named("applicationEmitter") IEventEmitter emitter) {
         this.emitter = emitter;
     }
 
     @Override
     public void init() {
-        this.emitter.emit(new InitEvent());
+        this.emitter.emit(new InitEvent(super.getParameters()));
     }
 
     @Override
     public void start(Stage stage) {
-        this.emitter.emit(new StartEvent(stage));
+        this.emitter.emit(new StartEvent(stage, super.getParameters()));
     }
 
     @Override
     public void stop() {
-        this.emitter.emit(new StopEvent());
+        this.emitter.emit(new StopEvent(super.getParameters()));
     }
 
 }

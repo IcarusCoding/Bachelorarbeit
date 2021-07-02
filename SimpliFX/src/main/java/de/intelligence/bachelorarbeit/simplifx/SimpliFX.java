@@ -16,6 +16,10 @@ import javafx.application.Preloader;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.sun.javafx.application.ParametersImpl;
 import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.stage.StageHelper;
@@ -24,13 +28,13 @@ import com.sun.javafx.util.Logging;
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.annotation.PreloaderEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.application.DIConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
-import de.intelligence.bachelorarbeit.simplifx.internaldi.Injector;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -39,7 +43,7 @@ public final class SimpliFX {
     private static final SimpliFXLogger LOG = SimpliFXLogger.create(SimpliFX.class);
 
     private static IDiscoveryResult discoveryResult;
-    private static ClasspathScanPolicy scanPolicy = ClasspathScanPolicy.GLOBAL;
+    private static ClasspathScanPolicy scanPolicy = ClasspathScanPolicy.LOCAL;
     private static Class<?> callerClass;
     private static Injector globalInjector;
 
@@ -50,10 +54,20 @@ public final class SimpliFX {
     public static void launch() {
         final StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
         SimpliFX.callerClass = walker.getCallerClass();
+        SimpliFX.startDiscovery();
+        SimpliFX.launch(SimpliFX.findApplicationClass());
+    }
 
+    public static void launchWithPreloader() {
+        final StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+        SimpliFX.callerClass = walker.getCallerClass();
+        SimpliFX.startDiscovery();
+        SimpliFX.launch(SimpliFX.findApplicationClass(), SimpliFX.findPreloaderClass());
+    }
+
+    private static Class<?> findApplicationClass() {
         Class<?> applicationClass = null;
-        if (Reflection.reflect(callerClass).isAnnotationPresent(ApplicationEntryPoint.class)
-                && SimpliFX.validateClassType(callerClass)) {
+        if (SimpliFX.validateEntryPoint(callerClass, ApplicationEntryPoint.class)) {
             applicationClass = callerClass;
         } else {
             final List<Class<?>> declared = SimpliFX
@@ -63,49 +77,69 @@ public final class SimpliFX {
             }
         }
         if (applicationClass == null) {
-            SimpliFX.startDiscovery();
-            final Optional<Class<?>> classOpt = SimpliFX.discoveryResult
+            final Optional<Class<?>> clazzOpt = SimpliFX.discoveryResult
                     .findClassesAnnotatedBy(ApplicationEntryPoint.class).stream()
                     .filter(SimpliFX::validateClassType).findFirst();
-            if (classOpt.isPresent()) {
-                SimpliFX.launch(classOpt.get());
-                return;
+            if (clazzOpt.isPresent()) {
+                return clazzOpt.get();
             }
+            throw new IllegalStateException("Could not find application class!");
         }
-        Conditions.checkNull(applicationClass, "Could not find application class!");
+        return applicationClass;
     }
 
-    public static void launch(Class<?> applicationClass) {
-        Conditions.checkNull(applicationClass, "Class cannot be null!");
-        Conditions.checkCondition(SimpliFX.validateEntryPoint(applicationClass),
-                "Invalid application class specified!");
-        final ConstructorReflection conRef = Conditions
-                .nullOnException(() -> Reflection.reflect(applicationClass).findConstructor());
-        Conditions.checkNull(conRef, "Unable to locate default constructor!");
-        SimpliFX.launchImpl(conRef.forceAccess().instantiate().getReflectable());
+    private static Class<?> findPreloaderClass() {
+        final Optional<Class<?>> clazzOpt = SimpliFX.discoveryResult.findClassesAnnotatedBy(PreloaderEntryPoint.class)
+                .stream().filter(SimpliFX::validateClassType).findFirst();
+        if (clazzOpt.isPresent()) {
+            return clazzOpt.get();
+        }
+        throw new IllegalStateException("Could not find preloader class!");
     }
 
-    public static void launch(Object obj) {
-        Conditions.checkNull(obj, "Instance cannot be null!");
-        Conditions.checkCondition(SimpliFX.validateEntryPoint(obj.getClass()),
-                "Invalid application instance specified!");
-        SimpliFX.launchImpl(obj);
+    public static void launch(Class<?> appEntrypointClass) {
+        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(appEntrypointClass, ApplicationEntryPoint.class)
+                .forceAccess().instantiate().getReflectable(), null);
     }
 
-    private static void launchImpl(Object applicationListener) {
+    public static void launch(Class<?> applicationClass, Class<?> preloaderClass) {
+        Conditions.checkCondition(applicationClass != preloaderClass,
+                "Different classes needed for application and preloader entrypoint!");
+        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(applicationClass, ApplicationEntryPoint.class)
+                        .forceAccess().instantiate().getReflectable(),
+                SimpliFX.validateEntrypointClass(preloaderClass, PreloaderEntryPoint.class)
+                        .forceAccess().instantiate().getReflectable());
+    }
+
+
+    public static void launch(Object applicationListener) {
+        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
+        SimpliFX.launchImpl(applicationListener, null);
+    }
+
+    public static void launch(Object applicationListener, Object preloaderListener) {
+        Conditions.checkCondition(applicationListener.getClass() != preloaderListener.getClass(),
+                "Different classes needed for application and preloader entrypoint!");
+        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
+        SimpliFX.validateEntrypointInstance(preloaderListener, PreloaderEntryPoint.class);
+        SimpliFX.launchImpl(applicationListener, preloaderListener);
+    }
+
+    private static void launchImpl(Object applicationListener, Object preloaderListener) {
         Logging.getJavaFXLogger().disableLogging();
-        SimpliFX.globalInjector = new Injector(new DIConfig());
+        SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
         final Class<?> applicationClass = applicationListener.getClass();
-        // ready to launch
-        System.out.println(new String(SimpliFXConstants.BANNER));
-        System.out.println("READY: " + applicationClass);
 
-        final Application appImpl = SimpliFX.globalInjector.get(Application.class);
-        SimpliFX.globalInjector.get(IEventEmitter.class).register(applicationListener);
+        System.out.println(new String(SimpliFXConstants.BANNER));
+        SimpliFX.LOG.info("Starting application with entrypoint: " + applicationClass.getName());
+
+        final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
+        final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
+
         final Thread fxLauncherThread = new Thread(() -> {
-            Launcher l = new Launcher(applicationClass);
+            final Launcher l = new Launcher(appImpl, preImpl);
             try {
-                l.launchApplication(appImpl, null, null);
+                l.launchApplication(applicationListener, preloaderListener, null);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -116,7 +150,6 @@ public final class SimpliFX {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        // TODO find preloader
         // TODO init all subsystems -> create main controller & controller system, custom fxml loader, ...
     }
 
@@ -136,8 +169,7 @@ public final class SimpliFX {
                                                                  Class<? extends Annotation> annotation) {
         final List<Class<?>> validClasses = new ArrayList<>();
         for (Class<?> declaredClass : clazz.getDeclaredClasses()) {
-            if (Reflection.reflect(declaredClass).isAnnotationPresent(annotation)
-                    && SimpliFX.validateClassType(declaredClass)) {
+            if (SimpliFX.validateEntryPoint(declaredClass, annotation)) {
                 validClasses.add(declaredClass);
             }
         }
@@ -149,27 +181,56 @@ public final class SimpliFX {
                 && !Modifier.isAbstract(clazz.getModifiers()) && !clazz.isEnum();
     }
 
-    private static boolean validateEntryPoint(Class<?> clazz) {
+    private static boolean validateEntryPoint(Class<?> clazz, Class<? extends Annotation> annotation) {
         return SimpliFX.validateClassType(clazz) && Reflection.reflect(clazz)
-                .isAnnotationPresent(ApplicationEntryPoint.class);
+                .isAnnotationPresent(annotation);
+    }
+
+    private static ConstructorReflection validateEntrypointClass(Class<?> clazz,
+                                                                 Class<? extends Annotation> annotation) {
+        Conditions.checkNull(clazz, "Entrypoint class cannot be null!");
+        Conditions.checkCondition(SimpliFX.validateEntryPoint(clazz, annotation),
+                "Invalid entrypoint class specified: " + clazz.getSimpleName());
+        final ConstructorReflection conRef = Conditions
+                .nullOnException(() -> Reflection.reflect(clazz).findConstructor());
+        return Conditions.checkNull(conRef, "Unable to locate default constructor!");
+    }
+
+    private static void validateEntrypointInstance(Object instance, Class<? extends Annotation> annotation) {
+        Conditions.checkNull(instance, "Entrypoint instance cannot be null!");
+        Conditions.checkCondition(SimpliFX.validateEntryPoint(instance.getClass(), annotation),
+                "Invalid entrypoint instance specified: " + instance.getClass().getSimpleName());
     }
 
     private static final class Launcher {
 
         private static final AtomicBoolean toolkitInitialized = new AtomicBoolean(false);
 
-        private final Class<?> applicationClass;
-        private final Semaphore applicationExitSem;
-        private final AtomicReference<LaunchState> currAppState;
+        private final Application applicationImpl;
+        private final Preloader preloaderImpl;
 
-        private Launcher(Class<?> applicationClass) {
-            this.applicationClass = applicationClass;
+        private final Semaphore applicationExitSem;
+        private final Semaphore preloaderExitSem;
+        private final AtomicReference<LaunchState> currAppState;
+        private final AtomicReference<LaunchState> currPreState;
+
+        private <T extends Application, S extends Preloader> Launcher(T applicationImpl, S preloaderImpl) {
+            this.applicationImpl = applicationImpl;
+            this.preloaderImpl = preloaderImpl;
             this.applicationExitSem = new Semaphore(0);
+            this.preloaderExitSem = new Semaphore(0);
             this.currAppState = new AtomicReference<>(LaunchState.INIT);
+            this.currPreState = new AtomicReference<>(LaunchState.INIT);
         }
 
-        private <T extends Application, S extends Preloader>
-        void launchApplication(T applicationImpl, S preloaderImpl, String[] args) throws Exception {
+        private void launchApplication(Object applicationListener, Object preloaderListener, String[] args) throws
+                Exception {
+            SimpliFX.globalInjector.getInstance(Key.get(IEventEmitter.class, Names.named("applicationEmitter")))
+                    .register(applicationListener);
+            if (preloaderListener != null) {
+                SimpliFX.globalInjector.getInstance(Key.get(IEventEmitter.class, Names.named("preloaderEmitter")))
+                        .register(preloaderListener);
+            }
             if (!Launcher.toolkitInitialized.getAndSet(true)) {
                 final Semaphore sem = new Semaphore(0);
                 PlatformImpl.startup(sem::release);
@@ -177,14 +238,34 @@ public final class SimpliFX {
             }
             final ExitListener exitListener = new ExitListener();
             PlatformImpl.addListener(exitListener);
+            if (preloaderListener != null) {
+                PlatformImpl.runAndWait(
+                        () -> ParametersImpl.registerParameters(this.preloaderImpl, new ParametersImpl(args)));
+                this.preloaderImpl.init();
+                PlatformImpl.runAndWait(() -> {
+                    this.currPreState.set(LaunchState.START);
+                    final Stage primary = this.createStage(preloaderListener.getClass());
+                    StageHelper.setPrimary(primary, true);
+                    try {
+                        this.preloaderImpl.start(primary);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                this.doNotifyProgress(0);
+            }
+            this.doNotifyProgress(1);
+            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_LOAD);
             PlatformImpl.runAndWait(() -> {
                 ParametersImpl.registerParameters(applicationImpl, new ParametersImpl(args));
                 PlatformImpl.setApplicationName(applicationImpl.getClass());
             });
+            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
             applicationImpl.init();
+            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
-                final Stage primary = this.createStage();
+                final Stage primary = this.createStage(applicationListener.getClass());
                 StageHelper.setPrimary(primary, true);
                 try {
                     applicationImpl.start(primary);
@@ -206,15 +287,39 @@ public final class SimpliFX {
             PlatformImpl.tkExit();
         }
 
-        private Stage createStage() {
+        private void doNotifyProgress(double progress) {
+            if (this.preloaderImpl == null) {
+                return;
+            }
+            PlatformImpl.runAndWait(() -> this.preloaderImpl
+                    .handleProgressNotification(new Preloader.ProgressNotification(progress)));
+        }
+
+        private void doNotifyStateChange(Preloader.StateChangeNotification.Type type) {
+            if (this.preloaderImpl == null) {
+                return;
+            }
+            PlatformImpl.runAndWait(() -> this.preloaderImpl
+                    .handleStateChangeNotification(new Preloader.StateChangeNotification(type, this.applicationImpl)));
+        }
+
+        private void doNotifyError(String message, Throwable cause) {
+            if (this.preloaderImpl == null) {
+                return;
+            }
+            PlatformImpl.runAndWait(() -> this.preloaderImpl
+                    .handleErrorNotification(new Preloader.ErrorNotification(null, message, cause)));
+        }
+
+        private Stage createStage(Class<?> entrypointClass) {
             final Stage stage = new Stage();
-            Reflection.reflect(applicationClass).getAnnotation(StageConfig.class).ifPresent(config -> {
+            Reflection.reflect(entrypointClass).getAnnotation(StageConfig.class).ifPresent(config -> {
                 stage.setTitle(config.title());
                 stage.initStyle(config.style());
                 stage.setAlwaysOnTop(config.alwaysTop());
                 boolean iconError = false;
                 if (!config.iconPath().isBlank()) {
-                    try (InputStream stream = applicationClass.getResourceAsStream(config.iconPath())) {
+                    try (InputStream stream = entrypointClass.getResourceAsStream(config.iconPath())) {
                         if (stream != null) {
                             stage.getIcons().add(new Image(stream));
                         } else {
@@ -225,7 +330,7 @@ public final class SimpliFX {
                     }
                 }
                 if (iconError) {
-                    LOG.warn("Could not load application icon from {}.");
+                    LOG.error("Could not load icon from " + config.iconPath() + ".");
                 }
                 stage.setResizable(config.resizeable());
                 stage.setOnCloseRequest(w -> PlatformImpl.exit());
@@ -256,6 +361,8 @@ public final class SimpliFX {
                 if (implicitExit) {
                     if (Launcher.this.currAppState.get().id >= LaunchState.START.id) {
                         Launcher.this.applicationExitSem.release();
+                    } else if (Launcher.this.currPreState.get().id >= LaunchState.START.id) {
+                        Launcher.this.preloaderExitSem.release();
                     }
                 }
             }

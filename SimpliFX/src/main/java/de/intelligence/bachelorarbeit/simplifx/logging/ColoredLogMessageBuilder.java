@@ -21,12 +21,12 @@ public class ColoredLogMessageBuilder {
     }
 
     public ColoredLogMessageBuilder add(String message, Color color) {
-        this.builder.append(color).append(message).append(Color.RESET);
+        this.builder.append(color.getColor()).append(message).append(Color.RESET.getColor());
         return this;
     }
 
     public ColoredLogMessageBuilder addDate(long millis, DateFormat format, Color color) {
-        this.builder.append(color).append(format.format(new Date(millis))).append(Color.RESET);
+        this.builder.append(color.getColor()).append(format.format(new Date(millis))).append(Color.RESET.getColor());
         return this;
     }
 

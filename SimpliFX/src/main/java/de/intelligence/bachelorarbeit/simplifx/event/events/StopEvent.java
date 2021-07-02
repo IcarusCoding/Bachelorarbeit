@@ -1,3 +1,11 @@
 package de.intelligence.bachelorarbeit.simplifx.event.events;
 
-public final class StopEvent extends AbstractEvent {}
+import javafx.application.Application;
+
+public final class StopEvent extends AbstractApplicationEvent {
+
+    public StopEvent(Application.Parameters parameters) {
+        super(parameters);
+    }
+
+}
