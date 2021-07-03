@@ -5,11 +5,16 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import javafx.application.Application;
 import javafx.application.Preloader;
@@ -28,13 +33,21 @@ import com.sun.javafx.util.Logging;
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.annotation.Localize;
+import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PreloaderEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.annotation.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.application.DIConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
+import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
+import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
+import de.intelligence.bachelorarbeit.simplifx.localization.CompoundResourceBundle;
+import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -46,6 +59,7 @@ public final class SimpliFX {
     private static ClasspathScanPolicy scanPolicy = ClasspathScanPolicy.LOCAL;
     private static Class<?> callerClass;
     private static Injector globalInjector;
+    private static II18N globalI18N;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -136,6 +150,26 @@ public final class SimpliFX {
         final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
         final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
 
+        final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
+                applicationListener, preloaderListener);
+        SimpliFX.globalI18N = SimpliFX.setupI18N(bundleDetector);
+        bundleDetector.injectValue(SimpliFX.globalI18N, true, ex -> {
+            System.out.println("EXCEPTION");
+            //TODO handle
+        });
+
+        final AnnotatedFieldDetector<Localize> detector = new AnnotatedFieldDetector<>(Localize.class,
+                applicationListener);
+        detector.findAllFields();
+        detector.getAnnotations().forEach(localize -> {
+
+        });
+
+        // TODO init all subsystems -> create main controller & controller system, ...
+        //TODO beautify at the end
+        Reflection.reflect(applicationListener).iterateMethods(methodRef ->
+                methodRef.isAnnotationPresent(PostConstruct.class), methodRef -> methodRef.forceAccess().invoke());
+
         final Thread fxLauncherThread = new Thread(() -> {
             final Launcher l = new Launcher(appImpl, preImpl);
             try {
@@ -150,7 +184,31 @@ public final class SimpliFX {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        // TODO init all subsystems -> create main controller & controller system, custom fxml loader, ...
+    }
+
+    private static II18N setupI18N(IAnnotatedFieldDetector<ResourceBundle> bundleDetector) {
+        bundleDetector.findAllFields((f, a) -> f.canAccept(I18N.class));
+        final Map<Locale, List<java.util.ResourceBundle>> bundleMap = new HashMap<>();
+        bundleDetector.getAnnotations()
+                /*.forEach(bundle -> I18N.findAllBundlesWithBaseName(bundle.directory(), bundle.name(), ex -> {
+                    ex.printStackTrace();
+                    //TODO handle
+                }).forEach((l, b) -> {
+                    if (!bundleMap.containsKey(l)) {
+                        bundleMap.put(l, new ArrayList<>());
+                    }
+                    bundleMap.get(l).add(b);
+                }));*/
+                .stream().filter(b -> !b.value().isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
+                .map(locale -> java.util.ResourceBundle.getBundle(b.value(), locale))
+                .filter(Conditions.distinct(java.util.ResourceBundle::getLocale)).forEach(bundle -> {
+                    if (!bundleMap.containsKey(bundle.getLocale())) {
+                        bundleMap.put(bundle.getLocale(), new ArrayList<>());
+                    }
+                    bundleMap.get(bundle.getLocale()).add(bundle);
+                }));
+        return new I18N(bundleMap.entrySet().stream().map(entry ->
+                new CompoundResourceBundle(entry.getKey(), entry.getValue())).collect(Collectors.toList()));
     }
 
     private static void startDiscovery() {

@@ -49,6 +49,14 @@ public final class FieldReflection extends ReflectableMember<Field> {
                 super.handler, () -> super.reflectable.get(super.accessor));
     }
 
+    public boolean canAccept(Object obj) {
+        return this.canAccept(obj.getClass());
+    }
+
+    public boolean canAccept(Class<?> clazz) {
+        return super.reflectable.getType().isAssignableFrom(clazz);
+    }
+
     /**
      * Takes the instance of the {@link Field} and creates a new {@link InstanceReflection} from that
      *

@@ -85,6 +85,7 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <mainClass>de.intelligence.bachelorarbeit.demoapplications.Core</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>${lib.path}</classpathPrefix>
                         </manifest>
@@ -106,6 +107,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>de.intelligence.bachelorarbeit.demoapplications.Core</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

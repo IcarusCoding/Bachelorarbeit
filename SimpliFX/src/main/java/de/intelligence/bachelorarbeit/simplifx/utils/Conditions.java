@@ -1,6 +1,11 @@
 package de.intelligence.bachelorarbeit.simplifx.utils;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
 
@@ -69,6 +74,17 @@ public final class Conditions {
             } catch (Exception ignored) {}
         }
         return null;
+    }
+
+    public static <T> T[] concat(T[] first, T val) {
+        T[] result = Arrays.copyOf(first, first.length + 1);
+        result[first.length] = val;
+        return result;
+    }
+
+    public static <T> Predicate<T> distinct(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 
 }

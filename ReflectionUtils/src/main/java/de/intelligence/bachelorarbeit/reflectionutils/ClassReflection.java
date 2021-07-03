@@ -132,6 +132,16 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
         throw new IllegalArgumentException("No suitable method found!");
     }
 
+    public FieldReflection reflectField(String name) {
+        for (var field : super.reflectable.getDeclaredFields()) {
+            if (!field.getName().equals(name)) {
+                continue;
+            }
+            return Reflection.setExceptionHandler(new FieldReflection(field, null), this.handler);
+        }
+        throw new IllegalArgumentException("No suitable field found!");
+    }
+
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
         return super.reflectable.isAnnotationPresent(annotation);

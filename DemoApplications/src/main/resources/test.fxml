@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="de.intelligence.bachelorarbeit.demoapplications.TestController"
+            prefHeight="400.0" prefWidth="600.0">
+    <AreaChart fx:id="chart" title="%chart.key">
+        <xAxis>
+            <CategoryAxis side="BOTTOM"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis side="LEFT"/>
+        </yAxis>
+    </AreaChart>
+    <!--<TestComponent fx:id="btn" numberOne="%test.key" numberTwo="%test.key2"/>-->
+</AnchorPane>
