@@ -11,6 +11,7 @@
         <module>SimpliFX</module>
         <module>DemoApplications</module>
         <module>ReflectionUtils</module>
+        <module>SimpliFX-Dagger1</module>
     </modules>
 
     <properties>

@@ -58,6 +58,25 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
      * @return A {@link ConstructorReflection} instance representing the new entry point
      */
     public ConstructorReflection findConstructor(Class<?>... argTypes) {
+        final ConstructorReflection constructorRef = this.findConstructor0(argTypes);
+        if (constructorRef != null) {
+            return constructorRef;
+        }
+        throw new IllegalArgumentException("No suitable constructor found!");
+    }
+
+    /**
+     * Finds a constructor with the specified parameter types
+     *
+     * @param argTypes The constructor parameter types
+     * @return An {@link Optional} containing a {@link ConstructorReflection} instance representing the new entry point
+     * or {@link Optional#empty()} if no constructor was found
+     */
+    public Optional<ConstructorReflection> hasConstructor(Class<?>... argTypes) {
+        return Optional.ofNullable(this.findConstructor0(argTypes));
+    }
+
+    private ConstructorReflection findConstructor0(Class<?>... argTypes) {
         if (argTypes == null) {
             argTypes = new Class[0];
         }
@@ -69,7 +88,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
                 return Reflection.setExceptionHandler(Reflection.reflect(constructor), this.handler);
             }
         }
-        throw new IllegalArgumentException("No suitable constructor found!");
+        return null;
     }
 
     /**

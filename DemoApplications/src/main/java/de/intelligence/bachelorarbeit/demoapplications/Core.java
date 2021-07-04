@@ -1,6 +1,10 @@
 package de.intelligence.bachelorarbeit.demoapplications;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -11,27 +15,33 @@ import lombok.extern.log4j.Log4j2;
 
 import de.intelligence.bachelorarbeit.simplifx.ClasspathScanPolicy;
 import de.intelligence.bachelorarbeit.simplifx.SimpliFX;
+import de.intelligence.bachelorarbeit.simplifx.localization.CompoundResourceBundle;
+import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 
 @Log4j2
 public final class Core {
 
+    static II18N ii18N = new I18N(Arrays.asList(new CompoundResourceBundle(Locale.GERMAN,
+                    Collections.singletonList(ResourceBundle.getBundle("TestBundle", Locale.GERMAN))),
+            new CompoundResourceBundle(Locale.ENGLISH,
+                    Collections.singletonList(ResourceBundle.getBundle("TestBundle", Locale.ENGLISH)))));
 
     public static void main(String[] args) throws IOException {
        /* PlatformImpl.startup(() -> {
             Pane p = null;
             try {
                 var loader = new SimpliFXMLLoader(Core.class.getResource("/speed.fxml"));
-                loader.setResources(ResourceBundle.getBundle("TestBundle"));
-                loader.setTestInstance(testInstance);
+                loader.setII18N(ii18N);
                 p = loader.load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             ((Button) p.lookup("#testId")).setOnAction(e -> {
-                if(testInstance.getCurrentLocale().equals(Locale.ENGLISH)) {
-                    testInstance.setLocale(Locale.GERMAN);
+                if(ii18N.getCurrentLocale().equals(Locale.ENGLISH)) {
+                    ii18N.setLocale(Locale.GERMAN);
                 } else {
-                    testInstance.setLocale(Locale.ENGLISH);
+                    ii18N.setLocale(Locale.ENGLISH);
                 }
             });
             Stage s = new Stage();

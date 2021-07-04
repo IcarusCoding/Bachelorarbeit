@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,10 +32,12 @@ import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.stage.StageHelper;
 import com.sun.javafx.util.Logging;
 
+import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
+import de.intelligence.bachelorarbeit.reflectionutils.MethodReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
-import de.intelligence.bachelorarbeit.simplifx.annotation.Localize;
+import de.intelligence.bachelorarbeit.simplifx.annotation.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PreloaderEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.ResourceBundle;
@@ -42,6 +46,8 @@ import de.intelligence.bachelorarbeit.simplifx.application.DIConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
+import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
+import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
@@ -60,6 +66,7 @@ public final class SimpliFX {
     private static Class<?> callerClass;
     private static Injector globalInjector;
     private static II18N globalI18N;
+    private static DIEnvironment appDIEnv;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -158,12 +165,33 @@ public final class SimpliFX {
             //TODO handle
         });
 
-        final AnnotatedFieldDetector<Localize> detector = new AnnotatedFieldDetector<>(Localize.class,
-                applicationListener);
-        detector.findAllFields();
-        detector.getAnnotations().forEach(localize -> {
-
-        });
+        final Annotation[] annotations = applicationListener.getClass().getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
+                final DIAnnotation diAnnotation = annotation.annotationType().getAnnotation(DIAnnotation.class);
+                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = diAnnotation.value();
+                final ClassReflection classRef = Reflection.reflect(factory);
+                final Optional<ConstructorReflection> constructorRefOpt = classRef.hasConstructor();
+                if (constructorRefOpt.isEmpty()) {
+                    LOG.warn("Failed to instantiate DI factory " + classRef.getReflectable().getSimpleName()
+                            + ". Reason: Missing default constructor.");
+                    break;
+                }
+                final ParameterizedType type = (ParameterizedType) factory.getGenericInterfaces()[0];
+                final Type typeArg = type.getActualTypeArguments()[0];
+                final Class<?> clazz = (Class<?>) typeArg;
+                final IDIEnvironmentFactory<?> factoryInstance = constructorRefOpt.get().instantiateUnsafeAndGet();
+                final MethodReflection methodRef = Reflection.reflect(factoryInstance)
+                        .reflectMethod("create", Object.class, clazz);
+                methodRef.setExceptionHandler(ex -> {
+                    //TODO exception display depending on verbosity level
+                    LOG.warn("Exception occurred while injecting:");
+                    ex.printStackTrace();
+                });
+                SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
+                break;
+            }
+        }
 
         // TODO init all subsystems -> create main controller & controller system, ...
         //TODO beautify at the end

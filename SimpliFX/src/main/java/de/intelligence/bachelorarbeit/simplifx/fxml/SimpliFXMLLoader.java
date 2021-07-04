@@ -2409,6 +2409,7 @@ public class SimpliFXMLLoader {
                             return TranslatableBuilderProperty
                                     .createWithParameters(controller, property.get(), propertyName, aValue, ii18N);
                         }
+                        return new TranslatableBuilderProperty(ii18N.createBindingForKey(aValue), aValue);
                     } else {
                         return new TranslatableBuilderProperty(null, aValue);
                     }

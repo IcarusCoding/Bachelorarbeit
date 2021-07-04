@@ -7,6 +7,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import com.google.inject.Inject;
+
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
@@ -16,12 +18,17 @@ import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.event.events.StopEvent;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
+import de.intelligence.bachelorarbeit.simplifx.guice.GuiceInjection;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 
+@GuiceInjection({TestGuiceModule.class})
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
         resizeable = false, iconPath = "/icon.png")
 @ApplicationEntryPoint(Core.class)
 public final class TestApplication {
+
+    @Inject
+    private ITestService service;
 
     @ResourceBundle("TestBundle")
     private II18N language;
@@ -31,7 +38,8 @@ public final class TestApplication {
 
     @PostConstruct
     private void postConstructTest() {
-        //System.out.println("Post Construct: " + language.get("test.key") + " " + language.get("test.key2"));
+        System.out.println("Post Construct: " + language.get("test.key") + " " + language.get("test.key2"));
+        service.test();
     }
 
     @EventHandler
