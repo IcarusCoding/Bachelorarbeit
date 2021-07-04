@@ -1,40 +1,39 @@
 package de.intelligence.bachelorarbeit.demoapplications;
 
 import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
+import javafx.scene.control.Button;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.LocalizeValue;
 
 //TODO test localize arguments normal fxmlloader
 public class TestController {
 
-    @LocalizeValue(id = "btn", property = "numberOne")
-    private final IntegerProperty property;
-    @LocalizeValue(id = "btn", property = "numberTwo")
-    private final IntegerProperty property2;
-    @LocalizeValue(id = "chart", property = "title") //TODO check if empty
+    @LocalizeValue(id = "chart", property = "title")
     private final FloatProperty charProperty;
+
+    @LocalizeValue(id = "chart", property = "title")
+    private final FloatProperty charProperty2;
+
     @FXML
     private AreaChart<Number, Number> chart;
     @FXML
-    private TestComponent btn;
+    private Button btn;
 
     public TestController() {
-        property = new SimpleIntegerProperty(42);
-        property2 = new SimpleIntegerProperty(100000);
         charProperty = new SimpleFloatProperty(55.6F);
+        charProperty2 = new SimpleFloatProperty(888888.8F);
     }
 
     @FXML
     private void initialize() {
-
+        btn.setOnAction(e -> {
+            charProperty.setValue(charProperty.get() + Math.random());
+            charProperty2.setValue(charProperty2.get() + Math.random());
+        });
         System.out.println(btn);
-
-
     }
 
 }

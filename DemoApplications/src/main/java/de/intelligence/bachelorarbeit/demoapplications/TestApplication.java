@@ -45,7 +45,7 @@ public final class TestApplication {
         final Stage testStage = event.getStage();
         // testing
         final SimpliFXMLLoader loader = new SimpliFXMLLoader(getClass().getResource("/test.fxml"));
-        loader.setTestInstance(language);
+        loader.setII18N(language);
         try {
             Pane p = loader.load();
             Scene scene = new Scene(p);

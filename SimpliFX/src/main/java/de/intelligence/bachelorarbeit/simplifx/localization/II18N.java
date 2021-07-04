@@ -21,4 +21,6 @@ public interface II18N {
 
     void setLocale(Locale locale);
 
+    boolean containsKey(String key);
+
 }

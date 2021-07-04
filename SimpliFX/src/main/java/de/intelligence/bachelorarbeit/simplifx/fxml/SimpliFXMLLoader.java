@@ -61,9 +61,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -86,7 +84,6 @@ import javafx.collections.SetChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.fxml.LoadException;
 import javafx.fxml.LoadListener;
@@ -124,7 +121,6 @@ import static com.sun.javafx.FXPermissions.MODIFY_FXML_CLASS_LOADER_PERMISSION;
  *
  * @since JavaFX 2.0
  */
-//TODO replace resourcebundle with I18N instance
 public class SimpliFXMLLoader {
 
     /**
@@ -179,10 +175,6 @@ public class SimpliFXMLLoader {
      * The {@literal <fx:include>} 'source' attribute.
      */
     public static final String INCLUDE_SOURCE_ATTRIBUTE = "source";
-    /**
-     * The {@literal <fx:include>} 'resources' attribute.
-     */
-    public static final String INCLUDE_RESOURCES_ATTRIBUTE = "resources";
     /**
      * The {@literal <fx:include>} 'charset' attribute.
      */
@@ -374,9 +366,8 @@ public class SimpliFXMLLoader {
     private final LinkedList<SimpliFXMLLoader> loaders;
     private final SimpliFXMLLoader.ControllerAccessor controllerAccessor =
             new SimpliFXMLLoader.ControllerAccessor();
-    private II18N testInstance; // TODO remove
+    private II18N ii18N;
     private URL location;
-    private ResourceBundle resources;
     private ObservableMap<String, Object> namespace = FXCollections.observableHashMap();
     private Object root = null;
     private Object controller = null;
@@ -415,38 +406,36 @@ public class SimpliFXMLLoader {
     /**
      * Creates a new FXMLLoader instance.
      *
-     * @param location  the location used to resolve relative path attribute values
-     * @param resources the resources used to resolve resource key attribute values
-     * @since JavaFX 2.1
+     * @param location the location used to resolve relative path attribute values
+     * @param ii18N    the {@link II18N} instance used to resolve resource key attribute values
      */
-    public SimpliFXMLLoader(URL location, ResourceBundle resources) {
-        this(location, resources, null);
+    public SimpliFXMLLoader(URL location, II18N ii18N) {
+        this(location, ii18N, null);
     }
 
     /**
      * Creates a new FXMLLoader instance.
      *
      * @param location       the location used to resolve relative path attribute values
-     * @param resources      resources used to resolve resource key attribute values
+     * @param ii18N          the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory the builder factory used by this loader
-     * @since JavaFX 2.1
      */
-    public SimpliFXMLLoader(URL location, ResourceBundle resources, BuilderFactory builderFactory) {
-        this(location, resources, builderFactory, null);
+    public SimpliFXMLLoader(URL location, II18N ii18N, BuilderFactory builderFactory) {
+        this(location, ii18N, builderFactory, null);
     }
 
     /**
      * Creates a new FXMLLoader instance.
      *
      * @param location          the location used to resolve relative path attribute values
-     * @param resources         resources used to resolve resource key attribute values
+     * @param ii18N             the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory    the builder factory used by this loader
      * @param controllerFactory the controller factory used by this loader
      * @since JavaFX 2.1
      */
-    public SimpliFXMLLoader(URL location, ResourceBundle resources, BuilderFactory builderFactory,
+    public SimpliFXMLLoader(URL location, II18N ii18N, BuilderFactory builderFactory,
                             Callback<Class<?>, Object> controllerFactory) {
-        this(location, resources, builderFactory, controllerFactory, Charset.forName(DEFAULT_CHARSET_NAME));
+        this(location, ii18N, builderFactory, controllerFactory, Charset.forName(DEFAULT_CHARSET_NAME));
     }
 
     /**
@@ -462,15 +451,15 @@ public class SimpliFXMLLoader {
      * Creates a new FXMLLoader instance.
      *
      * @param location          the location used to resolve relative path attribute values
-     * @param resources         resources used to resolve resource key attribute values
+     * @param ii18N             the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory    the builder factory used by this loader
      * @param controllerFactory the controller factory used by this loader
      * @param charset           the character set used by this loader
      * @since JavaFX 2.1
      */
-    public SimpliFXMLLoader(URL location, ResourceBundle resources, BuilderFactory builderFactory,
+    public SimpliFXMLLoader(URL location, II18N ii18N, BuilderFactory builderFactory,
                             Callback<Class<?>, Object> controllerFactory, Charset charset) {
-        this(location, resources, builderFactory, controllerFactory, charset,
+        this(location, ii18N, builderFactory, controllerFactory, charset,
                 new LinkedList<SimpliFXMLLoader>());
     }
 
@@ -478,18 +467,18 @@ public class SimpliFXMLLoader {
      * Creates a new FXMLLoader instance.
      *
      * @param location          the location used to resolve relative path attribute values
-     * @param resources         resources used to resolve resource key attribute values
+     * @param ii18N             the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory    the builder factory used by this loader
      * @param controllerFactory the controller factory used by this loader
      * @param charset           the character set used by this loader
      * @param loaders           list of loaders
      * @since JavaFX 2.1
      */
-    public SimpliFXMLLoader(URL location, ResourceBundle resources, BuilderFactory builderFactory,
+    public SimpliFXMLLoader(URL location, II18N ii18N, BuilderFactory builderFactory,
                             Callback<Class<?>, Object> controllerFactory, Charset charset,
                             LinkedList<SimpliFXMLLoader> loaders) {
         setLocation(location);
-        setResources(resources);
+        setII18N(ii18N);
         setBuilderFactory(builderFactory);
         setControllerFactory(controllerFactory);
         setCharset(charset);
@@ -608,23 +597,23 @@ public class SimpliFXMLLoader {
     /**
      * Loads an object hierarchy from a FXML document.
      *
-     * @param <T>       the type of the root object
-     * @param location  the location used to resolve relative path attribute values
-     * @param resources the resources used to resolve resource key attribute values
+     * @param <T>      the type of the root object
+     * @param location the location used to resolve relative path attribute values
+     * @param ii18N    the {@link II18N} instance used to resolve resource key attribute values
      * @return the loaded object hierarchy
      * @throws IOException if an error occurs during loading
      */
-    public static <T> T load(URL location, ResourceBundle resources)
+    public static <T> T load(URL location, II18N ii18N)
             throws IOException {
-        return loadImpl(location, resources,
+        return loadImpl(location, ii18N,
                 (System.getSecurityManager() != null)
                         ? walker.getCallerClass()
                         : null);
     }
 
-    private static <T> T loadImpl(URL location, ResourceBundle resources,
+    private static <T> T loadImpl(URL location, II18N ii18N,
                                   Class<?> callerClass) throws IOException {
-        return loadImpl(location, resources, null,
+        return loadImpl(location, ii18N, null,
                 callerClass);
     }
 
@@ -633,24 +622,24 @@ public class SimpliFXMLLoader {
      *
      * @param <T>            the type of the root object
      * @param location       the location used to resolve relative path attribute values
-     * @param resources      the resources used to resolve resource key attribute values
+     * @param ii18N          the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory the builder factory used to load the document
      * @return the loaded object hierarchy
      * @throws IOException if an error occurs during loading
      */
-    public static <T> T load(URL location, ResourceBundle resources,
+    public static <T> T load(URL location, II18N ii18N,
                              BuilderFactory builderFactory)
             throws IOException {
-        return loadImpl(location, resources, builderFactory,
+        return loadImpl(location, ii18N, builderFactory,
                 (System.getSecurityManager() != null)
                         ? walker.getCallerClass()
                         : null);
     }
 
-    private static <T> T loadImpl(URL location, ResourceBundle resources,
+    private static <T> T loadImpl(URL location, II18N ii18N,
                                   BuilderFactory builderFactory,
                                   Class<?> callerClass) throws IOException {
-        return loadImpl(location, resources, builderFactory, null, callerClass);
+        return loadImpl(location, ii18N, builderFactory, null, callerClass);
     }
 
     /**
@@ -658,28 +647,28 @@ public class SimpliFXMLLoader {
      *
      * @param <T>               the type of the root object
      * @param location          the location used to resolve relative path attribute values
-     * @param resources         the resources used to resolve resource key attribute values
+     * @param ii18N             the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory    the builder factory used when loading the document
      * @param controllerFactory the controller factory used when loading the document
      * @return the loaded object hierarchy
      * @throws IOException if an error occurs during loading
      * @since JavaFX 2.1
      */
-    public static <T> T load(URL location, ResourceBundle resources,
+    public static <T> T load(URL location, II18N ii18N,
                              BuilderFactory builderFactory,
                              Callback<Class<?>, Object> controllerFactory)
             throws IOException {
-        return loadImpl(location, resources, builderFactory, controllerFactory,
+        return loadImpl(location, ii18N, builderFactory, controllerFactory,
                 (System.getSecurityManager() != null)
                         ? walker.getCallerClass()
                         : null);
     }
 
-    private static <T> T loadImpl(URL location, ResourceBundle resources,
+    private static <T> T loadImpl(URL location, II18N ii18N,
                                   BuilderFactory builderFactory,
                                   Callback<Class<?>, Object> controllerFactory,
                                   Class<?> callerClass) throws IOException {
-        return loadImpl(location, resources, builderFactory, controllerFactory,
+        return loadImpl(location, ii18N, builderFactory, controllerFactory,
                 Charset.forName(DEFAULT_CHARSET_NAME), callerClass);
     }
 
@@ -688,7 +677,7 @@ public class SimpliFXMLLoader {
      *
      * @param <T>               the type of the root object
      * @param location          the location used to resolve relative path attribute values
-     * @param resources         the resources used to resolve resource key attribute values
+     * @param ii18N             the {@link II18N} instance used to resolve resource key attribute values
      * @param builderFactory    the builder factory used when loading the document
      * @param controllerFactory the controller factory used when loading the document
      * @param charset           the character set used when loading the document
@@ -696,18 +685,18 @@ public class SimpliFXMLLoader {
      * @throws IOException if an error occurs during loading
      * @since JavaFX 2.1
      */
-    public static <T> T load(URL location, ResourceBundle resources,
+    public static <T> T load(URL location, II18N ii18N,
                              BuilderFactory builderFactory,
                              Callback<Class<?>, Object> controllerFactory,
                              Charset charset) throws IOException {
-        return loadImpl(location, resources, builderFactory, controllerFactory,
+        return loadImpl(location, ii18N, builderFactory, controllerFactory,
                 charset,
                 (System.getSecurityManager() != null)
                         ? walker.getCallerClass()
                         : null);
     }
 
-    private static <T> T loadImpl(URL location, ResourceBundle resources,
+    private static <T> T loadImpl(URL location, II18N ii18N,
                                   BuilderFactory builderFactory,
                                   Callback<Class<?>, Object> controllerFactory,
                                   Charset charset, Class<?> callerClass)
@@ -717,7 +706,7 @@ public class SimpliFXMLLoader {
         }
 
         SimpliFXMLLoader fxmlLoader =
-                new SimpliFXMLLoader(location, resources, builderFactory,
+                new SimpliFXMLLoader(location, ii18N, builderFactory,
                         controllerFactory, charset);
 
         return fxmlLoader.<T>loadImpl(callerClass);
@@ -809,10 +798,6 @@ public class SimpliFXMLLoader {
         }
     }
 
-    public void setTestInstance(II18N testInstance) {
-        this.testInstance = testInstance;
-    }
-
     private void injectFields(String fieldName, Object value) throws LoadException {
         if (controller != null && fieldName != null) {
             List<Field> fields = controllerAccessor.getControllerFields().get(fieldName);
@@ -847,21 +832,21 @@ public class SimpliFXMLLoader {
     }
 
     /**
-     * Returns the resources used to resolve resource key attribute values.
+     * Returns the {@link II18N} instance used to resolve resource key attribute values.
      *
-     * @return the resources used to resolve resource key attribute values
+     * @return the {@link II18N} instance used to resolve resource key attribute values
      */
-    public ResourceBundle getResources() {
-        return resources;
+    public II18N getII18N() {
+        return this.ii18N;
     }
 
     /**
-     * Sets the resources used to resolve resource key attribute values.
+     * Sets the {@link II18N} instance used to resolve resource key attribute values.
      *
-     * @param resources the resources
+     * @param ii18N the {@link II18N} instance
      */
-    public void setResources(ResourceBundle resources) {
-        this.resources = resources;
+    public void setII18N(II18N ii18N) {
+        this.ii18N = ii18N;
     }
 
     /**
@@ -1153,7 +1138,7 @@ public class SimpliFXMLLoader {
 
             // Initialize the namespace
             namespace.put(LOCATION_KEY, location);
-            namespace.put(RESOURCES_KEY, resources);
+            namespace.put(RESOURCES_KEY, ii18N);
 
             // Clear the script engine
             scriptEngine = null;
@@ -1236,7 +1221,7 @@ public class SimpliFXMLLoader {
 
             if (controller != null) {
                 if (controller instanceof Initializable) {
-                    ((Initializable) controller).initialize(location, resources);
+                    ((Initializable) controller).initialize(location, ii18N);
                 } else {
                     // Inject controller fields
                     Map<String, List<Field>> controllerFields =
@@ -1244,7 +1229,7 @@ public class SimpliFXMLLoader {
 
                     injectFields(LOCATION_KEY, location);
 
-                    injectFields(RESOURCES_KEY, resources);
+                    injectFields(RESOURCES_KEY, ii18N);
 
                     // Initialize the controller
                     Method initializeMethod = controllerAccessor
@@ -2052,12 +2037,33 @@ public class SimpliFXMLLoader {
         }
     }
 
-    public static class TranslatableBuilderProperty {
+    private static class TranslatableBuilderProperty {
 
         private final StringBinding translationBinding;
+        private final String key;
 
-        public TranslatableBuilderProperty(StringBinding translationBinding) {
+        private TranslatableBuilderProperty(StringBinding translationBinding, String key) {
             this.translationBinding = translationBinding;
+            this.key = key;
+        }
+
+        private static TranslatableBuilderProperty createWithParameters(Object controller, String fxId,
+                                                                        String propertyName, String key, II18N ii18N) {
+            final IAnnotatedFieldDetector<LocalizeValue> detector =
+                    new AnnotatedFieldDetector<>(LocalizeValue.class, controller);
+            detector.findAllFields((fieldRef, a) -> {
+                fieldRef.forceAccess();
+                return fieldRef.get() != null &&
+                        Property.class.isAssignableFrom(fieldRef.getReflectable().getType()) &&
+                        a[0].id().equals(fxId) && a[0].property().equals(propertyName);
+            });
+            final Map<Field, LocalizeValue[]> fields = detector.getAnnotatedFields(controller);
+            final Map<Integer, Property<?>> props = new TreeMap<>();
+            fields.forEach((f, v) -> props.put(v[0].index(),
+                    Reflection.reflect(f, controller).forceAccess().getUnsafe()));
+            return new TranslatableBuilderProperty(
+                    ii18N.createObservedBinding(key, props.values()
+                            .toArray()), key);
         }
 
     }
@@ -2277,9 +2283,6 @@ public class SimpliFXMLLoader {
                 throw constructLoadException(
                         new UnsupportedOperationException("This feature is not currently enabled."));
             } else {
-                // System.out.println("A: " + attribute.sourceType);
-                // System.out.println(attribute.name);
-                // System.out.println("C: " + value);
                 processValue(attribute.sourceType, attribute.name, value);
             }
         }
@@ -2295,13 +2298,11 @@ public class SimpliFXMLLoader {
 
         private boolean processValue(Class sourceType, String propertyName, String aValue)
                 throws LoadException {
-            // Arrays.stream(Thread.currentThread().getStackTrace()).forEach(System.out::println);
             boolean processed = false;
             //process list or array first
             if (sourceType == null && isTyped()) {
                 BeanAdapter valueAdapter = getValueAdapter();
                 Class<?> type = valueAdapter.getType(propertyName);
-                //TODO localization point?
                 if (type == null) {
                     throw new PropertyNotFoundException("Property \"" + propertyName
                             + "\" does not exist" + " or is read-only.");
@@ -2376,17 +2377,15 @@ public class SimpliFXMLLoader {
                     return aValue;
                 } else {
                     // Resolve the resource value
-                    //TODO remove
-                   /* if (resources == null) {
-                        throw constructLoadException("No resources specified.");
+                    if (ii18N == null) {
+                        throw constructLoadException("No II18N instance specified.");
                     }
-                    if (!resources.containsKey(aValue)) {
+                    if (!ii18N.containsKey(aValue)) {
                         throw constructLoadException("Resource \"" + aValue + "\" not found.");
-                    }*/
-                    return testInstance.get(aValue);
+                    }
+                    return ii18N.get(aValue);
                 }
             } else if (aValue.startsWith(RESOURCE_KEY_PREFIX)) {
-                //System.out.println("Found resource key: " + aValue);
                 aValue = aValue.substring(RESOURCE_KEY_PREFIX.length());
                 if (aValue.length() == 0) {
                     throw constructLoadException("Missing resource key.");
@@ -2397,46 +2396,22 @@ public class SimpliFXMLLoader {
                     return aValue;
                 } else {
                     // Resolve the resource value
-                    //TODO remove
-                    /*if (resources == null) {
-                        throw constructLoadException("No resources specified.");
+                    if (ii18N == null) {
+                        throw constructLoadException("No II18N instance specified.");
                     }
-                    if (!resources.containsKey(aValue)) {
+                    if (!ii18N.containsKey(aValue)) {
                         throw constructLoadException("Resource \"" + aValue + "\" not found.");
-                    }*/
+                    }
                     if (valueAdapter != null) {
                         final ObservableValue<?> val = valueAdapter.getPropertyModel("id");
-                        System.out.println("VAL: " + propertyName);
-
                         if (val instanceof StringProperty && controller != null && propertyName != null) {
                             final StringProperty property = (StringProperty) val;
-                            final String fxId = property.get();
-                            final IAnnotatedFieldDetector<LocalizeValue> detector =
-                                    new AnnotatedFieldDetector<>(LocalizeValue.class, controller);
-                            detector.findAllFields((fieldRef, a) -> {
-                                fieldRef.forceAccess();
-                                return fieldRef.get() != null &&
-                                        Property.class.isAssignableFrom(fieldRef.getReflectable().getType()) &&
-                                        a[0].id().equals(fxId) && a[0].property().equals(propertyName);
-                            });
-                            final Map<Field, LocalizeValue[]> fields = detector.getAnnotatedFields(controller);
-                            final Map<Integer, Property<?>> props = new TreeMap<>();
-                            fields.forEach((f, v) -> props.put(v[0].index(),
-                                    Reflection.reflect(f, controller).forceAccess().getUnsafe()));
-                            return new TranslatableBuilderProperty(
-                                    testInstance.createObservedBinding(aValue, props.values()
-                                            .toArray()));
+                            return TranslatableBuilderProperty
+                                    .createWithParameters(controller, property.get(), propertyName, aValue, ii18N);
                         }
-                    } else if (value instanceof ProxyBuilder) {
-                        final ProxyBuilder<?> proxyBuilder = (ProxyBuilder<?>) value;
-                        final Map<String, Object> userValues = Reflection.reflect(proxyBuilder)
-                                .reflectField("propertiesMap").forceAccess().getUnsafe();
-                        userValues.forEach((name, val) -> {
-                            System.out.println(name);
-                        });
-                        //System.out.println(adapter.getPropertyModel("title"));
+                    } else {
+                        return new TranslatableBuilderProperty(null, aValue);
                     }
-                    return new TranslatableBuilderProperty(testInstance.createBindingForKey(aValue));
                 }
             } else if (aValue.startsWith(EXPRESSION_PREFIX)) {
                 aValue = aValue.substring(EXPRESSION_PREFIX.length());
@@ -2519,18 +2494,13 @@ public class SimpliFXMLLoader {
                     + "Please use \\" + prefix + " instead.");
         }
 
-        // TODO ENTRY POINT FOR LOCALIZATION
         public void applyProperty(String name, Class<?> sourceType, Object value) {
-            //System.out.println("APPLY PROPERTY: " + name + " " + sourceType+ " " + value);
             if (sourceType == null) {
                 var m = getProperties();
                 if (value instanceof TranslatableBuilderProperty) {
                     final TranslatableBuilderProperty builderProperty = (TranslatableBuilderProperty) value;
                     final StringBinding binding = builderProperty.translationBinding;
                     if (m instanceof ProxyBuilder<?>) {
-                        final ProxyBuilder<?> builder = (ProxyBuilder<?>) m;
-                        System.out.println("PROXY BUILDER: " + name);
-                        //System.out.println(builder.entrySet());
                         m.put(name, builderProperty);
                     } else if (m instanceof BeanAdapter) {
                         m.put(name, binding.get());
@@ -2803,8 +2773,6 @@ public class SimpliFXMLLoader {
         @SuppressWarnings("unchecked")
         public void processEndElement() throws IOException {
             super.processEndElement();
-
-            // Build the value, if necessary
             if (value instanceof Builder<?>) {
                 Builder<Object> builder = (Builder<Object>) value;
                 updateValue(builder.build());
@@ -2818,11 +2786,17 @@ public class SimpliFXMLLoader {
                             final ObservableValue<?> obsVal = new BeanAdapter(value).getPropertyModel(name);
                             if (obsVal instanceof StringProperty) {
                                 final StringProperty strProp = (StringProperty) obsVal;
-                                strProp.bind(transProp.translationBinding);
+                                final String key = transProp.key;
+                                if (controller != null && name != null && fx_id != null) {
+                                    final TranslatableBuilderProperty bindProp = TranslatableBuilderProperty
+                                            .createWithParameters(controller, fx_id, name, key, ii18N);
+                                    strProp.bind(bindProp.translationBinding);
+                                    return;
+                                }
+                                strProp.bind(ii18N.createBindingForKey(key));
                             }
                         }
                     });
-                    //System.out.println(adapter.getPropertyModel("title"));
                 }
 
                 processValue();
@@ -3135,7 +3109,7 @@ public class SimpliFXMLLoader {
     // Element representing an include
     private class IncludeElement extends SimpliFXMLLoader.ValueElement {
         public String source = null;
-        public ResourceBundle resources = SimpliFXMLLoader.this.resources;
+        public II18N resources = SimpliFXMLLoader.this.ii18N;
         public Charset charset = SimpliFXMLLoader.this.charset;
 
         @Override
@@ -3148,13 +3122,6 @@ public class SimpliFXMLLoader {
                     }
 
                     source = value;
-                } else if (localName.equals(INCLUDE_RESOURCES_ATTRIBUTE)) {
-                    if (loadListener != null) {
-                        loadListener.readInternalAttribute(localName, value);
-                    }
-
-                    resources = ResourceBundle.getBundle(value, Locale.getDefault(),
-                            SimpliFXMLLoader.this.resources.getClass().getClassLoader());
                 } else if (localName.equals(INCLUDE_CHARSET_ATTRIBUTE)) {
                     if (loadListener != null) {
                         loadListener.readInternalAttribute(localName, value);

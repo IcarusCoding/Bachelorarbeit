@@ -35,4 +35,9 @@ public final class CompoundResourceBundle extends ResourceBundle {
         return Collections.enumeration(this.resources.keySet());
     }
 
+    @Override
+    public boolean containsKey(String key) {
+        return this.resources.containsKey(key);
+    }
+
 }

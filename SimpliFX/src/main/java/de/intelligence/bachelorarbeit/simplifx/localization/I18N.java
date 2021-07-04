@@ -75,6 +75,11 @@ public final class I18N implements II18N {
         }
     }
 
+    @Override
+    public boolean containsKey(String key) {
+        return this.bundles.get(this.currentLocale.get()).containsKey(key);
+    }
+
   /*  public static Map<Locale, ResourceBundle> findAllBundlesWithBaseName(String directory, String base,
                                                                          Consumer<Exception> exceptionConsumer) {
         final List<Locale> foundLocales = FileUtils.getFilesFromClasspathDirectory(directory).stream().map(Path::toString)
