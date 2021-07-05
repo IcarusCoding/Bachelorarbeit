@@ -15,6 +15,9 @@ public interface ExceptionSupplier<T, U extends Exception> {
         try {
             return getWithException();
         } catch (Exception ex) {
+            if (handler == null) {
+                throw new ReflectionException(ex);
+            }
             handler.handleException(ex);
         }
         return null;

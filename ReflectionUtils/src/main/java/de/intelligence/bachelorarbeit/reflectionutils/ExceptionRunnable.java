@@ -13,6 +13,9 @@ public interface ExceptionRunnable<T extends Exception> {
         try {
             runWithException();
         } catch (Exception ex) {
+            if (handler == null) {
+                throw new ReflectionException(ex);
+            }
             handler.handleException(ex);
         }
     }

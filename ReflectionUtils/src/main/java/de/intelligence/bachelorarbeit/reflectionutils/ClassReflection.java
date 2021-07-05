@@ -20,7 +20,6 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
 
     ClassReflection(Class<?> clazz) {
         super(clazz);
-        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
     private static void iterateMethods(Class<?> clazz, @Nullable Identifier<Method> identifier,

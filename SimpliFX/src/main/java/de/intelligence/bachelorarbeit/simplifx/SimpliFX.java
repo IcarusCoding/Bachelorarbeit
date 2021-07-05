@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -165,32 +164,12 @@ public final class SimpliFX {
             //TODO handle
         });
 
-        final Annotation[] annotations = applicationListener.getClass().getAnnotations();
-        for (Annotation annotation : annotations) {
-            if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
-                final DIAnnotation diAnnotation = annotation.annotationType().getAnnotation(DIAnnotation.class);
-                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = diAnnotation.value();
-                final ClassReflection classRef = Reflection.reflect(factory);
-                final Optional<ConstructorReflection> constructorRefOpt = classRef.hasConstructor();
-                if (constructorRefOpt.isEmpty()) {
-                    LOG.warn("Failed to instantiate DI factory " + classRef.getReflectable().getSimpleName()
-                            + ". Reason: Missing default constructor.");
-                    break;
-                }
-                final ParameterizedType type = (ParameterizedType) factory.getGenericInterfaces()[0];
-                final Type typeArg = type.getActualTypeArguments()[0];
-                final Class<?> clazz = (Class<?>) typeArg;
-                final IDIEnvironmentFactory<?> factoryInstance = constructorRefOpt.get().instantiateUnsafeAndGet();
-                final MethodReflection methodRef = Reflection.reflect(factoryInstance)
-                        .reflectMethod("create", Object.class, clazz);
-                methodRef.setExceptionHandler(ex -> {
-                    //TODO exception display depending on verbosity level
-                    LOG.warn("Exception occurred while injecting:");
-                    ex.printStackTrace();
-                });
-                SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
-                break;
-            }
+        try {
+            SimpliFX.setupDI(applicationListener);
+        } catch (Exception ex) {
+            LOG.error("There was an error while trying to setup the DI framework:");
+            ex.printStackTrace();
+            return;
         }
 
         // TODO init all subsystems -> create main controller & controller system, ...
@@ -237,6 +216,30 @@ public final class SimpliFX {
                 }));
         return new I18N(bundleMap.entrySet().stream().map(entry ->
                 new CompoundResourceBundle(entry.getKey(), entry.getValue())).collect(Collectors.toList()));
+    }
+
+    private static void setupDI(Object applicationListener) {
+        final Annotation[] annotations = applicationListener.getClass().getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
+                final DIAnnotation diAnnotation = annotation.annotationType().getAnnotation(DIAnnotation.class);
+                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = diAnnotation.value();
+                final ClassReflection classRef = Reflection.reflect(factory);
+                final Optional<ConstructorReflection> constructorRefOpt = classRef.hasConstructor();
+                if (constructorRefOpt.isEmpty()) {
+                    LOG.warn("Failed to instantiate DI factory " + classRef.getReflectable().getSimpleName()
+                            + ". Reason: Missing default constructor.");
+                    break;
+                }
+                final Class<?> clazz = (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
+                        .getActualTypeArguments()[0];
+                final IDIEnvironmentFactory<?> factoryInstance = constructorRefOpt.get().instantiateUnsafeAndGet();
+                final MethodReflection methodRef = Reflection.reflect(factoryInstance)
+                        .reflectMethod("create", Object.class, clazz);
+                SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
+                break;
+            }
+        }
     }
 
     private static void startDiscovery() {

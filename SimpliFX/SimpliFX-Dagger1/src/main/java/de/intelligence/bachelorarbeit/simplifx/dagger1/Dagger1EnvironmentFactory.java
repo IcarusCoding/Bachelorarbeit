@@ -1,9 +1,9 @@
-package de.intelligence.bachelorarbeit.simplifx.guice;
+package de.intelligence.bachelorarbeit.simplifx.dagger1;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import com.google.inject.Module;
+import dagger.Module;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
@@ -11,13 +11,20 @@ import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 
-public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<GuiceInjection> {
+public final class Dagger1EnvironmentFactory implements IDIEnvironmentFactory<Dagger1Injection> {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(GuiceEnvironmentFactory.class);
+    private static final SimpliFXLogger LOG = SimpliFXLogger.create(Dagger1EnvironmentFactory.class);
 
     @Override
-    public DIEnvironment create(Object obj, GuiceInjection guiceInjection) {
-        final Module[] modules = Arrays.stream(guiceInjection.value()).distinct().map(Reflection::reflect)
+    public DIEnvironment create(Object obj, Dagger1Injection dagger1Injection) {
+        final Object[] modules = Arrays.stream(dagger1Injection.value()).distinct().map(Reflection::reflect)
+                .filter(classRef -> {
+                    boolean annotationPresent = classRef.isAnnotationPresent(Module.class);
+                    if (!annotationPresent) {
+                        LOG.warn("Found invalid dagger module: " + classRef.getReflectable().getSimpleName() + ".");
+                    }
+                    return annotationPresent;
+                })
                 .map(classRef -> {
                     final Optional<ConstructorReflection> conRefOpt = classRef.hasConstructor();
                     if (conRefOpt.isEmpty()) {
@@ -29,8 +36,8 @@ public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<Guic
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(conRef -> conRef.forceAccess().instantiate().getReflectable())
-                .map(Module.class::cast).toArray(Module[]::new);
-        return new GuiceEnvironment(obj, modules);
+                .toArray();
+        return new Dagger1Environment(obj, modules);
     }
 
 }

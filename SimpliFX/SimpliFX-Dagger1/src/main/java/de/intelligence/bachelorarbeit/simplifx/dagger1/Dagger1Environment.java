@@ -4,25 +4,23 @@ import dagger.ObjectGraph;
 
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 
-public final class Dagger1Environment implements DIEnvironment {
-
-    private final Object module;
+final class Dagger1Environment implements DIEnvironment {
 
     private final ObjectGraph graph;
 
-    public Dagger1Environment(Object obj, Object module, Object... modules) {
-        this.module = module;
-        this.graph = null;
+    Dagger1Environment(Object obj, Object... modules) {
+        this.graph = ObjectGraph.create(modules);
+        this.inject(obj);
     }
 
     @Override
     public void inject(Object instance) {
-
+        this.graph.inject(instance);
     }
 
     @Override
     public <T> T get(Class<T> clazz) {
-        return null;
+        return this.graph.get(clazz);
     }
 
 }

@@ -4,6 +4,6 @@ import java.lang.annotation.Annotation;
 
 public interface IDIEnvironmentFactory<T extends Annotation> {
 
-    DIEnvironment create(Object root, T t);
+    DIEnvironment create(Object obj, T t);
 
 }

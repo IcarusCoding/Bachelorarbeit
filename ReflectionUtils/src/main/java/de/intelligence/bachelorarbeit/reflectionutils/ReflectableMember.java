@@ -23,7 +23,6 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
     protected ReflectableMember(T reflectable, Object accessor) {
         super(reflectable);
         this.accessor = accessor;
-        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
     /**

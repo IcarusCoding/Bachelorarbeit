@@ -1,13 +1,12 @@
 package de.intelligence.bachelorarbeit.demoapplications;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import com.google.inject.Inject;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
@@ -18,10 +17,12 @@ import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.event.events.StopEvent;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
-import de.intelligence.bachelorarbeit.simplifx.guice.GuiceInjection;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
-@GuiceInjection({TestGuiceModule.class})
+//@GuiceInjection({TestGuiceModule.class})
+//@Dagger1Injection({TestDagger1Module.class})
+@SpringInjection({TestSpringModule.class})
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
         resizeable = false, iconPath = "/icon.png")
 @ApplicationEntryPoint(Core.class)

@@ -17,7 +17,6 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
 
     InstanceReflection(Object instance) {
         super(instance);
-        this.handler = IReflectionExceptionHandler.DEFAULT;
     }
 
     private void iterateMethods(Object accessor, @Nullable Identifier<MethodReflection> identifier,
