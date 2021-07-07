@@ -1,14 +1,68 @@
 \chapter{Implementierung}
 \label{implementierung}
-
-\add{Implementierung}
-
-\section{Architektur}
+In diesem Kapitel werden wichtige Aspekte bei der Implementierung des Systems aufgezeigt. Auf essentielle Quelltextausschnitte, welche für eine Gewährleistung, der aus den Anforderungen resultierenden Funktionalität verantwortlich sind, wird detailliert eingegangen. Dabei werden wichtige Konzepte, Strukturen und Designentscheidungen der entwickelten Architektur hervorgehoben und aufgetretene Probleme beim Implementierungsprozess dargelegt. Außerdem werden ausgewählte Subsysteme von \texttt{SimpliFX} mit geeigneten Darstellungsmitteln präsentiert und, für ein besseres Verständnis der zusammenarbeitenden Komponenten, eine beispielhafte Nutzung dieser durchgeführt. Die Verwendung und das Zusammenspiel der zuvor in \autoref{annotations} definierten Annotationen, werden durch Quelltextbeispiele erklärt. Dazu werden mögliche mit einhergehende Restriktionen beleuchtet.
+\section{Architektur und Struktur der Software}
 \label{architektur}
-
-\add{Architektur}
-
-\subsection{...}
-
-\section{...}
-\add{Extend}
+Für die Implementierung und um eine, nach \autoref{nreq3} und \autoref{nreq4}, hohe Softwarequalität sowie Erweiterbarkeit, muss das System durch eine wohlüberlegte Architektur repräsentiert werden. Um eine hohe Unabhängigkeit des Systems zu gewährleisten und eine Überladung mit unnötigen Funktion zu vermeiden, wurde auf die Nutzung von externen Bibliotheken zur Vereinfachung des Implementierungsprozesses und die Reduktion des Zeitaufwandes weitgehend verzichtet. Nur externe Bibliotheken, welche komplexe Funktionen zur Verfügung stellen und daher nicht im Rahmen dieser Arbeit implementiert werden können, sind im Projekt enthalten. Auch dürfen Bibliotheken, welche eine Inkompatibilität mit der im Projekt genutzten Softwarelizenz aufweisen, nicht als Abhängigkeit genutzt werden. Für die Verwaltung der externen Bibliotheken und die Strukturierung des Systems wird, wie in \autoref{konzept_und_modellierung_designentscheidungen} erläutert, das Apache Maven\footref{ft:maven} Build-Management-Tool verwendet. Das Projekt wird nach der finalisierten Implementierung als Maven-Artefakt öffentlich zugänglich und aufgrund der quelloffenen Natur auch per GitHub einsehbar sein. \texttt{SimpliFX} bietet dem Nutzer dazu auch verschiedene spezialisierte Artefakte an, welche an ein bestimmtes Framework für die Abhängigkeitsinjektion angepasst wurde. Für die interne Trennung der Belange und Funktionen von \texttt{SimpliFX}, werden Java Pakete verwendet. Diese Paketstruktur wird im nachfolgenden Unterkapitel näher erläutert. Dabei wird auf die Funktionalität der, in den einzelnen Paketen definierten, Klassen eingegangen und mögliche wichtige Funktionen, Methoden und Klassen mit Beispielen und ausgewählten Quelltextausschnitten vorgestellt und explizit angegeben, ob eventuelle Restriktionen bei der Nutzung zu beachten sind.
+\section{Paketstrukturierung nach Funktionalität}
+Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_structure} dargestellt. Rote Pakete dienen zur Abhängigkeitsinjektion und sind nicht im normalen Funktionsumfang enthalten, sondern nur mittels spezialisierter Maven Artefakte nutzbar. 
+\def\Size{4pt}
+\definecolor{folderbackground}{RGB}{135,147,154}
+\tikzset{
+  folder/.pic={
+    \filldraw[draw=folderbackground,top color=folderbackground!50,bottom color=folderbackground]
+      (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);  
+    \filldraw[draw=folderbackground,top color=folderbackground!50,bottom color=folderbackground]
+      (-1.15*\Size,-0.7*\Size) rectangle (1.15*\Size,\Size);
+  },
+  folderopt/.pic={
+    \filldraw[draw=red,top color=red!50,bottom color=red]
+      (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);  
+    \filldraw[draw=red,top color=red!50,bottom color=red]
+      (-1.15*\Size,-0.7*\Size) rectangle (1.15*\Size,\Size);
+  }
+}
+\begin{figure}[H]
+	\centering
+	\begin{forest}
+		for tree={
+			font=\ttfamily,
+			grow'=0,
+			child anchor=west,
+			parent anchor=south,
+			anchor=west,
+			inner xsep=8pt,
+			inner ysep=0pt,
+			if n=5{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={11}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={15}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folder}\forestoption{edge label};}}}},
+			if n children=0{}{
+				delay={
+					prepend={[,phantom, calign with current]}
+				}
+			},
+			fit=band,
+			before computing xy={l=35pt}
+		}
+		[de.intelligence.bachelorarbeit.simplifx
+			[annotation]
+			[application]
+			[classpath]
+			[css]
+			[dagger1]
+			[di]
+			[event]
+			[events]
+			[exception]
+			[fxml]
+			[guice]
+			[injection]
+			[localization]
+			[logging]
+			[spring]
+			[utils]
+		]
+	\end{forest}
+	\caption{Paketstruktur -- \texttt{SimpliFX}}
+	\label{fig:package_structure}
+\end{figure}
+\noindent Die 
+TODO PAKETE ERKLÄREN (circa 2 Seiten), PROBLEME BEI ENTWICKLUNG, CODEBEISPIELE
