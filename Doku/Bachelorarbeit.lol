@@ -27,6 +27,8 @@
 \contentsline {lstlisting}{\numberline {4.3}Beispiel -- Instanziierungsablauf.}{27}{lstlisting.4.3}%
 \contentsline {lstlisting}{\numberline {4.4}Beispiel -- Verwendung der Reflection Schnittstelle.}{39}{lstlisting.4.4}%
 \addvspace {10\p@ }
+\contentsline {lstlisting}{\numberline {5.1}Beispiel -- Nutzung der \texttt {Pair} Klasse.}{51}{lstlisting.5.1}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
