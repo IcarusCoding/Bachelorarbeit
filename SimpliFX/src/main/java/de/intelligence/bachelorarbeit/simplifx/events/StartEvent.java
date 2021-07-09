@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.event.events;
+package de.intelligence.bachelorarbeit.simplifx.events;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

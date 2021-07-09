@@ -4,13 +4,13 @@ import javafx.application.Preloader;
 import javafx.stage.Stage;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
-import de.intelligence.bachelorarbeit.simplifx.annotation.PreloaderEntryPoint;
-import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
-import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.ProgressEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StateChangeEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StopEvent;
+import de.intelligence.bachelorarbeit.simplifx.application.PreloaderEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.ProgressEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
 
 @StageConfig(title = "TestPreloader")
 @PreloaderEntryPoint

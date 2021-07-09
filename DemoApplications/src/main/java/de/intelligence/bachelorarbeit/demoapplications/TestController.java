@@ -6,15 +6,14 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.control.Button;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.LocalizeValue;
+import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
-//TODO test localize arguments normal fxmlloader
 public class TestController {
 
     @LocalizeValue(id = "chart", property = "title")
     private final FloatProperty charProperty;
 
-    @LocalizeValue(id = "chart", property = "title")
+    @LocalizeValue(id = "chart", index = 1, property = "title")
     private final FloatProperty charProperty2;
 
     @FXML
@@ -33,7 +32,6 @@ public class TestController {
             charProperty.setValue(charProperty.get() + Math.random());
             charProperty2.setValue(charProperty2.get() + Math.random());
         });
-        System.out.println(btn);
     }
 
 }

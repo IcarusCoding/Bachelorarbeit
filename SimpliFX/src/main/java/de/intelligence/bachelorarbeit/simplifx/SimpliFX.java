@@ -35,16 +35,15 @@ import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.MethodReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
-import de.intelligence.bachelorarbeit.simplifx.annotation.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
-import de.intelligence.bachelorarbeit.simplifx.annotation.PreloaderEntryPoint;
-import de.intelligence.bachelorarbeit.simplifx.annotation.ResourceBundle;
-import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.DIConfig;
+import de.intelligence.bachelorarbeit.simplifx.application.PreloaderEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
+import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
@@ -53,9 +52,12 @@ import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector
 import de.intelligence.bachelorarbeit.simplifx.localization.CompoundResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
+//TODO prevent multiple launches
+//TODO check if I18N is required to launch application (bad)
 public final class SimpliFX {
 
     private static final SimpliFXLogger LOG = SimpliFXLogger.create(SimpliFX.class);
@@ -174,8 +176,13 @@ public final class SimpliFX {
 
         // TODO init all subsystems -> create main controller & controller system, ...
         //TODO beautify at the end
+        //TODO temporary solution
         Reflection.reflect(applicationListener).iterateMethods(methodRef ->
                 methodRef.isAnnotationPresent(PostConstruct.class), methodRef -> methodRef.forceAccess().invoke());
+        if (preloaderListener != null) {
+            Reflection.reflect(preloaderListener).iterateMethods(methodRef ->
+                    methodRef.isAnnotationPresent(PostConstruct.class), methodRef -> methodRef.forceAccess().invoke());
+        }
 
         final Thread fxLauncherThread = new Thread(() -> {
             final Launcher l = new Launcher(appImpl, preImpl);
@@ -343,7 +350,7 @@ public final class SimpliFX {
                 });
                 this.doNotifyProgress(0);
             }
-            this.doNotifyProgress(1);
+            this.doNotifyProgress(1); //TODO correct behaviour? (direct after 0.0?)
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_LOAD);
             PlatformImpl.runAndWait(() -> {
                 ParametersImpl.registerParameters(applicationImpl, new ParametersImpl(args));

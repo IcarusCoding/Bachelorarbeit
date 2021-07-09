@@ -136,6 +136,18 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
      * @throws IllegalArgumentException if no suitable method was found
      */
     public MethodReflection reflectMethod(String name, Class<?>... argTypes) {
+        final MethodReflection methodRef = this.reflectMethod0(name, argTypes);
+        if (methodRef != null) {
+            return methodRef;
+        }
+        throw new IllegalArgumentException("No suitable method found!");
+    }
+
+    public Optional<MethodReflection> hasMethod(String name, Class<?>... argTypes) {
+        return Optional.ofNullable(this.reflectMethod0(name, argTypes));
+    }
+
+    private MethodReflection reflectMethod0(String name, Class<?>... argTypes) {
         if (argTypes == null) {
             argTypes = new Class[0];
         }
@@ -147,7 +159,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
                 return Reflection.setExceptionHandler(Reflection.reflect(method, null), this.handler);
             }
         }
-        throw new IllegalArgumentException("No suitable method found!");
+        return null;
     }
 
     public FieldReflection reflectField(String name) {
@@ -158,6 +170,14 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
             return Reflection.setExceptionHandler(new FieldReflection(field, null), this.handler);
         }
         throw new IllegalArgumentException("No suitable field found!");
+    }
+
+    public boolean canAccept(Object obj) {
+        return this.canAccept(obj.getClass());
+    }
+
+    public boolean canAccept(Class<?> clazz) {
+        return super.reflectable.isAssignableFrom(clazz);
     }
 
     @Override

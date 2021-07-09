@@ -7,27 +7,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 public final class I18N implements II18N {
 
-    private final ObjectProperty<Locale> currentLocale;
+    private final ReadOnlyObjectWrapper<Locale> currentLocale;
     private final Map<Locale, CompoundResourceBundle> bundles;
 
     public I18N(List<CompoundResourceBundle> resourceBundles) {
         this.bundles = resourceBundles.stream()
                 .collect(Collectors.toMap(CompoundResourceBundle::getLocale, Function.identity()));
-        this.currentLocale = new SimpleObjectProperty<>(this.getDefaultLocale());
+        this.currentLocale = new ReadOnlyObjectWrapper<>(this.getDefaultLocale());
     }
 
     @Override
@@ -36,8 +37,25 @@ public final class I18N implements II18N {
     }
 
     @Override
+    public ReadOnlyObjectProperty<Locale> currentLocaleProperty() {
+        return this.currentLocale.getReadOnlyProperty();
+    }
+
+    @Override
     public Locale getDefaultLocale() {
         return Locale.ENGLISH;
+    }
+
+    @Override
+    public Optional<Locale> getByLanguageSpoken(String language) {
+        Locale toReturn = null;
+        for (final Locale l : this.getSupportedLanguages()) {
+            if (l.getDisplayLanguage(l).equalsIgnoreCase(language)) {
+                toReturn = l;
+                break;
+            }
+        }
+        return Optional.ofNullable(toReturn);
     }
 
     @Override
@@ -47,7 +65,6 @@ public final class I18N implements II18N {
 
     @Override
     public String get(String key, Object... args) {
-        //TODO argument count mismatch
         return MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key), args);
     }
 

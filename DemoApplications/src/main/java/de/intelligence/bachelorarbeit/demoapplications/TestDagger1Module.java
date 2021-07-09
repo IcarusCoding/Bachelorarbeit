@@ -1,10 +1,10 @@
 package de.intelligence.bachelorarbeit.demoapplications;
 
 
-//import dagger.Module;
-//import dagger.Provides;
+/*import dagger.Module;
+import dagger.Provides;
 
-//@Module(injects = TestApplication.class)
+@Module(injects = TestApplication.class)*/
 public final class TestDagger1Module {
 
     /*@Provides

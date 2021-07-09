@@ -1,15 +1,21 @@
 package de.intelligence.bachelorarbeit.simplifx.localization;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ReadOnlyObjectProperty;
 
 public interface II18N {
 
     Locale getCurrentLocale();
 
+    ReadOnlyObjectProperty<Locale> currentLocaleProperty();
+
     Locale getDefaultLocale();
+
+    Optional<Locale> getByLanguageSpoken(String language);
 
     Set<Locale> getSupportedLanguages();
 

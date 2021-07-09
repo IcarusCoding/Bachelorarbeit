@@ -106,10 +106,12 @@ import com.sun.javafx.reflect.ReflectUtil;
 import com.sun.javafx.util.Logging;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.LocalizeValue;
+import de.intelligence.bachelorarbeit.simplifx.annotation.CssProperty;
+import de.intelligence.bachelorarbeit.simplifx.css.CssMetaDataAdapter;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
 import static com.sun.javafx.FXPermissions.MODIFY_FXML_CLASS_LOADER_PERMISSION;
 
@@ -1574,6 +1576,14 @@ public class SimpliFXMLLoader {
 
         Class<?> type = loadTypeForPackage(packageName, className);
 
+        //TODO INJECT
+        Reflection.reflect(type).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
+                Modifier.isStatic(field.getModifiers()), field -> {
+            if (Reflection.reflectStatic(field).forceAccess().get() == null) {
+                CssMetaDataAdapter.createStaticMetaData(type, field);
+            }
+        });
+
         if (cache) {
             classes.put(className, type);
         }
@@ -2777,16 +2787,13 @@ public class SimpliFXMLLoader {
             if (value instanceof Builder<?>) {
                 Builder<Object> builder = (Builder<Object>) value;
                 updateValue(builder.build());
-                if (builder instanceof ProxyBuilder) {
-                    final ProxyBuilder<?> proxyBuilder = (ProxyBuilder<?>) builder;
+                if (builder instanceof final ProxyBuilder<?> proxyBuilder) {
                     final Map<String, Object> userValues = Reflection.reflect(proxyBuilder)
                             .reflectField("userValues").forceAccess().getUnsafe();
                     userValues.forEach((name, val) -> {
-                        if (val instanceof TranslatableBuilderProperty) {
-                            final TranslatableBuilderProperty transProp = (TranslatableBuilderProperty) val;
+                        if (val instanceof final TranslatableBuilderProperty transProp) {
                             final ObservableValue<?> obsVal = new BeanAdapter(value).getPropertyModel(name);
-                            if (obsVal instanceof StringProperty) {
-                                final StringProperty strProp = (StringProperty) obsVal;
+                            if (obsVal instanceof final StringProperty strProp) {
                                 final String key = transProp.key;
                                 if (controller != null && name != null && fx_id != null) {
                                     final TranslatableBuilderProperty bindProp = TranslatableBuilderProperty
@@ -2804,6 +2811,15 @@ public class SimpliFXMLLoader {
             } else {
                 processInstancePropertyAttributes();
             }
+
+            //TODO MAYBE INJECT
+            Reflection.reflect(value.getClass()).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
+                    Modifier.isStatic(field.getModifiers()), field -> {
+                if (Reflection.reflectStatic(field).forceAccess().get() != null) {
+                    CssMetaDataAdapter.bindMetaData(value, field, field.getAnnotationsByType(CssProperty.class));
+                    //System.out.println(Reflection.reflect(value).reflectField("styleableWidth").forceAccess().get());
+                }
+            });
 
             processEventHandlerAttributes();
 

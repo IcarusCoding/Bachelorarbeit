@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * The {@link InstanceReflection} class provides methods to perform reflective operations on instantiated objects.
@@ -63,6 +64,12 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
     public FieldReflection reflectField(String name) {
         return Reflection.reflect(Reflection.handleReflectiveExceptions(this.handler,
                 () -> super.reflectable.getClass().getDeclaredField(name)), super.reflectable);
+    }
+
+    public Optional<FieldReflection> hasField(String name) {
+        return Arrays.stream(super.reflectable.getClass().getDeclaredFields()).filter(f -> f.getName().equals(name))
+                .map(f -> Reflection.setExceptionHandler(new FieldReflection(f, super.reflectable), this.handler))
+                .findFirst();
     }
 
     /**

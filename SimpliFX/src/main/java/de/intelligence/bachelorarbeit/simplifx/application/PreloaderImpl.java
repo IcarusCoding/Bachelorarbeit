@@ -7,11 +7,11 @@ import javafx.application.Preloader;
 import javafx.stage.Stage;
 
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
-import de.intelligence.bachelorarbeit.simplifx.event.events.ErrorEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.ProgressEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StateChangeEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.ErrorEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.ProgressEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
 
 public final class PreloaderImpl extends Preloader {
 

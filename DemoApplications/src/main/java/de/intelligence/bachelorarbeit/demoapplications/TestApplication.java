@@ -8,24 +8,22 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
-import de.intelligence.bachelorarbeit.simplifx.annotation.ResourceBundle;
-import de.intelligence.bachelorarbeit.simplifx.annotation.StageConfig;
-import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StopEvent;
+import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
-//@GuiceInjection({TestGuiceModule.class})
-//@Dagger1Injection({TestDagger1Module.class})
-@SpringInjection({TestSpringModule.class})
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
         resizeable = false, iconPath = "/icon.png")
 @ApplicationEntryPoint(Core.class)
+@SpringInjection(TestSpringModule.class)
 public final class TestApplication {
 
     @Inject
@@ -39,13 +37,18 @@ public final class TestApplication {
 
     @PostConstruct
     private void postConstructTest() {
-        System.out.println("Post Construct: " + language.get("test.key") + " " + language.get("test.key2"));
+        //System.out.println("Post Construct: " + language.get("test.key") + " " + language.get("test.key2"));
         service.test();
     }
 
     @EventHandler
     private void onInit(InitEvent event) {
         System.out.println("Init event received! Thread: " + Thread.currentThread());
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @EventHandler
@@ -54,23 +57,16 @@ public final class TestApplication {
         final Stage testStage = event.getStage();
         // testing
         final SimpliFXMLLoader loader = new SimpliFXMLLoader(getClass().getResource("/test.fxml"));
-        loader.setII18N(language);
+        loader.setII18N(language2);
         try {
             Pane p = loader.load();
+            p.getStylesheets().add("test.css");
             Scene scene = new Scene(p);
             testStage.setScene(scene);
             testStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*StringProperty keyProp = new SimpleStringProperty("test.key");
-        IntegerProperty property = new SimpleIntegerProperty(42);
-        StringBinding binding = language.createObservedBinding("test.key", property);
-        System.out.println("BEFORE: " + binding.get());
-        language.setLocale(Locale.GERMAN);
-        System.out.println("AFTER: " + binding.get());
-        property.set(33);
-        System.out.println("AFTER 2: " + binding.get());*/
     }
 
     @EventHandler

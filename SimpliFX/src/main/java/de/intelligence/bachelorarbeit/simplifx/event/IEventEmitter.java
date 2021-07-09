@@ -6,4 +6,6 @@ public interface IEventEmitter {
 
     void register(Object obj);
 
+    void unregister(Object obj);
+
 }

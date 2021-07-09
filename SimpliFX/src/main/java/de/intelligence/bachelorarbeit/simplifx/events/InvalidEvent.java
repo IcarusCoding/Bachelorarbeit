@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.event.events;
+package de.intelligence.bachelorarbeit.simplifx.events;
 
 public final class InvalidEvent extends AbstractEvent {
 

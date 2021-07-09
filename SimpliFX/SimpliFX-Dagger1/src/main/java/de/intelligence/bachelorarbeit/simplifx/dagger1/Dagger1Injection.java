@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.DIAnnotation;
+import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

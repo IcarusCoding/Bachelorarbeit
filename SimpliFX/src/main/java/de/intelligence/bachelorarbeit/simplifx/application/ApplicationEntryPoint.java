@@ -1,17 +1,14 @@
-package de.intelligence.bachelorarbeit.simplifx.spring;
+package de.intelligence.bachelorarbeit.simplifx.application;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
-
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@DIAnnotation(SpringEnvironmentFactory.class)
-public @interface SpringInjection {
+public @interface ApplicationEntryPoint {
 
-    Class<?>[] value();
+    Class<?> value();
 
 }

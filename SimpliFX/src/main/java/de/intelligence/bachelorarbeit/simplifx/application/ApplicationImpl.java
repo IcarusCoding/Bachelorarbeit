@@ -7,9 +7,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
-import de.intelligence.bachelorarbeit.simplifx.event.events.InitEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StartEvent;
-import de.intelligence.bachelorarbeit.simplifx.event.events.StopEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
 
 public final class ApplicationImpl extends Application {
 

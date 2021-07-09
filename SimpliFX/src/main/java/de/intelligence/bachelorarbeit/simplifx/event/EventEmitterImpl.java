@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
-import de.intelligence.bachelorarbeit.simplifx.event.events.InvalidEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.InvalidEvent;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotatedMethodCache;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Pair;
@@ -55,13 +55,18 @@ public class EventEmitterImpl implements IEventEmitter {
         }
     }
 
+    @Override
+    public void unregister(Object obj) {
+        // TODO
+    }
+
     private boolean emit0(Object obj) {
         if (!this.handlerMethods.containsKey(obj.getClass())) {
             return false;
         }
         final Queue<Pair<Object, List<EventListener>>> queue = this.threadLocalQueue.get();
         queue.offer(Pair.of(obj, this.handlerMethods.get(obj.getClass()).stream()
-                .sorted(Comparator.comparing(EventListener::getPriority).reversed()).collect(Collectors.toList())));
+                .sorted(Comparator.comparing(EventListener::priority).reversed()).collect(Collectors.toList())));
         final AtomicReference<Pair<Object, List<EventListener>>> currentPair = new AtomicReference<>(queue.poll());
         while (currentPair.get() != null) {
             currentPair.get().getRight().forEach(
@@ -72,21 +77,7 @@ public class EventEmitterImpl implements IEventEmitter {
         return true;
     }
 
-    private static final class EventListener {
-
-        private final Object subObj;
-        private final Method method;
-        private final int priority;
-
-        private EventListener(Object subObj, Method method, int priority) {
-            this.subObj = subObj;
-            this.method = method;
-            this.priority = priority;
-        }
-
-        public int getPriority() {
-            return this.priority;
-        }
+    private record EventListener(Object subObj, Method method, int priority) {
 
     }
 
