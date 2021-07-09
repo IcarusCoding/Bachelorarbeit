@@ -43,6 +43,7 @@ import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
+import de.intelligence.bachelorarbeit.simplifx.controller.IControllerSystem;
 import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
@@ -67,6 +68,7 @@ public final class SimpliFX {
     private static Class<?> callerClass;
     private static Injector globalInjector;
     private static II18N globalI18N;
+    private static IControllerSystem controllerSystem;
     private static DIEnvironment appDIEnv;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
@@ -149,6 +151,7 @@ public final class SimpliFX {
 
     private static void launchImpl(Object applicationListener, Object preloaderListener) {
         Logging.getJavaFXLogger().disableLogging();
+        Logging.getCSSLogger().disableLogging();
         SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
         final Class<?> applicationClass = applicationListener.getClass();
 
@@ -157,6 +160,11 @@ public final class SimpliFX {
 
         final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
         final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
+
+        SimpliFX.controllerSystem = SimpliFX.globalInjector.getInstance(IControllerSystem.class);
+        if (!SimpliFX.controllerSystem.validateController(applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value())) {
+            return;
+        }
 
         final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
                 applicationListener, preloaderListener);

@@ -6,8 +6,11 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.control.Button;
 
+import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
+@Controller(fxml = "/test.fxml", css = "test.css")
 public class TestController {
 
     @LocalizeValue(id = "chart", property = "title")
@@ -18,12 +21,18 @@ public class TestController {
 
     @FXML
     private AreaChart<Number, Number> chart;
+
     @FXML
     private Button btn;
 
     public TestController() {
         charProperty = new SimpleFloatProperty(55.6F);
         charProperty2 = new SimpleFloatProperty(888888.8F);
+    }
+
+    @PostConstruct
+    private void afterConstruction() {
+        System.out.println("TestController: Post construct!");
     }
 
     @FXML

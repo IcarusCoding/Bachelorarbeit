@@ -6,6 +6,8 @@ import javafx.application.Preloader;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSystemImpl;
+import de.intelligence.bachelorarbeit.simplifx.controller.IControllerSystem;
 import de.intelligence.bachelorarbeit.simplifx.event.EventEmitterImpl;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 
@@ -28,6 +30,7 @@ public final class DIConfig extends AbstractModule {
                 .toInstance(this.preloaderEmitter);
         super.bind(Application.class).to(ApplicationImpl.class);
         super.bind(Preloader.class).to(PreloaderImpl.class);
+        super.bind(IControllerSystem.class).to(ControllerSystemImpl.class);
     }
 
 }

@@ -6,6 +6,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -48,6 +49,10 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
         if (clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class) {
             ClassReflection.iterateFields(clazz.getSuperclass(), identifier, callback);
         }
+    }
+
+    public boolean isNonStaticMember() {
+        return super.reflectable.isMemberClass() && !Modifier.isStatic(super.reflectable.getModifiers());
     }
 
     /**

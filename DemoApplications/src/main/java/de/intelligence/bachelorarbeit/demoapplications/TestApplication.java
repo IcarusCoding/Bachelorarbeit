@@ -12,6 +12,7 @@ import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
@@ -22,9 +23,14 @@ import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
         resizeable = false, iconPath = "/icon.png")
-@ApplicationEntryPoint(Core.class)
+@ApplicationEntryPoint(TestApplication.Test.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
+
+    @Controller(fxml = "/test.fxml", css = "test.css")
+    public static final class Test {
+
+    }
 
     @Inject
     private ITestService service;
