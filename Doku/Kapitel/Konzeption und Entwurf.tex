@@ -146,7 +146,7 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 \begin{freq}{Erweiterung des Controllerlebenszyklus}
 	Der Lebenszyklus eines Controllers soll, ähnlich wie bei Android Activities, in mehrere Phasen eingeteilt sein, welche durch die Nutzung von Annotationen durch den Entwickler abrufbar gemacht werden sollen. Methoden, welche nach einer bestimmten Phase ausgeführt werden sollen, sollen mit der zu der Phase gehörenden Annotation annotiert werden können. Der Lebenszyklus soll um folgende Phasen erweitert werden:
 	\begin{itemize}
-		\item In der \textbf{\texttt{AfterInject}} Phase sind alle Abhängigkeitsinjektionen und alle Instanziierungen von JavaFX Komponenten vollständig abgeschlossen und somit durch den Entwickler im Controller verwendbar.
+		\item In der \textbf{\texttt{PostConstruct}} Phase sind alle Abhängigkeitsinjektionen und alle Instanziierungen von JavaFX Komponenten vollständig abgeschlossen und somit durch den Entwickler im Controller verwendbar.
 		\item In der \textbf{\texttt{OnShow}} Phase wird das Wurzelelement des Controllers im Szenengraphen aktiv gerendert und ist somit durch den Endbenutzer in der grafischen Benutzeroberfläche zu erkennen.
 		\item In der \textbf{\texttt{OnHide}} Phase wurde das Wurzelelement des Controllers aus dem Szenengraphen entfernt und dementsprechend nicht gerendert.
 		\item In der \textbf{\texttt{OnDestroy}} Phase werden alle zwischengespeicherten Ressourcen und Informationen des Controllers entfernt. In dieser Phase sollen eventuell offene Ressourcen geschlossen werden. Damit der Controller wiederverwendet werden kann, muss eine erneute Initialisierung durch beispielsweise einen \texttt{FXMLLoader} erfolgen.
