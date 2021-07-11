@@ -7,14 +7,16 @@ package de.intelligence.bachelorarbeit.reflectionutils;
  * @author Deniz Groenhoff
  */
 @FunctionalInterface
-public interface ExceptionRunnable<T extends Exception> extends Runnable {
+public interface ExceptionRunnable<T extends Exception> {
 
-    @Override
-    default void run() {
+    default void run(IReflectionExceptionHandler handler) {
         try {
             runWithException();
         } catch (Exception ex) {
-            ex.printStackTrace(); // TODO remove
+            if (handler == null) {
+                throw new ReflectionException(ex);
+            }
+            handler.handleException(ex);
         }
     }
 

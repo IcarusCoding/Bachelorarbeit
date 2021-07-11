@@ -3,19 +3,21 @@ package de.intelligence.bachelorarbeit.reflectionutils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+import java.util.Optional;
 
 /**
  * The {@link ReflectableMember} class is an abstract class for reflection scopes that perform reflection on {@link Member} level
  *
  * @author Deniz Groenhoff
  */
-abstract class ReflectableMember<T extends Member & AnnotatedElement> extends ReflectableScope<T> implements Annotatable {
+abstract class ReflectableMember<T extends Member & AnnotatedElement> extends ReflectableScope<T> implements Annotatable, ExceptionHandleable {
 
     protected boolean shouldForceAccess;
     protected Object accessor;
+    protected IReflectionExceptionHandler handler;
 
     protected ReflectableMember(T reflectable) {
-        super(reflectable);
+        this(reflectable, null);
     }
 
     protected ReflectableMember(T reflectable, Object accessor) {
@@ -39,14 +41,39 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
         this.accessor = accessor;
     }
 
+    /**
+     * Retrieves the current accessor
+     *
+     * @return The current accessor
+     */
+    public Object getAccessor() {
+        return this.accessor;
+    }
+
+    /**
+     * Retrieves the current accessor
+     *
+     * @return The type-inferred accessor
+     */
+    public <T> T getAccessorUnsafe() {
+        return (T) this.accessor;
+    }
+
+    @Override
+    public void setExceptionHandler(IReflectionExceptionHandler handler) {
+        if (handler != null) {
+            this.handler = handler;
+        }
+    }
+
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
         return super.reflectable.isAnnotationPresent(annotation);
     }
 
     @Override
-    public <S extends Annotation> S getAnnotation(Class<S> annotation) {
-        return super.reflectable.getDeclaredAnnotation(annotation);
+    public <S extends Annotation> Optional<S> getAnnotation(Class<S> annotation) {
+        return Optional.ofNullable(super.reflectable.getDeclaredAnnotation(annotation));
     }
 
     @Override

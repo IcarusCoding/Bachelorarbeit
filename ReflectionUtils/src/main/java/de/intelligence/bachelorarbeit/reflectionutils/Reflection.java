@@ -103,31 +103,39 @@ public class Reflection {
     }
 
     static <T extends AccessibleObject & Member, S extends ReflectiveOperationException>
-    void makeAccessibleAndExecute(T member, Object accessor, boolean forceAccess, ExceptionRunnable<S> runnable) {
+    void makeAccessibleAndExecute(T member, Object accessor, boolean forceAccess, IReflectionExceptionHandler handler,
+                                  ExceptionRunnable<S> runnable) {
         if (forceAccess) {
             final boolean canAccess = member.canAccess(accessor);
             member.setAccessible(true);
-            runnable.run();
+            runnable.run(handler);
             member.setAccessible(canAccess);
             return;
         }
-        runnable.run();
+        runnable.run(handler);
     }
 
     static <T extends AccessibleObject & Member, S, U extends ReflectiveOperationException>
-    S makeAccessibleAndExecute(T member, Object accessor, boolean forceAccess, ExceptionSupplier<S, U> supplier) {
+    S makeAccessibleAndExecute(T member, Object accessor, boolean forceAccess, IReflectionExceptionHandler handler,
+                               ExceptionSupplier<S, U> supplier) {
         if (forceAccess) {
             final boolean canAccess = member.canAccess(accessor);
             member.setAccessible(true);
-            final S result = supplier.get();
+            final S result = supplier.get(handler);
             member.setAccessible(canAccess);
             return result;
         }
-        return supplier.get();
+        return supplier.get(handler);
     }
 
-    static <T, S extends ReflectiveOperationException> T handleReflectiveExceptions(ExceptionSupplier<T, S> supplier) {
-        return supplier.get();
+    static <T, S extends ReflectiveOperationException> T handleReflectiveExceptions(IReflectionExceptionHandler handler,
+                                                                                    ExceptionSupplier<T, S> supplier) {
+        return supplier.get(handler);
+    }
+
+    static <T extends ExceptionHandleable> T setExceptionHandler(T handleable, IReflectionExceptionHandler handler) {
+        handleable.setExceptionHandler(handler);
+        return handleable;
     }
 
 }

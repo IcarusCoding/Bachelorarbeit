@@ -2,6 +2,7 @@ package de.intelligence.bachelorarbeit.reflectionutils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Optional;
 
 /**
  * A {@link ReflectableScope} should be Annotatable if the underlying reflectable member is an {@link AnnotatedElement}
@@ -24,7 +25,7 @@ public interface Annotatable {
      * @param annotation The {@link Annotation}
      * @return The annotation if present, null otherwise
      */
-    <S extends Annotation> S getAnnotation(Class<S> annotation);
+    <S extends Annotation> Optional<S> getAnnotation(Class<S> annotation);
 
     /**
      * Retrieves the {@link AnnotatedElement}
