@@ -11,12 +11,12 @@
     <parent>
         <artifactId>bachelorarbeit</artifactId>
         <groupId>de.intelligence</groupId>
-        <version>1.1</version>
+        <version>1.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>simplifx</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <properties>
         <maven.compiler.source>${source.version}</maven.compiler.source>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>de.intelligence</groupId>
             <artifactId>reflection-utils</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
 
         <dependency>

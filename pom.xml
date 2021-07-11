@@ -5,7 +5,7 @@
 
     <groupId>de.intelligence</groupId>
     <artifactId>bachelorarbeit</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <build>
         <plugins>
             <plugin>
@@ -24,9 +24,6 @@
         <module>SimpliFX</module>
         <module>DemoApplications</module>
         <module>ReflectionUtils</module>
-        <module>SimpliFX-Dagger1</module>
-        <module>SimpliFX-Spring</module>
-        <module>SimpliFX/SimpliFX-Spring</module>
     </modules>
 
     <properties>
