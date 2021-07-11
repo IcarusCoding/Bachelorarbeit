@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
+import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
 @Controller(fxml = "/test.fxml", css = "test.css")
@@ -32,7 +33,13 @@ public class TestController {
 
     @PostConstruct
     private void afterConstruction() {
+        System.out.println(charProperty);
         System.out.println("TestController: Post construct!");
+    }
+
+    @OnDestroy
+    private void onDestruction() {
+        System.out.println("DESTRUCTION");
     }
 
     @FXML

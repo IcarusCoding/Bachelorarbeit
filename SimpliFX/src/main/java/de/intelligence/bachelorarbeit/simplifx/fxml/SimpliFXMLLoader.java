@@ -2898,29 +2898,27 @@ public class SimpliFXMLLoader {
                                 + " can only be applied to root element.");
                     }
 
-                    if (controller != null) {
-                        throw constructLoadException("Controller value already specified.");
-                    }
-
-                    if (!staticLoad) {
-                        Class<?> type;
-                        try {
-                            type = getClassLoader().loadClass(value);
-                        } catch (ClassNotFoundException exception) {
-                            throw constructLoadException(exception);
-                        }
-
-                        try {
-                            if (controllerFactory == null) {
-                                ReflectUtil.checkPackageAccess(type);
-                                setController(type.newInstance());
-                            } else {
-                                setController(controllerFactory.call(type));
+                    if (controller == null) {
+                        if (!staticLoad) {
+                            Class<?> type;
+                            try {
+                                type = getClassLoader().loadClass(value);
+                            } catch (ClassNotFoundException exception) {
+                                throw constructLoadException(exception);
                             }
-                        } catch (InstantiationException exception) {
-                            throw constructLoadException(exception);
-                        } catch (IllegalAccessException exception) {
-                            throw constructLoadException(exception);
+
+                            try {
+                                if (controllerFactory == null) {
+                                    ReflectUtil.checkPackageAccess(type);
+                                    setController(type.newInstance());
+                                } else {
+                                    setController(controllerFactory.call(type));
+                                }
+                            } catch (InstantiationException exception) {
+                                throw constructLoadException(exception);
+                            } catch (IllegalAccessException exception) {
+                                throw constructLoadException(exception);
+                            }
                         }
                     }
                 } else {
