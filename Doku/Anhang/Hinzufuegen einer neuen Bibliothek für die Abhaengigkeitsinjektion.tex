@@ -1,0 +1,43 @@
+\chapter{Hinzufügen einer Bibliothek für die Abhängigkeitsinjektion}
+\label{appendix:add_new_di_library}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Umgebung., captionpos=b, nolol]
+public class TestEnvironment implements DIEnvironment {
+	public TestEnvironment(Object obj, Class<?>[] modules) {
+		// Initialisiere Bibliothek
+	}
+
+	#@Override
+	public void inject(Object obj) {
+		// Injiziere Abhängigkeiten in Objekt-Instanz
+	}
+
+	#@Override
+	public <T> T get(Class<T> clazz) {
+		// Erstelle neue Instanz der übergebenen Klasse
+	}
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Umgebung., captionpos=b, nolol]
+public class TestEnvironmentFactory implements 
+		IDIEnvironmentFactory<TestInjection> {
+	#@Override
+	public DIEnvironment create(Object obj, TestInjection annotation) {
+		// Erstellen einer neuen Instanz der Umgebung
+		return new TestEnvironment(obj, annotation.value());
+	}
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Annotation., captionpos=b, nolol]
+#@Target(ElementType.TYPE)
+#@Retention(RetentionPolicy.RUNTIME)
+#@DIAnnotation(TestEnvironmentFactory.class)
+public @interface TestInjection {
+	Class<?>[] value();
+}
+	\end{lstlisting}
+\end{figure}

@@ -29,6 +29,8 @@
 \usepackage{array}
 \usepackage{tablefootnote}
 \usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{forest}
 
 \makeatletter
 \def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
@@ -232,7 +234,6 @@
 % Zusammenfassung erstellen
 \begin{abstract}
 	\input{Sonstiges/Abstract.tex}
-	\add{Remove empty page}
 \end{abstract}
 \begin{abstract}
 	\input{Sonstiges/Zusammenfassung.tex}
@@ -253,6 +254,7 @@
 
 \begin{appendix}
 	\input{Anhang/Controllerbasierte JavaFX Anwendung.tex}
+	\input{Anhang/Hinzufuegen einer neuen Bibliothek für die Abhaengigkeitsinjektion.tex}
 \end{appendix}
 
 % Abkürzungsverzeichnis
