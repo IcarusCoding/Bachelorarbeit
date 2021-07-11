@@ -9,14 +9,16 @@ import java.util.function.Supplier;
  * @author Deniz Groenhoff
  */
 @FunctionalInterface
-public interface ExceptionSupplier<T, U extends Exception> extends Supplier<T> {
+public interface ExceptionSupplier<T, U extends Exception> {
 
-    @Override
-    default T get() {
+    default T get(IReflectionExceptionHandler handler) {
         try {
             return getWithException();
         } catch (Exception ex) {
-            ex.printStackTrace(); // TODO remove
+            if (handler == null) {
+                throw new ReflectionException(ex);
+            }
+            handler.handleException(ex);
         }
         return null;
     }

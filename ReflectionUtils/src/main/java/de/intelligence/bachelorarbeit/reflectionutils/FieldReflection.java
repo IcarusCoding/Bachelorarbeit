@@ -26,7 +26,7 @@ public final class FieldReflection extends ReflectableMember<Field> {
     public void set(Object value) {
         Reflection.makeAccessibleAndExecute(super.reflectable,
                 Modifier.isStatic(super.reflectable.getModifiers()) ? null : super.accessor, super.shouldForceAccess,
-                () -> super.reflectable.set(accessor, value));
+                super.handler, () -> super.reflectable.set(accessor, value));
     }
 
     /**
@@ -46,7 +46,15 @@ public final class FieldReflection extends ReflectableMember<Field> {
     public Object get() {
         return Reflection.makeAccessibleAndExecute(super.reflectable,
                 Modifier.isStatic(super.reflectable.getModifiers()) ? null : super.accessor, super.shouldForceAccess,
-                () -> super.reflectable.get(super.accessor));
+                super.handler, () -> super.reflectable.get(super.accessor));
+    }
+
+    public boolean canAccept(Object obj) {
+        return this.canAccept(obj.getClass());
+    }
+
+    public boolean canAccept(Class<?> clazz) {
+        return super.reflectable.getType().isAssignableFrom(clazz);
     }
 
     /**
@@ -55,7 +63,7 @@ public final class FieldReflection extends ReflectableMember<Field> {
      * @return A new {@link InstanceReflection} which contains the instance of the value from the {@link Field}
      */
     public InstanceReflection toInstanceReflection() {
-        return Reflection.reflect(get());
+        return Reflection.setExceptionHandler(Reflection.reflect(get()), super.handler);
     }
 
     @Override
