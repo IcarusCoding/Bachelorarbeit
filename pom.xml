@@ -21,9 +21,12 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>SimpliFX</module>
-        <module>DemoApplications</module>
         <module>ReflectionUtils</module>
+        <module>SimpliFX</module>
+        <module>SimpliFX-Dagger1</module>
+        <module>SimpliFX-Spring</module>
+        <module>SimpliFX-Guice</module>
+        <module>DemoApplications</module>
     </modules>
 
     <properties>
