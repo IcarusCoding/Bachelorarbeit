@@ -27,7 +27,7 @@ jobs:
       - name: Build & Package
         run: |
           mvn -B package --file pom.xml
-          mkdir build && cp SimpliFX/target/*.jar build && cp DemoApplications/target/*.jar build && cp Doku/Bachelorarbeit.pdf build && cp ReflectionUtils/target/*.jar build
+          mkdir build && cp SimpliFX/target/*.jar build && cp DemoApplications/target/*.jar build && cp Doku/Bachelorarbeit.pdf build && cp ReflectionUtils/target/*.jar build && cp SimpliFX-Dagger1/target/*.jar build && cp SimpliFX-Guice/target/*.jar build && cp SimpliFX-Spring/target/*.jar build
       - name: Cache setup
         uses: actions/cache@v2
         with:
