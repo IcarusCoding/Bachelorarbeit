@@ -1,0 +1,7 @@
+AnchorPane {
+    -fx-background-color: cyan;
+}
+
+Label {
+    -fx-text-fill: black;
+}

@@ -14,6 +14,13 @@ public final class AnnotationUtils {
         throw new UnsupportedOperationException();
     }
 
+    public static <T extends Annotation> void invokeMethodsByAnnotation(Object obj, Class<T> annotation,
+                                                                        Predicate<Method> condition,
+                                                                        Object... params) {
+        AnnotatedMethodCache.getMethodsAnnotatedBy(annotation, obj.getClass()).stream()
+                .filter(condition).forEach(m -> Reflection.reflect(m, obj).forceAccess().invoke(params));
+    }
+
     public static <T extends Annotation> void invokeMethodsByPrioritizedAnnotation(Object obj, Class<T> annotation,
                                                                                    Predicate<Method> condition,
                                                                                    Function<T, Integer> priority,
