@@ -2,6 +2,7 @@ package de.intelligence.bachelorarbeit.simplifx.controller;
 
 import java.util.function.Consumer;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.layout.Pane;
 
 public interface IControllerGroup {
@@ -11,6 +12,8 @@ public interface IControllerGroup {
     void destroy(Class<?> clazz);
 
     void destroy();
+
+    void setParent(IController parent);
 
     Class<?> getStartController();
 
@@ -23,5 +26,7 @@ public interface IControllerGroup {
     ControllerGroupContext getContextFor(String groupId);
 
     Class<?> getActiveController();
+
+    ReadOnlyObjectProperty<ControllerVisibilityContext.VisibilityState> visibilityProperty();
 
 }

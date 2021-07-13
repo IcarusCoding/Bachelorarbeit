@@ -31,6 +31,16 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + clazz.getSimpleName() + "\" is already registered in another group!");
         }
         final IController created = super.creator.createController(clazz);
+        created.getVisibilityContext().stateProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println("NEW STATE " + created.getControllerClass().getSimpleName() + " -> " + newVal);
+            /*if(ControllerVisibilityContext.VisibilityState.SHOWN.equals(newVal)) {
+                AnnotationUtils.invokeMethodsByPrioritizedAnnotation(created.getControllerInstance(), OnShow.class,
+                        m -> m.getParameterCount() == 0, OnShow::value);
+            } else if(ControllerVisibilityContext.VisibilityState.HIDDEN.equals(newVal)) {
+                AnnotationUtils.invokeMethodsByPrioritizedAnnotation(created.getControllerInstance(), OnHide.class,
+                        m -> m.getParameterCount() == 0, OnHide::value);
+            }*/
+        });
         ControllerRegistry.addController(super.groupId, clazz);
         super.registeredControllers.put(clazz, created);
         return created;
@@ -39,19 +49,35 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
     @Override
     public Pane start(IControllerGroupWrapper wrapper) {
         Conditions.checkNull(wrapper, "wrapper must not be null.");
-        super.groupWrapper.set(wrapper);
+        super.groupWrapper.set(wrapper); // shown 100%
         final IController controller = this.getOrCreateController(super.startController);
         super.activeHandler.set(controller);
+        super.activeHandler.addListener((obs, oldVal, newVal) -> {
+            if (oldVal != null) {
+                oldVal.getVisibilityContext().setState(ControllerVisibilityContext.VisibilityState.HIDDEN);
+            }
+            if (newVal != null) {
+                newVal.getVisibilityContext().setState(ControllerVisibilityContext.VisibilityState.SHOWN);
+            }
+        });
         wrapper.setController(controller);
-        for (final IControllerGroup group : super.subGroups.values()) {
-            group.start(new ControllerGroupWrapperImpl());
-        }
+        setupSubGroups(controller);
         FXThreadUtils.runOnFXThread(() -> {
             super.readyConsumer.accept(wrapper.getWrapper());
             AnnotationUtils.invokeMethodsByPrioritizedAnnotation(controller.getControllerInstance(),
                     PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
         });
+        if (this.parent == null) {
+            this.visibility.set(ControllerVisibilityContext.VisibilityState.SHOWN);
+        }
         return wrapper.getWrapper();
+    }
+
+    //TODO unbind everything
+    @Override
+    public void destroy() {
+        super.registeredControllers.values().forEach(c -> c.getSubGroups().values().forEach(IControllerGroup::destroy));
+        super.registeredControllers.keySet().forEach(this::destroy);
     }
 
     //TODO remove group when last controller destroyed and remove root
@@ -66,14 +92,7 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
         }
     }
 
-    //TODO unbind everything
-    @Override
-    public void destroy() {
-        super.subGroups.values().forEach(IControllerGroup::destroy);
-        super.registeredControllers.keySet().forEach(this::destroy);
-    }
-
-    @Override
+    @Override //TODO state check (only allow registering when not started)
     public void registerSubGroup(Class<?> startController, String groupId, Consumer<Pane> readyConsumer) {
         if (ControllerRegistry.isRegistered(groupId)) {
             throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
@@ -81,7 +100,8 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
         if (ControllerRegistry.isRegistered(startController)) {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + startController.getSimpleName() + "\" is already registered in another group!");
         }
-        super.subGroups.put(groupId, new ControllerGroupImpl(startController, super.provider, super.ii18N, readyConsumer, groupId));
+        super.currentSubGroups.put(groupId,
+                new ControllerGroupImpl(startController, super.provider, super.ii18N, readyConsumer, groupId));
     }
 
     @Override
@@ -90,8 +110,19 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
             return;
         }
         final IController controller = this.getOrCreateController(newController);
-        super.groupWrapper.get().switchController(controller, factory);
+
+        super.groupWrapper.get().switchController(controller, factory, state -> {
+        });
         super.activeHandler.set(controller);
+    }
+
+    private void setupSubGroups(IController controller) {
+        controller.getSubGroups().putAll(super.currentSubGroups);
+        super.currentSubGroups.clear();
+        for (final IControllerGroup group : controller.getSubGroups().values()) {
+            group.setParent(controller);
+            group.start(new ControllerGroupWrapperImpl());
+        }
     }
 
     @Override

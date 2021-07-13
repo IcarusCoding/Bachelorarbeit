@@ -6,11 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Pane;
 
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
 abstract class AbstractControllerGroup implements IControllerGroup {
 
@@ -24,7 +27,10 @@ abstract class AbstractControllerGroup implements IControllerGroup {
     protected final ObjectProperty<IController> activeHandler;
     protected final ObjectProperty<IControllerGroupWrapper> groupWrapper;
     protected final Map<Class<?>, IController> registeredControllers;
-    protected final Map<String, IControllerGroup> subGroups;
+    protected final ReadOnlyObjectWrapper<ControllerVisibilityContext.VisibilityState> visibility;
+    protected final Map<String, IControllerGroup> currentSubGroups;
+
+    protected IController parent;
 
     AbstractControllerGroup(Class<?> startController, IControllerFactoryProvider provider, II18N ii18N, Consumer<Pane> readyConsumer, String groupId) {
         this.startController = startController;
@@ -37,9 +43,32 @@ abstract class AbstractControllerGroup implements IControllerGroup {
         this.activeHandler = new SimpleObjectProperty<>();
         this.groupWrapper = new SimpleObjectProperty<>();
         this.registeredControllers = new ConcurrentHashMap<>();
-        this.subGroups = new HashMap<>();
+        this.visibility = new ReadOnlyObjectWrapper<>(ControllerVisibilityContext.VisibilityState.UNDEFINED);
+        this.visibility.addListener((obs, oldVal, newVal) -> {
+            System.out.println("NEW STATE " + (groupId) + " -> " + newVal);
+            if (this.activeHandler.get() != null) {
+                this.activeHandler.get().getVisibilityContext().setState(newVal);
+            }
+        });
+        this.currentSubGroups = new HashMap<>();
+        //this.groupWrapper.addListener((obs, oldVal, newVal) -> this.visibility.set(ControllerVisibilityContext.VisibilityState.SHOWN));
         ControllerRegistry.register(groupId, this.ctx);
         ControllerRegistry.addController(groupId, startController);
+    }
+
+    @Override
+    public void setParent(IController parent) {
+        Conditions.checkNull(parent, "parent must not be null.");
+        Conditions.checkCondition(this.parent == null, "parent was already set.");
+        this.parent = parent;
+        this.parent.getVisibilityContext().stateProperty().addListener((obs, oldVal, newVal) -> {
+            // this.visibility.bind(this.parent.getVisibilityContext().stateProperty());
+            if (newVal.equals(ControllerVisibilityContext.VisibilityState.HIDDEN) || newVal.equals(ControllerVisibilityContext.VisibilityState.GROUP_HIDDEN)) {
+                this.visibility.set(ControllerVisibilityContext.VisibilityState.GROUP_HIDDEN);
+            } else if (newVal.equals(ControllerVisibilityContext.VisibilityState.SHOWN)) {
+                this.visibility.set(ControllerVisibilityContext.VisibilityState.SHOWN);
+            }
+        });
     }
 
     @Override
@@ -50,6 +79,11 @@ abstract class AbstractControllerGroup implements IControllerGroup {
     @Override
     public Class<?> getActiveController() {
         return this.activeHandler.get() == null ? null : this.activeHandler.get().getControllerClass();
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<ControllerVisibilityContext.VisibilityState> visibilityProperty() {
+        return this.visibility.getReadOnlyProperty();
     }
 
 }

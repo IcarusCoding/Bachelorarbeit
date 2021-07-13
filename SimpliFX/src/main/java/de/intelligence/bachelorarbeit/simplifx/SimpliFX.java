@@ -44,9 +44,6 @@ import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
-import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupImpl;
-import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupWrapperImpl;
-import de.intelligence.bachelorarbeit.simplifx.controller.IControllerGroup;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.FXMLControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
@@ -60,6 +57,9 @@ import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
+import de.intelligence.bachelorarbeit.simplifx.realC.ControllerGroupImpl;
+import de.intelligence.bachelorarbeit.simplifx.realC.ControllerGroupWrapperImpl;
+import de.intelligence.bachelorarbeit.simplifx.realC.IControllerGroup;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -365,10 +365,10 @@ public final class SimpliFX {
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
             applicationImpl.init();
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
-            final IControllerGroup mainGroup = new ControllerGroupImpl(applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
+            final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
                     SimpliFX.globalI18N, pane -> {
-            }, "main");
+            });
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
                 final Stage primary = this.createStage(applicationListener.getClass());
