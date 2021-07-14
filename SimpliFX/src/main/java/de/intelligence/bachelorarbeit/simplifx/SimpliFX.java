@@ -184,11 +184,11 @@ public final class SimpliFX {
         }
 
         if (preloaderListener != null) {
-            AnnotationUtils.invokeMethodsByPrioritizedAnnotation(preloaderListener,
-                    PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+            AnnotationUtils.invokeMethodsByAnnotation(preloaderListener,
+                    PostConstruct.class, PostConstruct::value, true);
         }
-        AnnotationUtils.invokeMethodsByPrioritizedAnnotation(applicationListener,
-                PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+        AnnotationUtils.invokeMethodsByAnnotation(applicationListener,
+                PostConstruct.class, PostConstruct::value, true);
 
         final Thread fxLauncherThread = new Thread(() -> {
             final Launcher l = new Launcher(appImpl, preImpl);

@@ -98,7 +98,7 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
             if (!method.getName().equals(name) || method.getParameterCount() != argTypes.length) {
                 continue;
             }
-            if (matchArguments(argTypes, method.getParameterTypes())) {
+            if (Reflection.matchArguments(argTypes, method.getParameterTypes())) {
                 return Reflection.setExceptionHandler(Reflection.reflect(method, super.reflectable), this.handler);
             }
         }

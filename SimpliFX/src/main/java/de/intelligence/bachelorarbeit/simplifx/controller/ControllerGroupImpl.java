@@ -64,8 +64,8 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
         setupSubGroups(controller);
         FXThreadUtils.runOnFXThread(() -> {
             super.readyConsumer.accept(wrapper.getWrapper());
-            AnnotationUtils.invokeMethodsByPrioritizedAnnotation(controller.getControllerInstance(),
-                    PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(),
+                    PostConstruct.class, PostConstruct::value, true);
         });
         if (this.parent == null) {
             this.visibility.set(ControllerVisibilityContext.VisibilityState.SHOWN);
@@ -86,8 +86,8 @@ public final class ControllerGroupImpl extends AbstractControllerGroup {
         if (super.registeredControllers.containsKey(clazz)) {
             ControllerRegistry.removeController(clazz);
             final IController controller = super.registeredControllers.remove(clazz);
-            AnnotationUtils.invokeMethodsByPrioritizedAnnotation(controller.getControllerInstance(), OnDestroy.class,
-                    m -> m.getParameterCount() == 0, OnDestroy::value);
+            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnDestroy.class,
+                    OnDestroy::value, true);
             controller.destroy();
         }
     }

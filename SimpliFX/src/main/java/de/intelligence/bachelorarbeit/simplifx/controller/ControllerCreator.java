@@ -79,8 +79,7 @@ final class ControllerCreator {
             System.out.println("HANDLE EXCEPTION");
             //TODO HANDLE
         });
-        AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class,
-                m -> m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(ControllerGroupContext.class), this.ctx);
+        AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class, true, false, this.ctx);
         return new ControllerImpl(instance, pane);
     }
 
