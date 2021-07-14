@@ -60,14 +60,14 @@ public final class ControllerGroupImpl implements IControllerGroup {
             }
             if (newVal.type().equals(VisibilityState.SHOWN)) {
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnShow.class, OnShow::value,
-                        true, true, controller.getVisibilityContext());
+                        true, controller.getVisibilityContext());
             } else if (newVal.type().equals(VisibilityState.HIDDEN)) {
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnHide.class, OnHide::value,
-                        true, true, controller.getVisibilityContext());
+                        true, controller.getVisibilityContext());
             }
         });
         final ControllerSetupContext ctx = new ControllerSetupContext(controller.getControllerClass(), this, this.groupCtx);
-        AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, true, false, ctx);
+        AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, true, ctx);
         controller.getSubGroups().forEach((groupId, group) -> {
             group.start(); //TODO dont start in pre init
         });
@@ -115,7 +115,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         if (this.loadedControllers.containsKey(clazz)) {
             de.intelligence.bachelorarbeit.simplifx.controller.ControllerRegistry.removeController(clazz);
             final IController controller = this.loadedControllers.remove(clazz);
-            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnDestroy.class, OnDestroy::value, true);
+            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnDestroy.class, OnDestroy::value);
             controller.destroy();
         }
     }
@@ -181,7 +181,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     }
 
     private void postConstruct(Object instance) {
-        AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value, true);
+        AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value);
     }
 
     private IController getOrCreateController(Class<?> clazz) {

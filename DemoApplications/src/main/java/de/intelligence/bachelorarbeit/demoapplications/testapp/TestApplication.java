@@ -16,6 +16,8 @@ import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
+import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
@@ -27,15 +29,17 @@ public final class TestApplication {
     @Inject
     private ITestService service;
 
+    @ResourceBundle("test/Messages")
     @ResourceBundle("TestBundle")
     private II18N language;
 
-    @ResourceBundle("test/Messages")
-    private II18N language2;
+    @Shared
+    private SharedResources resources;
 
     @PostConstruct
     private void postConstructTest() {
         service.test();
+        System.out.println("RESOURCES: " + resources);
     }
 
     @EventHandler

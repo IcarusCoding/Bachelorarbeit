@@ -59,6 +59,7 @@ import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -74,6 +75,7 @@ public final class SimpliFX {
     private static Injector globalInjector;
     private static II18N globalI18N;
     private static DIEnvironment appDIEnv;
+    private static SharedResources globalResources;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -156,6 +158,7 @@ public final class SimpliFX {
         Logging.getJavaFXLogger().disableLogging();
         Logging.getCSSLogger().disableLogging();
         SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
+        SimpliFX.globalResources = new SharedResources();
         final Class<?> applicationClass = applicationListener.getClass();
 
         System.out.println(new String(SimpliFXConstants.BANNER));
@@ -163,8 +166,6 @@ public final class SimpliFX {
 
         final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
         final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
-
-        // TODO init all subsystems -> create main controller & controller system, ...
 
         final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
                 applicationListener, preloaderListener);
@@ -209,15 +210,6 @@ public final class SimpliFX {
         bundleDetector.findAllFields((f, a) -> f.canAccept(I18N.class));
         final Map<Locale, List<java.util.ResourceBundle>> bundleMap = new HashMap<>();
         bundleDetector.getAnnotations()
-                /*.forEach(bundle -> I18N.findAllBundlesWithBaseName(bundle.directory(), bundle.name(), ex -> {
-                    ex.printStackTrace();
-                    //TODO handle
-                }).forEach((l, b) -> {
-                    if (!bundleMap.containsKey(l)) {
-                        bundleMap.put(l, new ArrayList<>());
-                    }
-                    bundleMap.get(l).add(b);
-                }));*/
                 .stream().filter(b -> !b.value().isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
                 .map(locale -> java.util.ResourceBundle.getBundle(b.value(), locale))
                 .filter(Conditions.distinct(java.util.ResourceBundle::getLocale)).forEach(bundle -> {
@@ -363,11 +355,11 @@ public final class SimpliFX {
             });
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
             applicationImpl.init();
-            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
                     SimpliFX.globalI18N, pane -> {
             });
+            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
                 final Stage primary = this.createStage(applicationListener.getClass());
