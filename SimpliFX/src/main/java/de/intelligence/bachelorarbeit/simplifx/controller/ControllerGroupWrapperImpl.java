@@ -1,7 +1,5 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
-import java.util.function.Consumer;
-
 import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -13,17 +11,18 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     private final ReadOnlyObjectWrapper<Pane> wrapper;
 
     public ControllerGroupWrapperImpl() {
-        this.wrapper = new ReadOnlyObjectWrapper<>(new StackPane());
+        this.wrapper = new ReadOnlyObjectWrapper<>();
     }
 
-    private void switchController0(IController handler, Timeline prev, Timeline next, Consumer<SwitchState> stateConsumer) {
-        stateConsumer.accept(SwitchState.SWITCH_STARTED);
+    private void switchController0(IController handler, Timeline prev, Timeline next) {
+        if (this.wrapper.get() == null) {
+            throw new RuntimeException("switch impossible!");
+        }
         this.wrapper.get().prefHeightProperty().bind(handler.getRoot().prefHeightProperty());
         this.wrapper.get().prefWidthProperty().bind(handler.getRoot().prefWidthProperty());
         //TODO do animation stuff
         // ....
         this.setController(handler.getRoot());
-        stateConsumer.accept(SwitchState.SWITCH_ENDED);
     }
 
     private void setController(Pane pane) {
@@ -31,19 +30,19 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     }
 
     @Override
-    public void switchController(IController handler, IWrapperAnimationFactory animationFactory, Consumer<SwitchState> stateConsumer) {
+    public void switchController(IController handler, IWrapperAnimationFactory animationFactory) {
         this.switchController0(handler, animationFactory.createForNext(handler.getRoot()),
-                animationFactory.createForPrevious(wrapper.get()), stateConsumer);
+                animationFactory.createForPrevious(wrapper.get()));
     }
 
     @Override
     public void setController(IController handler) {
         if (this.wrapper.get() == null) { // first controller
+            this.wrapper.set(new StackPane());
             setController(handler.getRoot());
             return;
         }
-        this.switchController(handler, new DefaultWrapperAnimationFactory(), state -> {
-        });
+        this.switchController(handler, new DefaultWrapperAnimationFactory());
     }
 
     @Override

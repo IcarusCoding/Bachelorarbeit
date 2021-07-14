@@ -8,11 +8,11 @@ import de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.left.
 import de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.right.RightControllerOne;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
+import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
-import de.intelligence.bachelorarbeit.simplifx.realC.ControllerSetupContext;
 
 @Controller(fxml = "/controllers/fxml/MainController.fxml", css = "controllers/css/main.css")
 public final class MainController {

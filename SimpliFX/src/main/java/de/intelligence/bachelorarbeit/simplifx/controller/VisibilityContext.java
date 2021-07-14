@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.realC;
+package de.intelligence.bachelorarbeit.simplifx.controller;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;

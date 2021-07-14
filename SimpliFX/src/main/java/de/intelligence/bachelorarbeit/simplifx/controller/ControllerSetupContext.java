@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.realC;
+package de.intelligence.bachelorarbeit.simplifx.controller;
 
 import java.util.function.Consumer;
 

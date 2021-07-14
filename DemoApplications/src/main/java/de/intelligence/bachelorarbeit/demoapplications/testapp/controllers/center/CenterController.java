@@ -13,14 +13,14 @@ import de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.right
 import de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.right.RightControllerTwo;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
+import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext;
+import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
-import de.intelligence.bachelorarbeit.simplifx.realC.ControllerGroupContext;
-import de.intelligence.bachelorarbeit.simplifx.realC.ControllerSetupContext;
 
 @Controller(fxml = "/controllers/fxml/center/CenterController.fxml", css = "controllers/css/center.css")
 public final class CenterController {
