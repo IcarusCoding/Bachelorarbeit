@@ -34,7 +34,7 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
 
     @Override
     public void setController(IController handler) {
-        if (this.wrapper.get() == null) { // first controller
+        if (this.wrapper.get().getChildren().size() == 0) { // first controller
             setController(handler.getRoot());
             return;
         }

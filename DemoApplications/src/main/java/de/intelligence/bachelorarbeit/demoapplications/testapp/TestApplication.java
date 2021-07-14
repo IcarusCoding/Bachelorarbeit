@@ -1,10 +1,12 @@
-package de.intelligence.bachelorarbeit.demoapplications;
+package de.intelligence.bachelorarbeit.demoapplications.testapp;
 
 import javax.inject.Inject;
 
-import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import de.intelligence.bachelorarbeit.demoapplications.ITestService;
+import de.intelligence.bachelorarbeit.demoapplications.TestSpringModule;
+import de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.main.MainController;
 import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
@@ -18,7 +20,7 @@ import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
         resizeable = false, iconPath = "/icon.png")
-@ApplicationEntryPoint(TestController.class)
+@ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
 
@@ -33,7 +35,6 @@ public final class TestApplication {
 
     @PostConstruct
     private void postConstructTest() {
-        //System.out.println("Post Construct: " + language.get("test.key") + " " + language.get("test.key2"));
         service.test();
     }
 
@@ -50,20 +51,7 @@ public final class TestApplication {
     @EventHandler
     private void onStart(StartEvent event) {
         System.out.println("Start event received! Thread: " + Thread.currentThread());
-        final Stage testStage = event.getStage();
-        testStage.show();
-        // testing
-        /*final SimpliFXMLLoader loader = new SimpliFXMLLoader(getClass().getResource("/test.fxml"));
-        loader.setII18N(language2);
-        try {
-            Pane p = loader.load();
-            p.getStylesheets().add("test.css");
-            Scene scene = new Scene(p);
-            testStage.setScene(scene);
-            testStage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        event.getStage().show();
     }
 
     @EventHandler

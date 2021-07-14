@@ -88,7 +88,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
             if (constructor.getParameterCount() != argTypes.length) {
                 continue;
             }
-            if (matchArguments(argTypes, constructor.getParameterTypes())) {
+            if (Reflection.matchArguments(argTypes, constructor.getParameterTypes())) {
                 return Reflection.setExceptionHandler(Reflection.reflect(constructor), this.handler);
             }
         }
@@ -160,7 +160,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
             if (!method.getName().equals(name) || method.getParameterCount() != argTypes.length) {
                 continue;
             }
-            if (matchArguments(argTypes, method.getParameterTypes())) {
+            if (Reflection.matchArguments(argTypes, method.getParameterTypes())) {
                 return Reflection.setExceptionHandler(Reflection.reflect(method, null), this.handler);
             }
         }

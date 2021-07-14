@@ -18,17 +18,18 @@ import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
+import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
+import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
-import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 
 final class ControllerCreator {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(DefaultControllerGroup.class);
+    private static final SimpliFXLogger LOG = SimpliFXLogger.create(ControllerGroupImpl.class);
 
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
@@ -38,7 +39,7 @@ final class ControllerCreator {
         this.ii18N = ii18N;
     }
 
-    IController createController(Class<?> clazz) throws IOException {
+    IController createController(Class<?> clazz) {
         final ControllerLoadContext ctx = this.validateController(clazz);
         boolean validControllerAttribSpecified = false;
 
@@ -48,7 +49,7 @@ final class ControllerCreator {
             if (!attrib.isBlank() && clazz.getCanonicalName().equals(attrib)) {
                 validControllerAttribSpecified = true;
             }
-        } catch (ParserConfigurationException | SAXException | XPathExpressionException ignored) {
+        } catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException ignored) {
         }
 
         final SimpliFXMLLoader loader = new SimpliFXMLLoader();
@@ -60,11 +61,24 @@ final class ControllerCreator {
         loader.setII18N(this.ii18N);
         loader.setClassLoader(clazz.getClassLoader());
         loader.setLocation(ctx.fxmlLocation);
-        final Pane pane = loader.load();
+        Pane pane = null;
+        try {
+            pane = loader.load();
+        } catch (IOException e) {
+            //TODO error handling
+            throw new RuntimeException("TODO ERROR HANDLING");
+        }
         final Object instance = loader.getController();
         pane.getStylesheets().add(ctx.cssLocation);
-        AnnotationUtils.invokeMethodsByPrioritizedAnnotation(instance,
-                PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+        final IAnnotatedFieldDetector<ResourceBundle> detector = new AnnotatedFieldDetector<>(ResourceBundle.class, instance);
+        detector.findAllFields();
+        detector.injectValue(this.ii18N, true, ex -> {
+            System.out.println("HANDLE EXCEPTION");
+            //TODO HANDLE
+        });
+        System.out.println("LOADED " + ctx.fxmlLocation);
+        //  AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class,
+        //          m -> m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(ControllerSetupContext.class), setupCtx);
         return new ControllerImpl(instance, pane);
     }
 

@@ -1,5 +1,8 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
+import java.util.Map;
+
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.layout.Pane;
 
 public interface IController {
@@ -10,6 +13,12 @@ public interface IController {
 
     Class<?> getControllerClass();
 
+    Map<String, IControllerGroup> getSubGroups();
+
     void destroy();
+
+    ObjectProperty<VisibilityState> visibilityProperty();
+
+    VisibilityContext getVisibilityContext();
 
 }
