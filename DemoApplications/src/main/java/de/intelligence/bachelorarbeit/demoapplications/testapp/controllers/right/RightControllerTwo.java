@@ -10,6 +10,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
+import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 
 @Controller(fxml = "/controllers/fxml/right/RightControllerTwo.fxml", css = "controllers/css/rightTwo.css")
 public final class RightControllerTwo {
@@ -28,13 +29,13 @@ public final class RightControllerTwo {
     }
 
     @OnShow
-    private void onShow() {
-        System.out.println("RightControllerTwo: Shown!");
+    private void onShow(VisibilityContext ctx) {
+        System.out.println("RightControllerTwo: " + ctx.getVisibility());
     }
 
     @OnHide
-    private void onHide() {
-        System.out.println("RightControllerTwo: Hidden!");
+    private void onHide(VisibilityContext ctx) {
+        System.out.println("RightControllerTwo: " + ctx.getVisibility());
     }
 
     @OnDestroy

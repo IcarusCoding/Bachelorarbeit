@@ -7,9 +7,9 @@ import javafx.scene.layout.Pane;
 
 public interface IControllerGroup {
 
-    IController constructController(Class<?> clazz);
+    IController constructController(Class<?> clazz, Consumer<Pane> readyConsumer);
 
-    Pane start(IControllerGroupWrapper wrapper);
+    Pane start();
 
     void registerSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer);
 

@@ -14,7 +14,6 @@ import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFa
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerGroupDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
-import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.FXThreadUtils;
 
 public final class ControllerGroupImpl implements IControllerGroup {
@@ -40,7 +39,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         this.readyConsumer = readyConsumer;
         this.creator = new ControllerCreator(provider, ii18N);
         this.loadedControllers = new ConcurrentHashMap<>();
-        this.groupWrapper = new SimpleObjectProperty<>();
+        this.groupWrapper = new SimpleObjectProperty<>(new ControllerGroupWrapperImpl());
         this.activeController = new SimpleObjectProperty<>();
         this.groupCtx = new ControllerGroupContext(this);
         this.visibility = new SimpleObjectProperty<>(VisibilityState.UNDEFINED);
@@ -49,7 +48,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     }
 
     @Override
-    public IController constructController(Class<?> clazz) {
+    public IController constructController(Class<?> clazz, Consumer<Pane> readyConsumer) {
         if (!this.startController.equals(clazz) && ControllerRegistry.isRegistered(clazz)) {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + clazz.getSimpleName() + "\" is already registered in another group!");
         }
@@ -70,19 +69,20 @@ public final class ControllerGroupImpl implements IControllerGroup {
         final ControllerSetupContext ctx = new ControllerSetupContext(controller.getControllerClass(), this, this.groupCtx);
         AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, true, false, ctx);
         controller.getSubGroups().forEach((groupId, group) -> {
-            group.start(new ControllerGroupWrapperImpl()); //TODO dont start in pre init
+            group.start(); //TODO dont start in pre init
+        });
+        FXThreadUtils.runOnFXThread(() -> {
+            postConstruct(controller.getControllerInstance());
         });
         return controller;
     }
 
     @Override
-    public Pane start(IControllerGroupWrapper wrapper) {
-        Conditions.checkNull(wrapper, "wrapper must not be null.");
-        this.groupWrapper.set(wrapper);
+    public Pane start() {
+        readyConsumer.accept(this.groupWrapper.get().getWrapper());
         final IController controller = this.getOrCreateController(this.startController);
-        initController(controller, this.readyConsumer);
         setController(controller, new DefaultWrapperAnimationFactory());
-        return wrapper.getWrapper();
+        return this.groupWrapper.get().getWrapper();
     }
 
     @Override
@@ -106,12 +106,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         if (this.activeController.get() == null || this.activeController.get().getControllerClass().equals(newController)) {
             return;
         }
-        boolean needsPostConstruct = !this.loadedControllers.containsKey(newController); //TODO ugly
-        final IController controller = this.getOrCreateController(newController);
-        if (needsPostConstruct) {
-            postConstruct(controller.getControllerInstance());
-        }
-        setController(controller, factory);
+        setController(this.getOrCreateController(newController), factory);
     }
 
     //TODO remove group when last controller destroyed and remove root
@@ -185,13 +180,6 @@ public final class ControllerGroupImpl implements IControllerGroup {
         }
     }
 
-    private void initController(IController controller, Consumer<Pane> readyConsumer) {
-        FXThreadUtils.runOnFXThread(() -> {
-            readyConsumer.accept(this.groupWrapper.get().getWrapper());
-            postConstruct(controller.getControllerInstance());
-        });
-    }
-
     private void postConstruct(Object instance) {
         AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value, true);
     }
@@ -200,7 +188,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         if (this.loadedControllers.containsKey(clazz)) {
             return this.loadedControllers.get(clazz);
         }
-        return this.constructController(clazz);
+        return this.constructController(clazz, null);
     }
 
 }

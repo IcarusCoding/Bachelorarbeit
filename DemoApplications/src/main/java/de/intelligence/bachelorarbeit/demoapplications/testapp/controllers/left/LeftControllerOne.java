@@ -10,6 +10,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
+import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 
 @Controller(fxml = "/controllers/fxml/left/LeftControllerOne.fxml", css = "controllers/css/leftOne.css")
 public final class LeftControllerOne {
@@ -28,13 +29,13 @@ public final class LeftControllerOne {
     }
 
     @OnShow
-    private void onShow() {
-        System.out.println("LeftControllerOne: Shown!");
+    private void onShow(VisibilityContext ctx) {
+        System.out.println("LeftControllerOne: " + ctx.getVisibility());
     }
 
     @OnHide
-    private void onHide() {
-        System.out.println("LeftControllerOne: Hidden!");
+    private void onHide(VisibilityContext ctx) {
+        System.out.println("LeftControllerOne: " + ctx.getVisibility());
     }
 
     @OnDestroy

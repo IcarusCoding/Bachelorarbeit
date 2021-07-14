@@ -19,6 +19,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnDestroy;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
+import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 
@@ -65,13 +66,13 @@ public final class CenterController {
     }
 
     @OnShow
-    private void onShow() {
-        System.out.println("CenterController: Shown!");
+    private void onShow(VisibilityContext ctx) {
+        System.out.println("CenterController: " + ctx.getVisibility());
     }
 
     @OnHide
-    private void onHide() {
-        System.out.println("CenterController: Hidden!");
+    private void onHide(VisibilityContext ctx) {
+        System.out.println("CenterController: " + ctx.getVisibility());
     }
 
     @OnDestroy

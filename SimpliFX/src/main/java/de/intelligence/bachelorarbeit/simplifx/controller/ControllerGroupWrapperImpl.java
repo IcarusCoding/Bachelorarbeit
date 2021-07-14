@@ -11,13 +11,10 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     private final ReadOnlyObjectWrapper<Pane> wrapper;
 
     public ControllerGroupWrapperImpl() {
-        this.wrapper = new ReadOnlyObjectWrapper<>();
+        this.wrapper = new ReadOnlyObjectWrapper<>(new StackPane());
     }
 
     private void switchController0(IController handler, Timeline prev, Timeline next) {
-        if (this.wrapper.get() == null) {
-            throw new RuntimeException("switch impossible!");
-        }
         this.wrapper.get().prefHeightProperty().bind(handler.getRoot().prefHeightProperty());
         this.wrapper.get().prefWidthProperty().bind(handler.getRoot().prefWidthProperty());
         //TODO do animation stuff
@@ -37,8 +34,7 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
 
     @Override
     public void setController(IController handler) {
-        if (this.wrapper.get() == null) { // first controller
-            this.wrapper.set(new StackPane());
+        if (this.wrapper.get().getChildren().size() == 0) { // first controller
             setController(handler.getRoot());
             return;
         }

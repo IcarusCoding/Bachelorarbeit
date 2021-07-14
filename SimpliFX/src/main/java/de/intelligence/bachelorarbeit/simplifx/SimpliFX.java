@@ -45,7 +45,6 @@ import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupImpl;
-import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupWrapperImpl;
 import de.intelligence.bachelorarbeit.simplifx.controller.IControllerGroup;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.FXMLControllerFactoryProvider;
@@ -372,7 +371,7 @@ public final class SimpliFX {
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
                 final Stage primary = this.createStage(applicationListener.getClass());
-                primary.setScene(new Scene(mainGroup.start(new ControllerGroupWrapperImpl())));
+                primary.setScene(new Scene(mainGroup.start()));
                 StageHelper.setPrimary(primary, true);
                 try {
                     applicationImpl.start(primary);
