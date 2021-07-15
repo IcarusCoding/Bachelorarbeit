@@ -98,7 +98,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
             throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
         }
         this.loadedControllers.get(originController).getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController,
-                this.provider, this.ii18N, this.resources, this.readyConsumer));
+                this.provider, this.ii18N, this.resources, readyConsumer));
     }
 
     @Override
