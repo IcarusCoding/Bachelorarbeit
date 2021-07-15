@@ -13,6 +13,7 @@ import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerGroupDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.FXThreadUtils;
 
@@ -22,6 +23,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final Class<?> startController;
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
+    private final SharedResources resources;
     private final Consumer<Pane> readyConsumer;
 
     private final ControllerCreator creator;
@@ -31,13 +33,15 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final ControllerGroupContext groupCtx;
     private final ObjectProperty<VisibilityState> visibility;
 
-    public ControllerGroupImpl(String groupId, Class<?> startController, IControllerFactoryProvider provider, II18N ii18N, Consumer<Pane> readyConsumer) {
+    public ControllerGroupImpl(String groupId, Class<?> startController, IControllerFactoryProvider provider, II18N ii18N,
+                               SharedResources resources, Consumer<Pane> readyConsumer) {
         this.groupId = groupId;
         this.startController = startController;
         this.provider = provider;
         this.ii18N = ii18N;
+        this.resources = resources;
         this.readyConsumer = readyConsumer;
-        this.creator = new ControllerCreator(provider, ii18N);
+        this.creator = new ControllerCreator(provider, ii18N, resources);
         this.loadedControllers = new ConcurrentHashMap<>();
         this.groupWrapper = new SimpleObjectProperty<>(new ControllerGroupWrapperImpl());
         this.activeController = new SimpleObjectProperty<>();
@@ -93,7 +97,8 @@ public final class ControllerGroupImpl implements IControllerGroup {
         if (ControllerRegistry.isRegistered(groupId)) {
             throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
         }
-        this.loadedControllers.get(originController).getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController, this.provider, this.ii18N, readyConsumer));
+        this.loadedControllers.get(originController).getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController,
+                this.provider, this.ii18N, this.resources, this.readyConsumer));
     }
 
     @Override

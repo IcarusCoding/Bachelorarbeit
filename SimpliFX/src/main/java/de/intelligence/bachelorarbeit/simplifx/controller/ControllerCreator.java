@@ -26,6 +26,8 @@ import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
 final class ControllerCreator {
 
@@ -33,10 +35,12 @@ final class ControllerCreator {
 
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
+    private final SharedResources resources;
 
-    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N) {
+    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources) {
         this.provider = provider;
         this.ii18N = ii18N;
+        this.resources = resources;
     }
 
     IController createController(Class<?> clazz) {
@@ -76,9 +80,8 @@ final class ControllerCreator {
             System.out.println("HANDLE EXCEPTION");
             //TODO HANDLE
         });
-        System.out.println("LOADED " + ctx.fxmlLocation);
-        //  AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class,
-        //          m -> m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(ControllerSetupContext.class), setupCtx);
+        final SharedFieldInjector injector = new SharedFieldInjector(instance);
+        injector.inject(this.resources);
         return new ControllerImpl(instance, pane);
     }
 

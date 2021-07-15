@@ -22,12 +22,21 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
+import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
 @Controller(fxml = "/controllers/fxml/center/CenterController.fxml", css = "controllers/css/center.css")
 public final class CenterController {
 
     @ResourceBundle
     private II18N language;
+
+    @Shared
+    private SharedResources resources;
+
+    @Shared
+    private SharedReference<String> testReference;
 
     @FXML
     private Button switchBtn;
@@ -56,6 +65,9 @@ public final class CenterController {
     @PostConstruct
     private void afterConstruction() {
         System.out.println("CenterController: Post-Construct!");
+        System.out.println("RESOURCES (center): " + this.resources);
+        System.out.println("BOOL REFERENCE (center): " + this.testReference.get());
+        this.testReference.set("true");
         this.switchLanguageBtn.setOnAction(evt -> {
             if (this.language.getCurrentLocale().equals(Locale.GERMAN)) {
                 this.language.setLocale(Locale.ENGLISH);

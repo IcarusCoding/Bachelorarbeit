@@ -59,6 +59,7 @@ import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
@@ -174,6 +175,8 @@ public final class SimpliFX {
             System.out.println("EXCEPTION");
             //TODO handle
         });
+        final SharedFieldInjector injector = new SharedFieldInjector(applicationListener, preloaderListener);
+        injector.inject(SimpliFX.globalResources);
 
         try {
             SimpliFX.setupDI(applicationListener);
@@ -357,7 +360,7 @@ public final class SimpliFX {
             applicationImpl.init();
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N, pane -> {
+                    SimpliFX.globalI18N, SimpliFX.globalResources, pane -> {
             });
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
