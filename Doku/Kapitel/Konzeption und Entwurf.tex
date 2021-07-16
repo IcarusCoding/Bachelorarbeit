@@ -144,8 +144,9 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 	Ein Controller soll als solcher erkannt werden, wenn dieser eine spezielle Annotation aufweist. Die Annotation muss dabei die Quelle der FXML und der \ac{css} Datei enthalten und weitere auf Controller bezogene Konfigurationsmöglichkeiten bereitstellen.
 \end{freq}
 \begin{freq}{Erweiterung des Controllerlebenszyklus}
-	Der Lebenszyklus eines Controllers soll, ähnlich wie bei Android Activities, in mehrere Phasen eingeteilt sein, welche durch die Nutzung von Annotationen durch den Entwickler abrufbar gemacht werden sollen. Methoden, welche nach einer bestimmten Phase ausgeführt werden sollen, sollen mit der zu der Phase gehörenden Annotation annotiert werden können. Der Lebenszyklus soll um folgende Phasen erweitert werden:
+	Der Lebenszyklus eines Controllers soll, ähnlich wie bei Android Activities, in mehrere Phasen eingeteilt sein, welche durch die Nutzung von Annotationen durch den Entwickler abrufbar gemacht werden sollen. Methoden, welche bei einer bestimmten Phase ausgeführt werden sollen, müssen mit der zu der Phase gehörenden Annotation annotiert werden können. Der Lebenszyklus soll um folgende Phasen erweitert werden:
 	\begin{itemize}
+		\item In der \textbf{\texttt{Setup}} Phase ist die grobe Initialisierung eines Controllers beendet und die vom Entwickler spezifizierten Subcontroller werden initialisiert.
 		\item In der \textbf{\texttt{PostConstruct}} Phase sind alle Abhängigkeitsinjektionen und alle Instanziierungen von JavaFX Komponenten vollständig abgeschlossen und somit durch den Entwickler im Controller verwendbar.
 		\item In der \textbf{\texttt{OnShow}} Phase wird das Wurzelelement des Controllers im Szenengraphen aktiv gerendert und ist somit durch den Endbenutzer in der grafischen Benutzeroberfläche zu erkennen.
 		\item In der \textbf{\texttt{OnHide}} Phase wurde das Wurzelelement des Controllers aus dem Szenengraphen entfernt und dementsprechend nicht gerendert.
@@ -159,7 +160,7 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 	Wenn mehrere Methoden mit denselben Lebenszyklusannotationen annotiert wurden, so soll die Reihenfolge der Aufrufe dieser, anhand eines optionalen Parameters in der Annotation bestimmt werden. Weisen mehrere Annotationen dieselbe Priorisierung auf, so soll nach der Deklarationsreihenfolge in der Klasse sortiert werden.
 \end{freq}
 \begin{freq}{Controllerverschachtelung und Supercontroller}
-	Ist das Wurzelelement eines Controllers in einem durch einen weiteren Controller aufgespannten Teilbaum des Szenengraphen enthalten, so handelt es sich bei ersterem Controller um einen Subcontroller des Letzteren. Subcontroller sollen bei Phasenänderung des Lebenszyklus ihres Supercontrollers benachrichtigt werden. Beispielsweise soll der Subcontroller in die \texttt{OnHide} Zustand wechseln, wenn der Supercontroller in denselben Zustand wechselt. Diese Beziehung soll bei Möglichkeit automatisch ermittelt werden aber dennoch explizit durch den Entwickler bei der Controllerdefinition deklariert werden können.
+	Ist das Wurzelelement eines Controllers in einem durch einen weiteren Controller aufgespannten Teilbaum des Szenengraphen enthalten, so handelt es sich bei ersterem Controller um einen Subcontroller des Letzteren. Subcontroller sollen bei Phasenänderung des Lebenszyklus ihres Supercontrollers benachrichtigt werden. Beispielsweise soll der Subcontroller in den \texttt{OnHide} Zustand wechseln, wenn der Supercontroller in denselben Zustand wechselt. Diese Beziehung soll durch den Entwickler bei der Controllerdefinition deklariert werden können.
 \end{freq}
 \begin{freq}{Gruppierung von ähnlichen Controllern}
 	Ähnliche Controller sollen bei Definition, sogenannten Controllergruppen zugeordnet werden können. Eine Controllergruppe teilt sich dasselbe Wurzelelement, weshalb immer nur ein Controller einer Controllergruppe gleichzeitig aktiv sein kann. Ein Controller soll dabei nur einer Controllergruppe zuordenbar sein. Wechselt der aktive Controller einer Controllergruppe, so soll die Controllergruppe davon in Kenntnis gesetzt werden und eventuelle Phasenwechsel von betroffenen Controllern ausgelöst werden. Verschachtelte Subcontroller sollen dabei zwischen einem Wechsel durch einen Supercontroller und einem selbst ausgelösten Wechsel differenzieren können.
@@ -384,9 +385,12 @@ Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Sp
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Guice und muss am Einstiegspunkt der Applikation angebracht sein. Guice-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
 \subsubsection{Annotation: @Dagger1Injection}
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Dagger der Version 1 und muss am Einstiegspunkt der Applikation angebracht werden. Dagger-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
-\subsubsection{Annotation: @Inject}
-Alle durch \texttt{SimpliFX} unterstützen externen Bibliotheken zur Abhängigkeitsinjektion sind mit der von Java bereitgestellten \texttt{javax.annotation.Inject} Annotation kompatibel. 
-\add{Complete when more information of injection process}
+\subsubsection{Annotation: @Setup}
+Die \texttt{@Setup} Annotation ist ausschließlich im Rahmen des Controller-Systems nutzbar und kann nur an Methoden angebracht werden. Hat \texttt{SimpliFX} einen Controller fertig initialisiert (Abhängigkeiten, Ressourcen, ...), so werden alle Setup-Methoden aufgerufen. In diesen Methoden kann der Entwickler neue Controller vom System initialisieren lassen und deren Wurzel-Node dann beispielsweise in anderen JavaFX-Komponenten integrieren.
+\subsubsection{Annotation: @OnShow und @OnHide}
+Methoden eines Controllers, welche mit \texttt{@OnShow} annotiert wurden, werden aufgerufen, wenn ein Controller im Szenengraphen enthalten ist und somit aktiv gerendert wird. Analog dazu werden \texttt{@OnHide} Methoden aufgerufen, wenn der Controller gewechselt wird und somit nicht mehr angezeigt wird.
+\subsubsection{Annotation: @OnDestroy}
+\texttt{@OnDestroy} Methoden werden aufgerufen, sobald ein Controller nicht länger benötigt wird und alle damit verbundenen Ressourcen gelöscht werden können.
 \subsubsection{Annotation: @EventEmitter und @EventReceiver}
 Die \texttt{@EventEmitter} Annotation verbindet das Auftreten von JavaFX-Events mit dem Aufruf von Methoden. Dabei werden Felder als EventEmitter deklariert und Methoden als EventReceiver. Ein notwendiger Parameter beider Annotationen ist ein gemeinsamer Identifikator, welcher die Beziehung zwischen Methode und Feld ermöglicht. Methoden müssen als Parameter die jeweilige JavaFX-Event Klasse als Parameter aufweisen.
 \subsubsection{Annotation: @FXThread}
@@ -489,8 +493,6 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		Inject & \ref{freq4} & -- & -- \\
-		\hline
 		DIAnnotation & \ref{freq4} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
@@ -543,7 +545,19 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		PostConstruct & \ref{freq8} & 
+		Setup & \ref{freq7},\ref{freq10}, \ref{freq11} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Priorität
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Methoden in Controllern
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		PostConstruct & \ref{freq7},\ref{freq8} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Priorität
@@ -555,7 +569,19 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		Shared & \ref{freq15} & 
+		OnShow, OnHide, OnDestroy & \ref{freq7},\ref{freq13} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Priorität
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Nur Methoden in Controllern
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		Shared & \ref{freq16} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Ressourcenidentifikator
@@ -567,7 +593,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		EventEmitter & \ref{freq16} & 
+		EventEmitter & \ref{freq17} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Beziehungsidentifikator
@@ -579,7 +605,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		EventReceiver & \ref{freq16} & 
+		EventReceiver & \ref{freq17} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Beziehungsidentifikator
@@ -591,7 +617,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		ConfigSource & \ref{freq17} & 
+		ConfigSource & \ref{freq18} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Pfad oder Name der Datei
@@ -603,7 +629,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		ConfigValue & \ref{freq17} & 
+		ConfigValue & \ref{freq18} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Konfigurationsschlüssel
@@ -616,7 +642,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		FXThread & \ref{freq20} & -- & 
+		FXThread & \ref{freq21} & -- & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Nur Methoden

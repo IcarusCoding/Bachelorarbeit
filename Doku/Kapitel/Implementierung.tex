@@ -33,7 +33,7 @@ Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_stru
 			anchor=west,
 			inner xsep=8pt,
 			inner ysep=0pt,
-			if n=5{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={11}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={15}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folder}\forestoption{edge label};}}}},
+			if n=6{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={12}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{if n={15}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folderopt}\forestoption{edge label};}}{edge path={\noexpand\path [draw, \forestoption{edge}] (!u.south west)+(12.5pt,0) |- (.child anchor) pic {folder}\forestoption{edge label};}}}},
 			if n children=0{}{
 				delay={
 					prepend={[,phantom, calign with current]}
@@ -43,9 +43,9 @@ Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_stru
 			before computing xy={l=35pt}
 		}
 		[de.intelligence.bachelorarbeit.simplifx
-			[annotation]
 			[application]
 			[classpath]
+			[controller]
 			[css]
 			[dagger1]
 			[di]
@@ -54,9 +54,8 @@ Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_stru
 			[exception]
 			[fxml]
 			[guice]
-			[injection]
 			[localization]
-			[logging]
+			[shared]
 			[spring]
 			[utils]
 		]
@@ -91,10 +90,47 @@ Das \texttt{guice} Paket ist für die Integration von Guice in \texttt{SimpliFX}
 Das \texttt{spring} Paket ist für die Integration von Spring in \texttt{SimpliFX} zuständig.
 Die Umgebungsklasse für Spring (\texttt{SpringEnvironment}) erstellt eine neue Instanz der \texttt{AnnotationConfigApplicationContext} Klasse, welche es ermöglicht, mittels einer \texttt{AutowireCapableBeanFactory}, Abhängigkeiten in bestehende Instanzen zu injizieren, sowie neue Instanzen aus Klassen zu erstellen.
 \subsubsection{Paket: localization}
+Alle Klassen und Funktionen, welche für das Umsetzen der dynamischen Lokalisierung benötigt wurden, sind im \texttt{localization} Paket enthalten. Dazu gehören beispielsweise die \texttt{II18N} Schnittstelle, eine Standard-Implementierung dieser und die \texttt{LocalizeValue} Annotation. 
+\subsubsection{Paket: controller}
+Das vollständige Controller-System ist im \texttt{controller} Paket enthalten. Das System kann auch unabhängig verwendet werden. Es ist jedoch ratsam, \texttt{SimpliFX} für die Initialisierung zu nutzen, da vorkonfigurierte Klassen wie beispielsweise \texttt{I18N} dafür benötigt werden. Das System kann durch die Erstellung eines neuen \texttt{IControllerGroup} Objektes gestartet werden. Die Schnittstelle stellt das Fundament des System dar und ist in \autoref{fig:controller_group_def} abgebildet. Durch die \texttt{start}-Methode kann die aktuelle Controllergruppe gestartet werden. Ist der Startcontroller zu dem Zeitpunkt noch nicht erstellt worden, so wird dieses mittels einem Aufruf der \texttt{constructController}-Methode nachgeholt. Diese Methode kann auch durch den Entwickler genutzt werden, um Controller zu generieren, bevor diese verwendet werden. Jede Gruppe muss exakt einen aktiven Controller besitzen, welcher durch \texttt{switchController} mit einer Standardanimation oder einer eigenen Animation gewechselt werden kann. Wird ein Controller bzw. eine Gruppe nicht weiter benötigt, so können mit den Aufruf der jeweiligen \texttt{destroy} Methode, alle gespeicherten Ressourcen und Instanzen gelöscht werden. Die von \texttt{SimpliFX} verwendete Implementierung dieser sowie eine Darstellung der verschiedenen Beziehungen zu anderen Komponenten des Systems ist in \autoref{appendix:controller_system} zu erkennen.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/Controller-System-Group.png}
+	\caption{Diagramm -- Einstiegspunkt des Controller-Systems.}
+	\label{fig:controller_group_def}
+\end{figure}
+Controllergruppen werden anhand eines \texttt{String}s eindeutig identifiziert und bei Konstruktion in einer globalen \texttt{ControllerRegistry} registriert, um doppelte Identifikatoren zu vermeiden. Dazu werden Controllerklassen vor der Konstruktion validiert, so ist es beispielsweise nicht erlaubt, eine nicht-statische, innere Klasse als Controller zu definieren, da eine direkte Instanziierung der Klasse durch \texttt{SimpliFX} in diesem Fall ausgeschlossen ist.
 \subsubsection{Paket: exception}
-\subsubsection{Paket: injection}
+Eigene Ausnahme-Klassen sind im \texttt{exception} Paket aufzufinden. Dazu gehören spezielle Ausnahmen für das Controller-System oder generelle Ausnahmen, welche von einer Vielzahl der \texttt{SimpliFX}-Komponenten genutzt werden.
 \subsubsection{Paket: css}
+Alle \ac{css} bezogenen Klassen sind im \texttt{css} Paket enthalten. Einige davon werden dabei ausschließlich durch den \texttt{SimpliFXMLLoader} genutzt um automatisch \ac{css} Metadaten für eigene JavaFX-Komponenten zu generieren. 
 \subsubsection{Paket: classpath}
+Wie bereits im Konzept beschrieben, wird für das Finden der Applikation- bzw. Preloader-Klasse ein System benötigt, welches in der Lage ist, den Klassenpfad zur Laufzeit des Programms nach Dateien zu durchsuchen. Dieses System findet nahezu alle Klassen und Ressourcen aus dem Klassenpfad, wird momentan aber nur für das Finden der jeweiligen Einstiegspunkte verwendet. Nur Klassenpfade aus einer unkomprimierten Orderstruktur (beispielsweise bei der Nutzung von verschiedenen Entwicklungsumgebungen) und aus komprimierten JAR-Archiven sind möglich. Die Architektur ermöglicht aber ein Hinzufügen von weiteren Klassenpfadquellen wie z.B. WAR-Archiven (siehe \autoref{fig:classpath_sources}). 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth-2cm]{Abbildungen/Klassenpfadscan-Sources.png}
+	\caption{Diagramm -- Mögliche Quellen für Klassenpfade.}
+	\label{fig:classpath_sources}
+\end{figure}
+\noindent Damit ein Klassenpfadscan initiiert werden kann, muss, wie in \autoref{fig:classpath_interface} dargestellt, eine neue Instanz der \texttt{ClassDiscovery} Klasse erstellt werden. Eventuelle Konfigurationen wie das Hinzufügen weiterer \texttt{ClassLoader} oder dem Spezifizieren eines Basispfades, welcher den zu scannenden Klassenpfad einschränkt und somit in den meisten Fällen zu einer Reduktion der benötigten Scanzeit beiträgt, können durch die Nutzung des \texttt{DiscoveryContextBuilder} erreicht werden. Der \texttt{DiscoveryContextBuilder} bietet dabei auch standardisierte Konfigurationen an.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth-2cm]{Abbildungen/Klassenpfadscan-Discovery.png}
+	\caption{Diagramm -- Klassenpfad Schnittstelle und Implementierung.}
+	\label{fig:classpath_interface}
+\end{figure}
+\noindent Eine beispielhafte Nutzung des Klassenpfadscans ist im folgenden Quelltextausschnitt dargestellt:
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Beispiel -- Initiierung eines Klassenpfadscans., captionpos=b, label=lst:classpath_scan_usage]
+// Startet einen Scan mit Standardkonfiguration
+var r = new ClassDiscovery(new DiscoveryContextBuilder()
+		.setDefaultClassLoaders().build()).startDiscovery());
+// Sucht alle mit @StageConfig annotierten Klassen
+List<Class<?>> a = r.findClassesAnnotatedBy(StageConfig.class);
+	\end{lstlisting}
+\end{figure}
+\subsubsection{Paket: shared}
+Die für das Konzept der geteilten Ressourcen benötigten Klassen wie zum Beispiel der \texttt{SharedResources} Klasse, welche alle globalen Ressourcen an zentraler Stelle sammelt und dem Entwickler bei Bedarf zur Verfügung stellt oder der \texttt{SharedFieldInjector} Klasse, welche für das Injizieren der Ressourcen in die Applikation sowie in alle neu erstellten Controller verantwortlich ist.
 \subsubsection{Paket: event}
 Das Event System findet seinen Ursprung im \texttt{event} Paket. Es setzt sich aus einer Schnittstelle, deren Implementierung und der \texttt{@EventHandler} Annotation zusammen. Die \texttt{IEventEmitter} Klasse (siehe \autoref{fig:event_emitter}) ermöglicht das Registrieren sowie das Abmelden eines Objektes beim System. Bei der Registrierung wird das übergebene Objekt auf Methoden untersucht, welche mit \texttt{@EventHandler} annotiert wurden, validiert diese und speichert sie in einem internen Methoden Cache. Die Validierung ist nötig, da gefundene Methoden nur exakt einen Parameter als Event aufweisen dürfen. 
 \begin{figure}[H]
