@@ -19,8 +19,6 @@ import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.MethodReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.CssProperty;
-import de.intelligence.bachelorarbeit.simplifx.annotation.StyleProperty;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 
 public final class CssMetaDataAdapter {

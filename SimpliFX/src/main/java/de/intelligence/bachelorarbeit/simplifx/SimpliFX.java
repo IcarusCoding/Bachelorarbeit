@@ -229,8 +229,8 @@ public final class SimpliFX {
         final Annotation[] annotations = applicationListener.getClass().getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
-                final DIAnnotation diAnnotation = annotation.annotationType().getAnnotation(DIAnnotation.class);
-                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = diAnnotation.value();
+                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = annotation.annotationType()
+                        .getAnnotation(DIAnnotation.class).value();
                 final ClassReflection classRef = Reflection.reflect(factory);
                 final Optional<ConstructorReflection> constructorRefOpt = classRef.hasConstructor();
                 if (constructorRefOpt.isEmpty()) {
@@ -238,11 +238,11 @@ public final class SimpliFX {
                             + ". Reason: Missing default constructor.");
                     break;
                 }
-                final Class<?> clazz = (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
-                        .getActualTypeArguments()[0];
                 final IDIEnvironmentFactory<?> factoryInstance = constructorRefOpt.get().instantiateUnsafeAndGet();
                 final MethodReflection methodRef = Reflection.reflect(factoryInstance)
-                        .reflectMethod("create", Object.class, clazz);
+                        .reflectMethod("create", Object.class,
+                                (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
+                                        .getActualTypeArguments()[0]);
                 SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
                 break;
             }
@@ -340,7 +340,7 @@ public final class SimpliFX {
                 this.preloaderImpl.init();
                 PlatformImpl.runAndWait(() -> {
                     this.currPreState.set(LaunchState.START);
-                    final Stage primary = this.createStage(preloaderListener.getClass());
+                    final Stage primary = this.createStage(new Stage(), preloaderListener.getClass());
                     StageHelper.setPrimary(primary, true);
                     try {
                         this.preloaderImpl.start(primary);
@@ -365,8 +365,9 @@ public final class SimpliFX {
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
-                final Stage primary = this.createStage(applicationListener.getClass());
+                final Stage primary = new Stage();
                 primary.setScene(new Scene(mainGroup.start()));
+                this.createStage(primary, applicationListener.getClass());
                 StageHelper.setPrimary(primary, true);
                 try {
                     applicationImpl.start(primary);
@@ -413,8 +414,7 @@ public final class SimpliFX {
                     .handleErrorNotification(new Preloader.ErrorNotification(null, message, cause)));
         }
 
-        private Stage createStage(Class<?> entrypointClass) {
-            final Stage stage = new Stage();
+        private Stage createStage(Stage stage, Class<?> entrypointClass) {
             Reflection.reflect(entrypointClass).getAnnotation(StageConfig.class).ifPresent(config -> {
                 stage.setTitle(config.title());
                 stage.initStyle(config.style());

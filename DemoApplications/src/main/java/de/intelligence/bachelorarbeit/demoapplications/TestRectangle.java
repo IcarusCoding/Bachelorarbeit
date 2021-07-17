@@ -8,7 +8,7 @@ import javafx.css.StyleableDoubleProperty;
 import javafx.css.converter.SizeConverter;
 import javafx.scene.shape.Rectangle;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.CssProperty;
+import de.intelligence.bachelorarbeit.simplifx.css.CssProperty;
 
 public final class TestRectangle extends Rectangle {
 

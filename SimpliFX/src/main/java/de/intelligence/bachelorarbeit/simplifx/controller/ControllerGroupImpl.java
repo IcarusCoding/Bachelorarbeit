@@ -56,6 +56,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         if (!this.startController.equals(clazz) && ControllerRegistry.isRegistered(clazz)) {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + clazz.getSimpleName() + "\" is already registered in another group!");
         }
+        ControllerRegistry.addController(this.groupId, clazz);
         final IController controller = this.creator.createController(clazz);
         this.loadedControllers.put(clazz, controller);
         controller.visibilityProperty().addListener((obs, oldVal, newVal) -> {
@@ -71,7 +72,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
             }
         });
         final ControllerSetupContext ctx = new ControllerSetupContext(controller.getControllerClass(), this, this.groupCtx);
-        AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, true, ctx);
+        AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, Setup::value, true, ctx);
         controller.getSubGroups().forEach((groupId, group) -> {
             group.start(); //TODO dont start in pre init
         });
@@ -150,7 +151,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         return this.visibility;
     }
 
-    public void setController(IController controller, IWrapperAnimationFactory factory) {
+    private void setController(IController controller, IWrapperAnimationFactory factory) {
         if (controller.visibilityProperty().get().equals(VisibilityState.UNDEFINED)) {
             controller.getSubGroups().values().forEach(group ->
                     group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
