@@ -138,4 +138,18 @@ public class Reflection {
         return handleable;
     }
 
+    public static boolean matchArguments(Class<?>[] wanted, Class<?>[] actual) {
+        boolean found = true;
+        for (var index = 0; index < wanted.length; index++) {
+            final Class<?> wantedType = wanted[index];
+            final Class<?> actualType = actual[index];
+            if (!actualType.isAssignableFrom(wantedType)) {
+                found = PRIMITIVE_CHECK.test(actualType, wantedType);
+            }
+            if (!found) {
+                break;
+            }
+        }
+        return found;
+    }
 }

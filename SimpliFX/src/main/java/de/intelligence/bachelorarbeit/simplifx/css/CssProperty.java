@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.annotation;
+package de.intelligence.bachelorarbeit.simplifx.css;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
