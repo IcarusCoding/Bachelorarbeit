@@ -44,8 +44,7 @@ import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
-import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupWrapperImpl;
-import de.intelligence.bachelorarbeit.simplifx.controller.DefaultControllerGroup;
+import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupImpl;
 import de.intelligence.bachelorarbeit.simplifx.controller.IControllerGroup;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.FXMLControllerFactoryProvider;
@@ -60,6 +59,8 @@ import de.intelligence.bachelorarbeit.simplifx.localization.I18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
+import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -75,6 +76,7 @@ public final class SimpliFX {
     private static Injector globalInjector;
     private static II18N globalI18N;
     private static DIEnvironment appDIEnv;
+    private static SharedResources globalResources;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -157,6 +159,7 @@ public final class SimpliFX {
         Logging.getJavaFXLogger().disableLogging();
         Logging.getCSSLogger().disableLogging();
         SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
+        SimpliFX.globalResources = new SharedResources();
         final Class<?> applicationClass = applicationListener.getClass();
 
         System.out.println(new String(SimpliFXConstants.BANNER));
@@ -165,8 +168,6 @@ public final class SimpliFX {
         final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
         final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
 
-        // TODO init all subsystems -> create main controller & controller system, ...
-
         final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
                 applicationListener, preloaderListener);
         SimpliFX.globalI18N = SimpliFX.setupI18N(bundleDetector);
@@ -174,6 +175,8 @@ public final class SimpliFX {
             System.out.println("EXCEPTION");
             //TODO handle
         });
+        final SharedFieldInjector injector = new SharedFieldInjector(applicationListener, preloaderListener);
+        injector.inject(SimpliFX.globalResources);
 
         try {
             SimpliFX.setupDI(applicationListener);
@@ -184,11 +187,11 @@ public final class SimpliFX {
         }
 
         if (preloaderListener != null) {
-            AnnotationUtils.invokeMethodsByPrioritizedAnnotation(preloaderListener,
-                    PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+            AnnotationUtils.invokeMethodsByAnnotation(preloaderListener,
+                    PostConstruct.class, PostConstruct::value, true);
         }
-        AnnotationUtils.invokeMethodsByPrioritizedAnnotation(applicationListener,
-                PostConstruct.class, m -> m.getParameterCount() == 0, PostConstruct::value);
+        AnnotationUtils.invokeMethodsByAnnotation(applicationListener,
+                PostConstruct.class, PostConstruct::value, true);
 
         final Thread fxLauncherThread = new Thread(() -> {
             final Launcher l = new Launcher(appImpl, preImpl);
@@ -210,15 +213,6 @@ public final class SimpliFX {
         bundleDetector.findAllFields((f, a) -> f.canAccept(I18N.class));
         final Map<Locale, List<java.util.ResourceBundle>> bundleMap = new HashMap<>();
         bundleDetector.getAnnotations()
-                /*.forEach(bundle -> I18N.findAllBundlesWithBaseName(bundle.directory(), bundle.name(), ex -> {
-                    ex.printStackTrace();
-                    //TODO handle
-                }).forEach((l, b) -> {
-                    if (!bundleMap.containsKey(l)) {
-                        bundleMap.put(l, new ArrayList<>());
-                    }
-                    bundleMap.get(l).add(b);
-                }));*/
                 .stream().filter(b -> !b.value().isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
                 .map(locale -> java.util.ResourceBundle.getBundle(b.value(), locale))
                 .filter(Conditions.distinct(java.util.ResourceBundle::getLocale)).forEach(bundle -> {
@@ -235,8 +229,8 @@ public final class SimpliFX {
         final Annotation[] annotations = applicationListener.getClass().getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
-                final DIAnnotation diAnnotation = annotation.annotationType().getAnnotation(DIAnnotation.class);
-                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = diAnnotation.value();
+                final Class<? extends IDIEnvironmentFactory<? extends Annotation>> factory = annotation.annotationType()
+                        .getAnnotation(DIAnnotation.class).value();
                 final ClassReflection classRef = Reflection.reflect(factory);
                 final Optional<ConstructorReflection> constructorRefOpt = classRef.hasConstructor();
                 if (constructorRefOpt.isEmpty()) {
@@ -244,11 +238,11 @@ public final class SimpliFX {
                             + ". Reason: Missing default constructor.");
                     break;
                 }
-                final Class<?> clazz = (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
-                        .getActualTypeArguments()[0];
                 final IDIEnvironmentFactory<?> factoryInstance = constructorRefOpt.get().instantiateUnsafeAndGet();
                 final MethodReflection methodRef = Reflection.reflect(factoryInstance)
-                        .reflectMethod("create", Object.class, clazz);
+                        .reflectMethod("create", Object.class,
+                                (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
+                                        .getActualTypeArguments()[0]);
                 SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
                 break;
             }
@@ -316,8 +310,6 @@ public final class SimpliFX {
         private final AtomicReference<LaunchState> currAppState;
         private final AtomicReference<LaunchState> currPreState;
 
-        private IControllerGroup mainGroup; //TODO make final
-
         private <T extends Application, S extends Preloader> Launcher(T applicationImpl, S preloaderImpl) {
             this.applicationImpl = applicationImpl;
             this.preloaderImpl = preloaderImpl;
@@ -329,9 +321,6 @@ public final class SimpliFX {
 
         private void launchApplication(Object applicationListener, Object preloaderListener, String[] args) throws
                 Exception {
-            this.mainGroup = new DefaultControllerGroup(applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
-                    SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N);
             SimpliFX.globalInjector.getInstance(Key.get(IEventEmitter.class, Names.named("applicationEmitter")))
                     .register(applicationListener);
             if (preloaderListener != null) {
@@ -351,7 +340,7 @@ public final class SimpliFX {
                 this.preloaderImpl.init();
                 PlatformImpl.runAndWait(() -> {
                     this.currPreState.set(LaunchState.START);
-                    final Stage primary = this.createStage(preloaderListener.getClass());
+                    final Stage primary = this.createStage(new Stage(), preloaderListener.getClass());
                     StageHelper.setPrimary(primary, true);
                     try {
                         this.preloaderImpl.start(primary);
@@ -369,19 +358,16 @@ public final class SimpliFX {
             });
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
             applicationImpl.init();
+            final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
+                    SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
+                    SimpliFX.globalI18N, SimpliFX.globalResources, pane -> {
+            });
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
-                final Stage primary = this.createStage(applicationListener.getClass());
-
-                try {
-                    final Scene scene = new Scene(this.mainGroup.start(new ControllerGroupWrapperImpl()));
-                    primary.setScene(scene);
-                } catch (IOException e) {
-                    System.out.println("ERROR HANDLING");
-                    e.printStackTrace();
-                    //TODO handle globally
-                }
+                final Stage primary = new Stage();
+                primary.setScene(new Scene(mainGroup.start()));
+                this.createStage(primary, applicationListener.getClass());
                 StageHelper.setPrimary(primary, true);
                 try {
                     applicationImpl.start(primary);
@@ -393,7 +379,7 @@ public final class SimpliFX {
             if (this.currAppState.get().id >= LaunchState.EXIT.id) {
                 PlatformImpl.runAndWait(() -> {
                     try {
-                        this.mainGroup.destroy();
+                        mainGroup.destroy();
                         applicationImpl.stop();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -428,8 +414,7 @@ public final class SimpliFX {
                     .handleErrorNotification(new Preloader.ErrorNotification(null, message, cause)));
         }
 
-        private Stage createStage(Class<?> entrypointClass) {
-            final Stage stage = new Stage();
+        private Stage createStage(Stage stage, Class<?> entrypointClass) {
             Reflection.reflect(entrypointClass).getAnnotation(StageConfig.class).ifPresent(config -> {
                 stage.setTitle(config.title());
                 stage.initStyle(config.style());

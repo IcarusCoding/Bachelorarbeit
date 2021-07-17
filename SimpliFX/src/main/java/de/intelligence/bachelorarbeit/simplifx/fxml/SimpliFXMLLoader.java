@@ -106,8 +106,8 @@ import com.sun.javafx.reflect.ReflectUtil;
 import com.sun.javafx.util.Logging;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.CssProperty;
 import de.intelligence.bachelorarbeit.simplifx.css.CssMetaDataAdapter;
+import de.intelligence.bachelorarbeit.simplifx.css.CssProperty;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
@@ -2346,6 +2346,7 @@ public class SimpliFXMLLoader {
                         || !(aValue.startsWith(ESCAPE_PREFIX)
                         || aValue.startsWith(RELATIVE_PATH_PREFIX)
                         || aValue.startsWith(RESOURCE_KEY_PREFIX)
+                        || aValue.startsWith(RESOURCE_KEY_NOT_DYNAMIC_PREFIX)
                         || aValue.startsWith(EXPRESSION_PREFIX)
                         || aValue.startsWith(BI_DIRECTIONAL_BINDING_PREFIX))) {
                     throw constructLoadException("Invalid escape sequence.");
@@ -2414,8 +2415,7 @@ public class SimpliFXMLLoader {
                     }
                     if (valueAdapter != null) {
                         final ObservableValue<?> val = valueAdapter.getPropertyModel("id");
-                        if (val instanceof StringProperty && controller != null && propertyName != null) {
-                            final StringProperty property = (StringProperty) val;
+                        if (val instanceof final StringProperty property && controller != null && propertyName != null) {
                             return TranslatableBuilderProperty
                                     .createWithParameters(controller, property.get(), propertyName, aValue, ii18N);
                         }
@@ -2508,17 +2508,14 @@ public class SimpliFXMLLoader {
         public void applyProperty(String name, Class<?> sourceType, Object value) {
             if (sourceType == null) {
                 var m = getProperties();
-                if (value instanceof TranslatableBuilderProperty) {
-                    final TranslatableBuilderProperty builderProperty = (TranslatableBuilderProperty) value;
+                if (value instanceof final TranslatableBuilderProperty builderProperty) {
                     final StringBinding binding = builderProperty.translationBinding;
                     if (m instanceof ProxyBuilder<?>) {
                         m.put(name, builderProperty);
-                    } else if (m instanceof BeanAdapter) {
+                    } else if (m instanceof final BeanAdapter adapter) {
                         m.put(name, binding.get());
-                        final BeanAdapter adapter = (BeanAdapter) m;
                         final ObservableValue<?> obsVal = adapter.getPropertyModel(name);
-                        if (obsVal instanceof StringProperty) {
-                            final StringProperty property = (StringProperty) obsVal;
+                        if (obsVal instanceof final StringProperty property) {
                             property.bind(binding);
                         }
                     } else {
