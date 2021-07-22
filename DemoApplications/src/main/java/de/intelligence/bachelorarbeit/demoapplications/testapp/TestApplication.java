@@ -3,7 +3,6 @@ package de.intelligence.bachelorarbeit.demoapplications.testapp;
 import javax.inject.Inject;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.stage.StageStyle;
 
 import de.intelligence.bachelorarbeit.demoapplications.ITestService;
@@ -45,20 +44,13 @@ public final class TestApplication {
     @Shared("test")
     private ReadOnlyObjectProperty<String> dasdfgg;
 
-    @Shared
-    private ReadOnlyStringProperty testProperty;
-
     @PostConstruct
     private void postConstructTest() {
         service.test();
         System.out.println("RESOURCES: " + resources);
         testReference.set("test");
         System.out.println("BOOL REFERENCE: " + testReference.get());
-        testProperty.addListener((obs, oldV, newV) -> {
-            System.out.println("NEW VAL: " + newV);
-        });
         System.out.println("OBJECT PROPERTY: " + dasdfgg);
-        System.out.println("TESTIUS PROPERTY: " + testProperty);
     }
 
     @EventHandler

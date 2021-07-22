@@ -11,7 +11,7 @@ public final class SharedReference<T> {
 
     private final AtomicReference<T> ref;
     private final ReadOnlyObjectWrapper<T> refWrap;
-    private Class<?> type;
+    private final Class<?> type;
 
     private SharedReference(Class<?> type) {
         this.ref = new AtomicReference<>();
