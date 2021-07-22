@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyProperty;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
@@ -51,7 +50,6 @@ public class SharedFieldInjector {
                 final int indexOfFirstUppercase = matcher.find() ? matcher.start() : -1;
                 key = indexOfFirstUppercase == -1 ? fieldName : fieldName.substring(0, indexOfFirstUppercase);
             }
-            System.out.println("KEY: " + key);
             SharedReference<?> ref = resources.getForName(key);
             if (fieldType.equals(SharedReference.class) || fieldType.isAssignableFrom(ReadOnlyObjectProperty.class)) {
                 final Class<?> clazzType = this.validateGenericParameter(field);
@@ -74,22 +72,6 @@ public class SharedFieldInjector {
             }
             if (fieldType.isAssignableFrom(ReadOnlyObjectProperty.class)) {
                 fieldRef.set(ref.asProperty());
-                continue;
-            }
-            //TODO remove maybe -- not very useful
-            if (ReadOnlyProperty.class.isAssignableFrom(fieldType)) {
-                System.out.println("PROPERTY");
-                final ObjectPropertyConverter converter = new ObjectPropertyConverter();
-                if (ref == null) { // need to create own reference
-                    if (!converter.canConvert(fieldType)) {
-                        // field type not supported
-                        continue;
-                    }
-                    final Class<?> type = converter.getConversionType(fieldType);
-                    ref = SharedReference.empty(type);
-                    resources.create(key, ref);
-                }
-                fieldRef.set(converter.convert(ref.getType(), ref.asProperty()));
             }
         }
     }
