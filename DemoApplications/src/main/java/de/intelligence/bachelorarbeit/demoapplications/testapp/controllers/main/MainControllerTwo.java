@@ -30,7 +30,7 @@ public final class MainControllerTwo {
     @PostConstruct
     private void afterConstruction() {
         System.out.println("MainControllerTwo: Post-Construct!");
-        this.testBtn.setOnAction(e -> this.ctx.switchController(MainController.class, new FadeAnimation(Duration.millis(200))));
+        this.testBtn.setOnAction(e -> this.ctx.switchController(MainController.class, new FadeAnimation(Duration.millis(800))));
     }
 
     @OnShow
