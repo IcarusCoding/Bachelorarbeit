@@ -23,9 +23,9 @@ public final class MainController {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
-        ctx.createSubGroup(LeftControllerOne.class, "left", root::setLeft);
-        ctx.createSubGroup(CenterController.class, "center", root::setCenter);
-        ctx.createSubGroup(RightControllerOne.class, "right", root::setRight);
+        ctx.createSubGroup(LeftControllerOne.class, "left", this.root::setLeft);
+        ctx.createSubGroup(CenterController.class, "center", this.root::setCenter);
+        ctx.createSubGroup(RightControllerOne.class, "right", this.root::setRight);
     }
 
     @PostConstruct

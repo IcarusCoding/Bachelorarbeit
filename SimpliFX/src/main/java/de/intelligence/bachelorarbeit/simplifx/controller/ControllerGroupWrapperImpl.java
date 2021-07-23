@@ -75,17 +75,17 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     }
 
     @Override
-    public void switchController(IController handler, IWrapperAnimation animationFactory) {
-        this.switchController0(handler, animationFactory);
+    public void switchController(IController controller, IWrapperAnimation animationFactory) {
+        this.switchController0(controller, animationFactory);
     }
 
     @Override
-    public void setController(IController handler) {
+    public void setController(IController controller) {
         if (this.wrapper.get().getChildren().size() == 0) {
-            this.setController(handler.getRoot());
+            this.setController(controller.getRoot());
             return;
         }
-        this.switchController(handler, new DefaultWrapperAnimation());
+        this.switchController(controller, new DefaultWrapperAnimation());
     }
 
     @Override

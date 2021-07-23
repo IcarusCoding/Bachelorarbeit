@@ -9,11 +9,11 @@ import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnim
 
 public interface IControllerGroup {
 
-    IController constructController(Class<?> clazz, Consumer<Pane> readyConsumer);
+    IController getOrConstructController(Class<?> clazz);
 
     Pane start();
 
-    void registerSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer);
+    void createSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer);
 
     void switchController(Class<?> newController);
 

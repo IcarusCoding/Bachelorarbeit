@@ -31,7 +31,7 @@ import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
-final class ControllerCreator {
+public final class ControllerCreator {
 
     private static final SimpliFXLogger LOG = SimpliFXLogger.create(ControllerGroupImpl.class);
 
@@ -40,14 +40,14 @@ final class ControllerCreator {
     private final SharedResources resources;
     private final PropertyRegistry registry;
 
-    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources, PropertyRegistry registry) {
+    public ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources, PropertyRegistry registry) {
         this.provider = provider;
         this.ii18N = ii18N;
         this.resources = resources;
         this.registry = registry;
     }
 
-    IController createController(Class<?> clazz) {
+    public IController createController(Class<?> clazz) {
         final ControllerLoadContext ctx = this.validateController(clazz);
         boolean validControllerAttribSpecified = false;
 

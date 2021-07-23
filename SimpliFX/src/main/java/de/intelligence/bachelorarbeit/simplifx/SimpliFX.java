@@ -386,8 +386,7 @@ public final class SimpliFX {
             applicationImpl.init();
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry, pane -> {
-            });
+                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry, null, null);
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);

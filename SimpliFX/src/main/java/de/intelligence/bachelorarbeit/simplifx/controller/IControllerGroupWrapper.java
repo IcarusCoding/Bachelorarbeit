@@ -7,9 +7,9 @@ import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnim
 
 public interface IControllerGroupWrapper {
 
-    void switchController(IController handler, IWrapperAnimation animationFactory);
+    void switchController(IController controller, IWrapperAnimation animationFactory);
 
-    void setController(IController handler);
+    void setController(IController controller);
 
     ReadOnlyObjectProperty<Pane> wrapperProperty();
 
