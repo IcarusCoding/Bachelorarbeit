@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import javafx.scene.layout.Pane;
 
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
+
 //TODO interfaces
 public final class ControllerSetupContext {
 
@@ -25,7 +27,7 @@ public final class ControllerSetupContext {
         groupCtx.switchController(clazz);
     }
 
-    public void switchController(Class<?> clazz, IWrapperAnimationFactory factory) {
+    public void switchController(Class<?> clazz, IWrapperAnimation factory) {
         groupCtx.switchController(clazz, factory);
     }
 

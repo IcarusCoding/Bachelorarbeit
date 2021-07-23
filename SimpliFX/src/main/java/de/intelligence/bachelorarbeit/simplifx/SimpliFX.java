@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,6 +45,9 @@ import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClassDiscovery;
 import de.intelligence.bachelorarbeit.simplifx.classpath.DiscoveryContextBuilder;
 import de.intelligence.bachelorarbeit.simplifx.classpath.IDiscoveryResult;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigSource;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
+import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupImpl;
 import de.intelligence.bachelorarbeit.simplifx.controller.IControllerGroup;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
@@ -66,6 +70,7 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
 //TODO prevent multiple launches
 //TODO check if I18N is required to launch application (bad)
+//TODO remove some static behaviour
 public final class SimpliFX {
 
     private static final SimpliFXLogger LOG = SimpliFXLogger.create(SimpliFX.class);
@@ -77,6 +82,7 @@ public final class SimpliFX {
     private static II18N globalI18N;
     private static DIEnvironment appDIEnv;
     private static SharedResources globalResources;
+    private static PropertyRegistry globalPropertyRegistry;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -160,6 +166,7 @@ public final class SimpliFX {
         Logging.getCSSLogger().disableLogging();
         SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
         SimpliFX.globalResources = new SharedResources();
+        SimpliFX.globalPropertyRegistry = new PropertyRegistry(applicationListener.getClass().getClassLoader());
         final Class<?> applicationClass = applicationListener.getClass();
 
         System.out.println(new String(SimpliFXConstants.BANNER));
@@ -168,6 +175,8 @@ public final class SimpliFX {
         final Application appImpl = SimpliFX.globalInjector.getInstance(Application.class);
         final Preloader preImpl = SimpliFX.globalInjector.getInstance(Preloader.class);
 
+        // TODO convert to modular system
+        // I18N setup
         final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
                 applicationListener, preloaderListener);
         SimpliFX.globalI18N = SimpliFX.setupI18N(bundleDetector);
@@ -175,9 +184,25 @@ public final class SimpliFX {
             System.out.println("EXCEPTION");
             //TODO handle
         });
-        final SharedFieldInjector injector = new SharedFieldInjector(applicationListener, preloaderListener);
-        injector.inject(SimpliFX.globalResources);
 
+        // Configuration source setup
+        final AnnotatedFieldDetector<ConfigSource> configDetector = new AnnotatedFieldDetector<>(ConfigSource.class,
+                applicationListener, preloaderListener);
+        configDetector.findAllFields((fRef, a) -> fRef.getReflectable().getType().equals(Properties.class));
+        configDetector.getAnnotations().stream().flatMap(a -> Arrays.stream(a.value())).distinct()
+                .forEach(path -> SimpliFX.globalPropertyRegistry.loadFrom(path));
+        configDetector.injectValue(SimpliFX.globalPropertyRegistry.getReadOnlyProperties(), true, ex -> {
+            System.out.println("ERROR");
+            ex.printStackTrace(); //TODO handle
+        });
+
+        // Configuration value setup
+        new ConfigValueInjector(applicationListener, preloaderListener).inject(SimpliFX.globalPropertyRegistry);
+
+        // SharedResources setup
+        new SharedFieldInjector(applicationListener, preloaderListener).inject(SimpliFX.globalResources);
+
+        // DI setup
         try {
             SimpliFX.setupDI(applicationListener);
         } catch (Exception ex) {
@@ -186,6 +211,7 @@ public final class SimpliFX {
             return;
         }
 
+        // PostConstruct invocation
         if (preloaderListener != null) {
             AnnotationUtils.invokeMethodsByAnnotation(preloaderListener,
                     PostConstruct.class, PostConstruct::value, true);
@@ -360,7 +386,7 @@ public final class SimpliFX {
             applicationImpl.init();
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N, SimpliFX.globalResources, pane -> {
+                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry, pane -> {
             });
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {

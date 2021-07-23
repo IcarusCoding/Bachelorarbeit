@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.layout.Pane;
 
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
+
 public interface IControllerGroup {
 
     IController constructController(Class<?> clazz, Consumer<Pane> readyConsumer);
@@ -15,7 +17,7 @@ public interface IControllerGroup {
 
     void switchController(Class<?> newController);
 
-    void switchController(Class<?> newController, IWrapperAnimationFactory factory);
+    void switchController(Class<?> newController, IWrapperAnimation factory);
 
     //TODO remove group when last controller destroyed and remove root
     void destroy(Class<?> clazz);

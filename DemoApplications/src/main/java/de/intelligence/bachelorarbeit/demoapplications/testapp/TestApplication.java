@@ -1,6 +1,7 @@
 package de.intelligence.bachelorarbeit.demoapplications.testapp;
 
 import javax.inject.Inject;
+import java.util.Properties;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.stage.StageStyle;
@@ -12,6 +13,7 @@ import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigSource;
 import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
@@ -23,7 +25,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
-        resizeable = false, iconPath = "/icon.png")
+        resizeable = true, iconPath = "/icon.png")
 @ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
@@ -34,6 +36,9 @@ public final class TestApplication {
     @ResourceBundle("test/Messages")
     @ResourceBundle("TestBundle")
     private II18N language;
+
+    @ConfigSource({"test1.properties", "props/test2.properties"})
+    private Properties props;
 
     @Shared
     private SharedResources resources;
@@ -51,6 +56,10 @@ public final class TestApplication {
         testReference.set("test");
         System.out.println("BOOL REFERENCE: " + testReference.get());
         System.out.println("OBJECT PROPERTY: " + dasdfgg);
+        System.out.println("-----------------------------------");
+        System.out.println("PROPS: " + props);
+        System.out.println("HOST: " + props.getProperty("host"));
+        System.out.println("-----------------------------------");
     }
 
     @EventHandler

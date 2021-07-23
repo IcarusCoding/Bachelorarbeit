@@ -1,5 +1,7 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
+
 public final class ControllerGroupContext {
 
     private final IControllerGroup group;
@@ -12,7 +14,7 @@ public final class ControllerGroupContext {
         this.group.switchController(clazz);
     }
 
-    public void switchController(Class<?> clazz, IWrapperAnimationFactory factory) {
+    public void switchController(Class<?> clazz, IWrapperAnimation factory) {
         this.group.switchController(clazz, factory);
     }
 

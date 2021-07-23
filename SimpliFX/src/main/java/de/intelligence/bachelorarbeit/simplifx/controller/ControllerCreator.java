@@ -18,6 +18,8 @@ import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
+import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
@@ -36,11 +38,13 @@ final class ControllerCreator {
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
     private final SharedResources resources;
+    private final PropertyRegistry registry;
 
-    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources) {
+    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources, PropertyRegistry registry) {
         this.provider = provider;
         this.ii18N = ii18N;
         this.resources = resources;
+        this.registry = registry;
     }
 
     IController createController(Class<?> clazz) {
@@ -80,8 +84,8 @@ final class ControllerCreator {
             System.out.println("HANDLE EXCEPTION");
             //TODO HANDLE
         });
-        final SharedFieldInjector injector = new SharedFieldInjector(instance);
-        injector.inject(this.resources);
+        new ConfigValueInjector(instance).inject(this.registry);
+        new SharedFieldInjector(instance).inject(this.resources);
         return new ControllerImpl(instance, pane);
     }
 

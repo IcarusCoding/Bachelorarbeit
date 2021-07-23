@@ -10,6 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Pane;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.DefaultWrapperAnimation;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerGroupDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
@@ -24,6 +27,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
     private final SharedResources resources;
+    private final PropertyRegistry registry;
     private final Consumer<Pane> readyConsumer;
 
     private final ControllerCreator creator;
@@ -34,14 +38,15 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final ObjectProperty<VisibilityState> visibility;
 
     public ControllerGroupImpl(String groupId, Class<?> startController, IControllerFactoryProvider provider, II18N ii18N,
-                               SharedResources resources, Consumer<Pane> readyConsumer) {
+                               SharedResources resources, PropertyRegistry registry, Consumer<Pane> readyConsumer) {
         this.groupId = groupId;
         this.startController = startController;
         this.provider = provider;
         this.ii18N = ii18N;
         this.resources = resources;
+        this.registry = registry;
         this.readyConsumer = readyConsumer;
-        this.creator = new ControllerCreator(provider, ii18N, resources);
+        this.creator = new ControllerCreator(provider, ii18N, resources, registry);
         this.loadedControllers = new ConcurrentHashMap<>();
         this.groupWrapper = new SimpleObjectProperty<>(new ControllerGroupWrapperImpl());
         this.activeController = new SimpleObjectProperty<>();
@@ -86,7 +91,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     public Pane start() {
         readyConsumer.accept(this.groupWrapper.get().getWrapper());
         final IController controller = this.getOrCreateController(this.startController);
-        setController(controller, new DefaultWrapperAnimationFactory());
+        setController(controller, new DefaultWrapperAnimation());
         return this.groupWrapper.get().getWrapper();
     }
 
@@ -99,16 +104,16 @@ public final class ControllerGroupImpl implements IControllerGroup {
             throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
         }
         this.loadedControllers.get(originController).getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController,
-                this.provider, this.ii18N, this.resources, readyConsumer));
+                this.provider, this.ii18N, this.resources, this.registry, readyConsumer));
     }
 
     @Override
     public void switchController(Class<?> newController) {
-        this.switchController(newController, new DefaultWrapperAnimationFactory());
+        this.switchController(newController, new DefaultWrapperAnimation());
     }
 
     @Override
-    public void switchController(Class<?> newController, IWrapperAnimationFactory factory) {
+    public void switchController(Class<?> newController, IWrapperAnimation factory) {
         if (this.activeController.get() == null || this.activeController.get().getControllerClass().equals(newController)) {
             return;
         }
@@ -151,7 +156,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         return this.visibility;
     }
 
-    private void setController(IController controller, IWrapperAnimationFactory factory) {
+    private void setController(IController controller, IWrapperAnimation factory) {
         if (controller.visibilityProperty().get().equals(VisibilityState.UNDEFINED)) {
             controller.getSubGroups().values().forEach(group ->
                     group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
