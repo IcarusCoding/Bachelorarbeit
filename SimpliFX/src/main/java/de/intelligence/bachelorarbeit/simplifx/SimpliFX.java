@@ -22,6 +22,7 @@ import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import com.google.inject.Guice;
@@ -242,6 +243,9 @@ public final class SimpliFX {
                 .stream().filter(b -> !b.value().isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
                 .map(locale -> java.util.ResourceBundle.getBundle(b.value(), locale))
                 .filter(Conditions.distinct(java.util.ResourceBundle::getLocale)).forEach(bundle -> {
+                    if (bundle.getLocale().getLanguage().isBlank()) {
+                        return; // filter default
+                    }
                     if (!bundleMap.containsKey(bundle.getLocale())) {
                         bundleMap.put(bundle.getLocale(), new ArrayList<>());
                     }
@@ -387,11 +391,12 @@ public final class SimpliFX {
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
                     SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry, null, null);
+            final Pane root = mainGroup.start();
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
                 final Stage primary = new Stage();
-                primary.setScene(new Scene(mainGroup.start()));
+                primary.setScene(new Scene(root)); // TRY CATCH EVERYTHING AND ABORT CREATION TODO
                 this.createStage(primary, applicationListener.getClass());
                 StageHelper.setPrimary(primary, true);
                 try {

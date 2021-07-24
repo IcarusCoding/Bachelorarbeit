@@ -1,0 +1,7 @@
+#root {
+    -fx-background-color: #212121;
+}
+
+#connectionLbl {
+    -fx-text-fill: white;
+}

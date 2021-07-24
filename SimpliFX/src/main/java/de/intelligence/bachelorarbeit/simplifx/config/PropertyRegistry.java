@@ -23,7 +23,6 @@ public final class PropertyRegistry {
         this.properties = new Properties();
     }
 
-    //TODO check if replaced due to duplicate keys
     public void loadFrom(String path) {
         Conditions.checkNull(path, "path must not be null.");
         if (!this.tryLoad(path)) {

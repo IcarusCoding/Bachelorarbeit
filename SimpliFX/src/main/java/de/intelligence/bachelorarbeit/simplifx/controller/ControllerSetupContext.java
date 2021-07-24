@@ -19,6 +19,10 @@ public final class ControllerSetupContext {
         this.groupCtx = groupCtx;
     }
 
+    public ControllerGroupContext getGroupContext() {
+        return this.groupCtx;
+    }
+
     public void createSubGroup(Class<?> clazz, String groupId, Consumer<Pane> readyConsumer) {
         this.group.createSubGroup(controllerClass, clazz, groupId, readyConsumer);
     }

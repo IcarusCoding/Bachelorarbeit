@@ -37,6 +37,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final ObjectProperty<IController> activeController;
     private final ControllerGroupContext groupCtx;
     private final ObjectProperty<VisibilityState> visibility;
+    private boolean initialized;
 
     public ControllerGroupImpl(String groupId, Class<?> startController, IControllerFactoryProvider provider, II18N ii18N,
                                SharedResources resources, PropertyRegistry registry, Consumer<Pane> readyConsumer, IController superController) {
@@ -79,11 +80,15 @@ public final class ControllerGroupImpl implements IControllerGroup {
             this.readyConsumer.accept(this.groupWrapper.get().getWrapper());
         }
         this.setController(this.getOrConstructController(this.startController), new DefaultWrapperAnimation());
+        this.initialized = true;
         return this.groupWrapper.get().getWrapper();
     }
 
     @Override
     public void createSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer) {
+        if (this.initialized) {
+            throw new IllegalStateException("Subgroups can only be registered in the setup phase!");
+        }
         if (ControllerRegistry.isRegistered(startController)) {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + startController.getSimpleName() + "\" is already registered in another group!");
         }

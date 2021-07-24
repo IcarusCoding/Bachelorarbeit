@@ -14,7 +14,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.TopSlideAnimation;
 
-@Controller(fxml = "/controllers/fxml/right/RightControllerTwo.fxml", css = "controllers/css/rightTwo.css")
+@Controller(fxml = "/legacy/controllers/fxml/right/RightControllerTwo.fxml", css = "legacy/controllers/css/rightTwo.css")
 public final class RightControllerTwo {
 
     @FXML

@@ -1,0 +1,47 @@
+* {
+    -primary: #212121;
+    -secondary: #55a630;
+    -accent: #80b918
+}
+
+#root {
+    -fx-background-color: #212121;
+}
+
+#title {
+    -fx-font-size: 25;
+    -fx-text-fill: white;
+}
+
+JFXButton {
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-background-color: -primary;
+    -fx-border-color: -secondary;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+JFXTextField, JFXPasswordField {
+    -fx-text-fill: derive(-secondary, 45%);
+    -fx-prompt-text-fill: white;
+    -fx-accent: -accent;
+    -jfx-focus-color: -secondary;
+    -fx-font-size: 16px;
+}
+
+JFXButton:focused {
+    -fx-border-color: -secondary;
+    -fx-background-color: derive(-secondary, 5%);
+    -fx-text-fill: -primary;
+}
+
+JFXButton:hover {
+    -fx-border-color: -secondary;
+    -fx-background-color: -secondary;
+    -fx-text-fill: -primary;
+}
+
+.error-label {
+    -fx-font-size: 10pt;
+}

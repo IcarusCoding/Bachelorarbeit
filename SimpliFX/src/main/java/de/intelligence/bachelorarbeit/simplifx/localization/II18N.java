@@ -1,11 +1,13 @@
 package de.intelligence.bachelorarbeit.simplifx.localization;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.scene.control.Menu;
 
 public interface II18N {
 
@@ -24,6 +26,10 @@ public interface II18N {
     StringBinding createBindingForKey(String key, Object... args);
 
     StringBinding createObservedBinding(String key, Object... params);
+
+    Map<Locale, StringBinding> createBindings();
+
+    void setupMenu(Menu menu);
 
     void setLocale(Locale locale);
 

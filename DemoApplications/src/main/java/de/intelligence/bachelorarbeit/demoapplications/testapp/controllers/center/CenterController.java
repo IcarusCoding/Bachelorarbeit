@@ -31,7 +31,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
-@Controller(fxml = "/controllers/fxml/center/CenterController.fxml", css = "controllers/css/center.css")
+@Controller(fxml = "/legacy/controllers/fxml/center/CenterController.fxml", css = "legacy/controllers/css/center.css")
 public final class CenterController {
 
     @ResourceBundle

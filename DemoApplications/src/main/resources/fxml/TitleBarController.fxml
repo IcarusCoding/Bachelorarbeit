@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           xmlns="http://javafx.com/javafx"
+           fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TitleBarController">
+    <MenuBar>
+        <Menu text="%titleBar.settingsMenu">
+            <Menu text="%titleBar.settingsMenu.languageMenu" fx:id="languageMenu"/>
+        </Menu>
+    </MenuBar>
+</StackPane>

@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class ReadOnlyPropertiesWrapper extends Properties {
+public final class ReadOnlyPropertiesWrapper extends Properties {
 
     public ReadOnlyPropertiesWrapper(Properties props) {
         super.putAll(props);

@@ -25,7 +25,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
-        resizeable = true, iconPath = "/icon.png")
+        resizeable = true, iconPath = "/legacy/icon.png")
 @ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
@@ -33,11 +33,11 @@ public final class TestApplication {
     @Inject
     private ITestService service;
 
-    @ResourceBundle("test/Messages")
-    @ResourceBundle("TestBundle")
+    @ResourceBundle("legacy/test/Messages")
+    @ResourceBundle("legacy/TestBundle")
     private II18N language;
 
-    @ConfigSource({"test1.properties", "props/test2.properties"})
+    @ConfigSource({"legacy/test1.properties", "legacy/props/test2.properties"})
     private Properties props;
 
     @Shared
@@ -46,14 +46,14 @@ public final class TestApplication {
     @Shared
     private SharedReference<String> testReference;
 
-    @Shared("test")
+    @Shared("legacy/test")
     private ReadOnlyObjectProperty<String> dasdfgg;
 
     @PostConstruct
     private void postConstructTest() {
         service.test();
         System.out.println("RESOURCES: " + resources);
-        testReference.set("test");
+        testReference.set("legacy/test");
         System.out.println("BOOL REFERENCE: " + testReference.get());
         System.out.println("OBJECT PROPERTY: " + dasdfgg);
         System.out.println("-----------------------------------");

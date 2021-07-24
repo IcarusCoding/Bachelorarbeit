@@ -14,7 +14,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.BottomSlideAnimation;
 
-@Controller(fxml = "/controllers/fxml/right/RightControllerOne.fxml", css = "controllers/css/rightOne.css")
+@Controller(fxml = "/legacy/controllers/fxml/right/RightControllerOne.fxml", css = "legacy/controllers/css/rightOne.css")
 public final class RightControllerOne {
 
     @FXML

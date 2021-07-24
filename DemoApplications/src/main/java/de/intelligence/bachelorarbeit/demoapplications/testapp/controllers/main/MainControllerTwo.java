@@ -14,7 +14,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.FadeAnimation;
 
-@Controller(fxml = "/controllers/fxml/MainControllerTwo.fxml", css = "controllers/css/main.css")
+@Controller(fxml = "/legacy/controllers/fxml/MainControllerTwo.fxml", css = "legacy/controllers/css/main.css")
 public final class MainControllerTwo {
 
     @FXML

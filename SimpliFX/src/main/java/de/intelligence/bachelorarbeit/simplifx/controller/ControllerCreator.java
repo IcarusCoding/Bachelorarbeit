@@ -7,6 +7,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Optional;
 
 import javafx.css.Stylesheet;
@@ -73,8 +74,8 @@ public final class ControllerCreator {
         try {
             pane = loader.load();
         } catch (IOException e) {
-            //TODO error handling
-            throw new RuntimeException("TODO ERROR HANDLING");
+            //TODO error handling with controller name etc
+            throw new RuntimeException("TODO ERROR HANDLING", e);
         }
         final Object instance = loader.getController();
         pane.getStylesheets().add(ctx.cssLocation);
@@ -101,7 +102,7 @@ public final class ControllerCreator {
         final Controller annotation = controllerOpt.get();
         final String fxmlPath = annotation.fxml();
         URL fxmlLocation = null;
-        if (fxmlPath.isBlank() || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
+        if (fxmlPath.isBlank() || !fxmlPath.toLowerCase(Locale.ROOT).endsWith(".fxml") || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
             throw new InvalidControllerDefinitionException("Could not resolve fxml path (\"" + fxmlPath + "\") for controller \"" + clazz.getSimpleName() + "\".");
         }
         final String cssPath = annotation.css();

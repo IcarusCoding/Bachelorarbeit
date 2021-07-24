@@ -7,7 +7,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 
-@Controller(fxml = "/controllers/fxml/left/LeftControllerTwo.fxml", css = "controllers/css/leftTwo.css")
+@Controller(fxml = "/legacy/controllers/fxml/left/LeftControllerTwo.fxml", css = "legacy/controllers/css/leftTwo.css")
 public class TestController {
 
     @PostConstruct
