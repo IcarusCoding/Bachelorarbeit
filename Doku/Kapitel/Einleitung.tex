@@ -1,19 +1,22 @@
 \chapter{Einleitung}
 \label{einleitung}
-
-\add{Intro}
+\add{Programmierung wird immer beliebter, IT ist wichtig, effizient programmieren ist wichtig, bugs sind zeitaufwendig -> Prävention, annotationen machen alles leichter, sind einfach zu nutzen -> Automation}
+Das starke Wachstum von programmierbezogenen Berufen im Arbeitsmarkt sorgt für einen höheren Bedarf an Programmierern. Dabei werden Fertigkeiten wie das effiziente und weitgehend fehlerfreie Programmieren, vor allem in sicherheitskritischen Umgebungen, wichtiger als je zuvor.\add{bridge} Annotationen sind ein dynamisches Programmierkonstrukt, welche immer beliebter werden und dementsprechend auch heutzutage in vielen Programmiersprachen vorzufinden sind. In den meisten Fällen dienen sie der Vereinfachung von komplexen Aufgaben, der Automation von repetitiven Vorgängen und der Dokumentation von Quelltextelementen.
 
 \section{Motivation}
 \label{motivation}
-
-\add{Motivation}
-
+Zur Erstellung von platformunabhängigen Java-Anwendungen mit grafischer Benutzerschnittstelle wird immer mehr auf JavaFX, den Nachfolger der Swing Bibliothek, gesetzt. Diese erlaubt es Entwicklern, mit relativ wenig Zeitaufwand, zeitgemäße und moderne Applikationen zu erstellen. Selbst Entwickler, welche keinerlei Erfahrung mit der Entwicklung von grafischen Oberflächen in der Java Programmiersprache haben, werden keine Schwierigkeiten haben, solche mittels JavaFX zu entwerfen und schließlich zu implementieren. Wie später in der Problemanalyse gezeigt, bietet JavaFX zwar einen einfachen Einstieg in grundlegende Programmierkonstrukte aber
+kann bei der Erstellung von komplexen Anwendungen dennoch schnell zeitaufwendig und fehleranfällig werden.
 \section{Zielsetzung}
 \label{zielsetzung}
 
 \add{Zielsetzung}
-
+\newpage
 \section{Struktur}
 \label{struktur}
-
-\add{Struktur der Arbeit}
+Die Struktur der Arbeit setzt sich aus sechs Teilen zusammen. Begonnen wird mit der Definition und Erklärung von fundamentalen Kernkonzepten, aus welchen ein optimales Verständnis der genutzten Technologien resultieren soll. Zu diesen Kernkonzepten gehören essentielle softwaretechnische Grundlagen wie Entwurfsmuster oder das Vorstellen und die anschließende nähere Beleuchtung der Annotationsfunktion in Java und anderen Programmiersprachen. Außerdem wird auf einzelne Komponenten von JavaFX eingegangen und deren Interaktionen untereinander mit Beispielen untermauert (\ref{grundlagen}).\\
+Danach werden aktuelle Beispiele zur Annotationsprogrammierung aus anderen Arbeiten, Bibliotheken und Programmiersprachen vorgestellt. Dabei liegt der primäre Fokus auf einer Vereinfachung des Entwicklungsprozesses in der Java Umgebung. Der Stand der Technik wird abschließend in einem Fazit im zweiten Teil der Arbeit zusammengefasst und es erfolgt ein kurzer Ausblick auf nicht existierende Funktionalitäten in JavaFX, welche in bisherigen Arbeiten/Bibliotheken nicht zu finden waren (\ref{stand_der_technik}).\\
+Nachdem die gegenwärtig verfügbaren Maßnahmen zur Simplifizierung durch die Verwendung von Annotationen vorgestellt wurden, wird mit dem nächsten Teil, dem Entwickeln eines Entwurfes, begonnen. Dazu erfolgt zu Beginn eine Problemanalyse, welche Schwierigkeiten und komplexe Strukturen bei der Programmierung von JavaFX Anwendungen identifiziert. Die gefundenen Probleme werden dann mithilfe einer Anforderungsanalyse durch funktionale und nicht funktionale Anforderungen dargestellt. Dazu werden notwendige Rahmenbedingungen an die Bibliothek und die Softwarearchitektur erhoben und verwendete externe Bibliotheken kurz vorgestellt. Außerdem werden Konzepte für essentielle Schnittstellen entworfen, die einerseits für eine Gewährleistung der Funktionalität notwendig sind und anderseits für den Bibliotheksnutzer unabhängig verwendbar gemacht werden, sowie alle zu implementierenden Annotationen mit ihren Funktionen und Limitationen vorgestellt (\ref{konzeption_und_entwurf}).\\
+Mit den aus dem Entwurf und dem Konzept resultierenden Problemlösungen, Rahmenbedingungen an die Architektur und Anforderungen, wird das System in \fullref{implementierung} prototypisch implementiert. Dazu werden die implementierten Subsysteme näher betrachtet und teilweise mit Diagrammen untermauert. Darüber hinaus werden wichtige Teile des Entwicklungsprozesses aufgegriffen und in Form von Quelltextausschnitten erklärt.\\
+Nachdem der Entwicklungsprozess des Systems beendet wurde, wird eine Anwendung zur Demonstration der Funktionen erstellt, welche durch das Nutzen von den hinzugefügten Annotationen, als Hilfestellung für eventuelle Nutzer der Bibliothek dienen soll. Dabei wird explizit das Zusammenspiel der einzelnen Subsysteme vorgestellt. Die Demoanwendung dient außerdem als Maßstab für den Evaluationsprozess, in welchem eine weitere, zur Demoanwendung funktional identische, Anwendung erstellt wird, welche dabei ausschließlich mit den von JavaFX bereitgestellten Klassen und Methoden arbeitet. Beide Anwendungen werden durch verschiedene Aspekte wie die Benutzerfreundlichkeit oder den Programmieraufwand miteinander verglichen (\ref{evaluation}).\\
+Im letzten Kapitel erfolgt eine Zusammenfassung der erarbeiteten Ergebnisse sowie eine Bewertung dieser. Des Weiteren wird auf nicht funktionale Anforderungen wie die Erweiterbarkeit und die Wartbarkeit des Systems eingegangen (\ref{fazit}).
