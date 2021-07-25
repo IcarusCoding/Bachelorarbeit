@@ -22,6 +22,7 @@ public final class TopSlideAnimation extends AbstractWrapperAnimation {
             root.getChildren().setAll(after);
             before.setTranslateY(0);
             root.translateYProperty().unbind();
+            root.setTranslateY(0);
         });
     }
 }

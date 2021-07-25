@@ -10,7 +10,7 @@ import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
 
-@StageConfig(title = "Preloader", style = StageStyle.DECORATED, resizeable = false, iconPath = "/legacy/icon.png", autoShow = true)
+@StageConfig(title = "Preloader", style = StageStyle.DECORATED, resizeable = false, iconPath = "/icon/icon.png", autoShow = true)
 @PreloaderEntryPoint
 public class TestLoader {
 

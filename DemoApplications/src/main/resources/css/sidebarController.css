@@ -5,3 +5,16 @@
 #connectionLbl {
     -fx-text-fill: white;
 }
+
+JFXButton {
+    -fx-background-color: #212121;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+JFXButton:hover {
+    -fx-border-color: white;
+    -fx-background-color: #55a630;
+    -fx-text-fill: white;
+}

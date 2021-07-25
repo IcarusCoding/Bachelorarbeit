@@ -4,6 +4,7 @@ import javafx.beans.binding.StringBinding;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
@@ -16,11 +17,16 @@ import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
 import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
 
-@Controller(fxml = "/fxml/MainMenuController.fxml")
+import static de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerOne;
+
+@Controller(fxml = "/fxml/MainMenuController.fxml", css = "css/mainMenuController.css")
 public final class MainMenuController {
 
     @FXML
     private BorderPane root;
+
+    @FXML
+    private StackPane contentCenter;
 
     @ResourceBundle
     private II18N ii18N;
@@ -36,7 +42,7 @@ public final class MainMenuController {
     @Setup
     private void setup(ControllerSetupContext ctx) {
         ctx.createSubGroup(SidebarController.class, "sidebar", this.root::setLeft);
-        ctx.createSubGroup(ContentController.class, "sidebarContent", this.root::setCenter);
+        ctx.createSubGroup(TestControllerOne.class, "sidebarContent", this.contentCenter.getChildren()::setAll);
     }
 
     @PostConstruct

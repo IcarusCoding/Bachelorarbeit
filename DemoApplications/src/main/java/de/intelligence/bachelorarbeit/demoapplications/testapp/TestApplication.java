@@ -25,7 +25,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
-        resizeable = true, iconPath = "/legacy/icon.png")
+        resizeable = true, iconPath = "/icon/icon.png")
 @ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {

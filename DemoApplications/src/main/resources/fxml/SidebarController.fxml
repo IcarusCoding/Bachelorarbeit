@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import com.jfoenix.controls.JFXButton?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1"
            xmlns="http://javafx.com/javafx/11.0.1"
            fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.SidebarController"
            id="root" prefWidth="150">
-   <BorderPane prefHeight="200.0" prefWidth="100.0" StackPane.alignment="CENTER">
-      <top>
-         <HBox alignment="CENTER">
-            <Label fx:id="connectionLbl" text="%sidebar.connectionLbl" wrapText="true"/>
-         </HBox>
-      </top>
-      <bottom>
-         <VBox alignment="CENTER" spacing="10">
-            <Button mnemonicParsing="false" text="Button"/>
-            <Button mnemonicParsing="false" text="Button"/>
-            <Button mnemonicParsing="false" text="Button"/>
-            <Button mnemonicParsing="false" text="%sidebar.logoutBtn" onAction="#onLogoutPressed"/>
-         </VBox>
-      </bottom>
-      <StackPane.margin>
-         <Insets bottom="20.0" top="20.0" left="10.0" right="10.0"/>
-      </StackPane.margin>
-   </BorderPane>
+    <BorderPane prefHeight="200.0" prefWidth="100.0" StackPane.alignment="CENTER">
+        <top>
+            <HBox alignment="CENTER">
+                <Label fx:id="connectionLbl" text="%sidebar.connectionLbl" wrapText="true" textAlignment="CENTER"/>
+            </HBox>
+        </top>
+        <bottom>
+            <VBox alignment="CENTER" spacing="10">
+                <JFXButton mnemonicParsing="false" text="%sidebar.one" prefWidth="100" onAction="#onOnePressed"/>
+                <JFXButton mnemonicParsing="false" text="%sidebar.two" prefWidth="100" onAction="#onTwoPressed"/>
+                <JFXButton mnemonicParsing="false" text="%sidebar.three" prefWidth="100" onAction="#onThreePressed"/>
+                <JFXButton mnemonicParsing="false" text="%sidebar.logoutBtn" prefWidth="100"
+                           onAction="#onLogoutPressed"/>
+            </VBox>
+        </bottom>
+        <StackPane.margin>
+            <Insets bottom="20.0" top="20.0" left="10.0" right="10.0"/>
+        </StackPane.margin>
+    </BorderPane>
 </StackPane>

@@ -19,6 +19,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnim
 public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
 
     private final ReadOnlyObjectWrapper<Pane> wrapper;
+
     private Timeline running;
 
     public ControllerGroupWrapperImpl() {
@@ -31,26 +32,26 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
         this.wrapper.get().setClip(clipRect);
     }
 
-    private void switchController0(IController handler, IWrapperAnimation animationFactory) {
-        this.wrapper.get().prefHeightProperty().bind(handler.getRoot().prefHeightProperty());
-        this.wrapper.get().prefWidthProperty().bind(handler.getRoot().prefWidthProperty());
+    private void switchController0(IController controller, IWrapperAnimation animationFactory) {
+        this.wrapper.get().prefHeightProperty().bind(controller.getRoot().prefHeightProperty());
+        this.wrapper.get().prefWidthProperty().bind(controller.getRoot().prefWidthProperty());
         if (this.wrapper.get().getChildren().isEmpty()) {
-            this.setController(handler.getRoot());
-            return;
+            this.setController(controller.getRoot());
+        } else {
+            if (this.running != null) {
+                this.running.stop();
+            }
+            this.running = animationFactory.create(this.wrapper.get(), (Pane) this.wrapper.get().getChildren().get(0),
+                    controller.getRoot());
+            if (this.running == null) {
+                this.setController(controller.getRoot());
+            } else {
+                this.running.play();
+            }
         }
-        if (this.running != null) {
-            this.running.stop();
-        }
-        this.running = animationFactory.create(this.wrapper.get(), (Pane) this.wrapper.get().getChildren().get(0),
-                handler.getRoot());
-        if (this.running == null) {
-            this.setController(handler.getRoot());
-            return;
-        }
-        this.running.play();
-        this.getNextFocus(handler.getRoot()).ifPresentOrElse(Node::requestFocus, () -> {
-            handler.getRoot().setFocusTraversable(true);
-            handler.getRoot().requestFocus();
+        this.getNextFocus(controller.getRoot()).ifPresentOrElse(Node::requestFocus, () -> {
+            controller.getRoot().setFocusTraversable(true);
+            controller.getRoot().requestFocus();
         });
     }
 

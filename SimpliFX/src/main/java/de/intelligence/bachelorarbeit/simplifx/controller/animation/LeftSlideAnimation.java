@@ -22,6 +22,7 @@ public final class LeftSlideAnimation extends AbstractWrapperAnimation {
             root.getChildren().setAll(after);
             before.setTranslateX(0);
             root.translateXProperty().unbind();
+            root.setTranslateX(0);
         });
     }
 }

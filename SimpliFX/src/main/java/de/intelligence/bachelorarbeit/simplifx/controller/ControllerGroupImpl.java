@@ -29,7 +29,6 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final SharedResources resources;
     private final PropertyRegistry registry;
     private final Consumer<Pane> readyConsumer;
-    private final IController superController;
 
     private final ControllerCreator creator;
     private final Map<Class<?>, IController> loadedControllers;
@@ -48,7 +47,6 @@ public final class ControllerGroupImpl implements IControllerGroup {
         this.resources = resources;
         this.registry = registry;
         this.readyConsumer = readyConsumer;
-        this.superController = superController;
         this.creator = new ControllerCreator(provider, ii18N, resources, registry);
         this.loadedControllers = new ConcurrentHashMap<>();
         this.groupWrapper = new SimpleObjectProperty<>(new ControllerGroupWrapperImpl());

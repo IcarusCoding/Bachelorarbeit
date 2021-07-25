@@ -16,7 +16,7 @@ public final class MainController {
     @Setup
     private void setup(ControllerSetupContext ctx) {
         ctx.createSubGroup(TitleBarController.class, "titleBar", this.root::setTop);
-        ctx.createSubGroup(LoginController.class, "content", this.root::setCenter);
+        ctx.createSubGroup(LoginController.class, "mainContent", this.root::setCenter);
     }
 
 }
