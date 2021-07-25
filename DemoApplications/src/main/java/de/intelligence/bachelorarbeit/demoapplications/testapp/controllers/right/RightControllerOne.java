@@ -2,6 +2,7 @@ package de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.righ
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.util.Duration;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
@@ -11,8 +12,9 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.BottomSlideAnimation;
 
-@Controller(fxml = "/controllers/fxml/right/RightControllerOne.fxml", css = "controllers/css/rightOne.css")
+@Controller(fxml = "/legacy/controllers/fxml/right/RightControllerOne.fxml", css = "legacy/controllers/css/rightOne.css")
 public final class RightControllerOne {
 
     @FXML
@@ -20,7 +22,7 @@ public final class RightControllerOne {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
-        this.switchBtn.setOnAction(evt -> ctx.switchController(RightControllerTwo.class));
+        this.switchBtn.setOnAction(evt -> ctx.switchController(RightControllerTwo.class, new BottomSlideAnimation(Duration.millis(400))));
     }
 
     @PostConstruct

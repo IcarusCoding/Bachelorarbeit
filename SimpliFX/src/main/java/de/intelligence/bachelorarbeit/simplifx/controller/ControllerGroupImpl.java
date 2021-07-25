@@ -10,6 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Pane;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.DefaultWrapperAnimation;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerGroupDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
@@ -24,6 +27,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
     private final SharedResources resources;
+    private final PropertyRegistry registry;
     private final Consumer<Pane> readyConsumer;
 
     private final ControllerCreator creator;
@@ -32,32 +36,121 @@ public final class ControllerGroupImpl implements IControllerGroup {
     private final ObjectProperty<IController> activeController;
     private final ControllerGroupContext groupCtx;
     private final ObjectProperty<VisibilityState> visibility;
+    private boolean initialized;
 
     public ControllerGroupImpl(String groupId, Class<?> startController, IControllerFactoryProvider provider, II18N ii18N,
-                               SharedResources resources, Consumer<Pane> readyConsumer) {
+                               SharedResources resources, PropertyRegistry registry, Consumer<Pane> readyConsumer, IController superController) {
         this.groupId = groupId;
         this.startController = startController;
         this.provider = provider;
         this.ii18N = ii18N;
         this.resources = resources;
+        this.registry = registry;
         this.readyConsumer = readyConsumer;
-        this.creator = new ControllerCreator(provider, ii18N, resources);
+        this.creator = new ControllerCreator(provider, ii18N, resources, registry);
         this.loadedControllers = new ConcurrentHashMap<>();
         this.groupWrapper = new SimpleObjectProperty<>(new ControllerGroupWrapperImpl());
         this.activeController = new SimpleObjectProperty<>();
         this.groupCtx = new ControllerGroupContext(this);
         this.visibility = new SimpleObjectProperty<>(VisibilityState.UNDEFINED);
+        if (superController != null) {
+            // group visibility is always equal to super controller visibility
+            this.visibility.set(superController.visibilityProperty().get());
+        } else {
+            // there is no super controller -> this group is root element and therefore always shown
+            this.visibility.set(VisibilityState.SHOWN);
+        }
         ControllerRegistry.register(groupId, this.groupCtx);
         ControllerRegistry.addController(groupId, startController);
     }
 
     @Override
-    public IController constructController(Class<?> clazz, Consumer<Pane> readyConsumer) {
+    public IController getOrConstructController(Class<?> clazz) {
+        if (this.loadedControllers.containsKey(clazz)) {
+            return this.loadedControllers.get(clazz);
+        }
+        return this.createController(clazz);
+    }
+
+    @Override
+    public Pane start() {
+        if (this.readyConsumer != null) {
+            this.readyConsumer.accept(this.groupWrapper.get().getWrapper());
+        }
+        this.setController(this.getOrConstructController(this.startController), new DefaultWrapperAnimation());
+        this.initialized = true;
+        return this.groupWrapper.get().getWrapper();
+    }
+
+    @Override
+    public void createSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer) {
+        if (this.initialized) {
+            throw new IllegalStateException("Subgroups can only be registered in the setup phase!");
+        }
+        if (ControllerRegistry.isRegistered(startController)) {
+            throw new InvalidControllerGroupDefinitionException("Controller \"" + startController.getSimpleName() + "\" is already registered in another group!");
+        }
+        if (ControllerRegistry.isRegistered(groupId)) {
+            throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
+        }
+        final IController origin = this.loadedControllers.get(originController);
+        origin.getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController, this.provider, this.ii18N,
+                this.resources, this.registry, readyConsumer, origin));
+    }
+
+    @Override
+    public void switchController(Class<?> newController, IWrapperAnimation factory) {
+        if (this.activeController.get() != null && !this.activeController.get().getControllerClass().equals(newController)) {
+            this.setController(this.getOrConstructController(newController), factory);
+        }
+    }
+
+    @Override
+    public void destroy(Class<?> clazz) {
+        if (this.loadedControllers.containsKey(clazz)) {
+            ControllerRegistry.removeController(clazz);
+            final IController controller = this.loadedControllers.remove(clazz);
+            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnDestroy.class, OnDestroy::value);
+            controller.destroy();
+            if (this.loadedControllers.isEmpty()) {
+                if (!ControllerRegistry.removeGroup(this.groupId)) {
+                    System.out.println("ERROR: UNABLE TO REMOVE GROUP " + this.groupId);
+                    return;
+                }
+                this.groupWrapper.unbind();
+                this.visibility.unbind();
+                this.activeController.unbind();
+            }
+        }
+    }
+
+    @Override
+    public void switchController(Class<?> newController) {
+        this.switchController(newController, new DefaultWrapperAnimation());
+    }
+
+    @Override
+    public ControllerGroupContext getContextFor(String groupId) {
+        return ControllerRegistry.getContextFor(groupId);
+    }
+
+    @Override
+    public Class<?> getActiveController() {
+        return this.activeController.get().getControllerClass();
+    }
+
+    @Override
+    public void destroy() {
+        this.loadedControllers.values().forEach(c -> c.getSubGroups().values().forEach(IControllerGroup::destroy));
+        this.loadedControllers.keySet().forEach(this::destroy);
+    }
+
+    private IController createController(Class<?> clazz) {
         if (!this.startController.equals(clazz) && ControllerRegistry.isRegistered(clazz)) {
             throw new InvalidControllerGroupDefinitionException("Controller \"" + clazz.getSimpleName() + "\" is already registered in another group!");
         }
-        ControllerRegistry.addController(this.groupId, clazz);
         final IController controller = this.creator.createController(clazz);
+        ControllerRegistry.addController(this.groupId, clazz);
         this.loadedControllers.put(clazz, controller);
         controller.visibilityProperty().addListener((obs, oldVal, newVal) -> {
             if (oldVal.type().equals(newVal.type())) {
@@ -71,98 +164,28 @@ public final class ControllerGroupImpl implements IControllerGroup {
                         true, controller.getVisibilityContext());
             }
         });
-        final ControllerSetupContext ctx = new ControllerSetupContext(controller.getControllerClass(), this, this.groupCtx);
-        AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), Setup.class, Setup::value, true, ctx);
-        controller.getSubGroups().forEach((groupId, group) -> {
-            group.start(); //TODO dont start in pre init
-        });
-        FXThreadUtils.runOnFXThread(() -> {
-            postConstruct(controller.getControllerInstance());
-        });
+        final ControllerSetupContext ctx = new ControllerSetupContext(clazz, this, this.groupCtx);
+        final Object instance = controller.getControllerInstance();
+        AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class, Setup::value, true, ctx);
+        controller.getSubGroups().values().forEach(IControllerGroup::start);
+        FXThreadUtils.runOnFXThread(() -> AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value));
         return controller;
     }
 
-    @Override
-    public Pane start() {
-        readyConsumer.accept(this.groupWrapper.get().getWrapper());
-        final IController controller = this.getOrCreateController(this.startController);
-        setController(controller, new DefaultWrapperAnimationFactory());
-        return this.groupWrapper.get().getWrapper();
-    }
-
-    @Override
-    public void registerSubGroup(Class<?> originController, Class<?> startController, String groupId, Consumer<Pane> readyConsumer) {
-        if (ControllerRegistry.isRegistered(startController)) {
-            throw new InvalidControllerGroupDefinitionException("Controller \"" + startController.getSimpleName() + "\" is already registered in another group!");
-        }
-        if (ControllerRegistry.isRegistered(groupId)) {
-            throw new InvalidControllerGroupDefinitionException("Group with id \"" + groupId + "\" is already registered!");
-        }
-        this.loadedControllers.get(originController).getSubGroups().put(groupId, new ControllerGroupImpl(groupId, startController,
-                this.provider, this.ii18N, this.resources, readyConsumer));
-    }
-
-    @Override
-    public void switchController(Class<?> newController) {
-        this.switchController(newController, new DefaultWrapperAnimationFactory());
-    }
-
-    @Override
-    public void switchController(Class<?> newController, IWrapperAnimationFactory factory) {
-        if (this.activeController.get() == null || this.activeController.get().getControllerClass().equals(newController)) {
-            return;
-        }
-        setController(this.getOrCreateController(newController), factory);
-    }
-
-    //TODO remove group when last controller destroyed and remove root
-    @Override
-    public void destroy(Class<?> clazz) {
-        if (this.loadedControllers.containsKey(clazz)) {
-            de.intelligence.bachelorarbeit.simplifx.controller.ControllerRegistry.removeController(clazz);
-            final IController controller = this.loadedControllers.remove(clazz);
-            AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnDestroy.class, OnDestroy::value);
-            controller.destroy();
-        }
-    }
-
-    //TODO unbind everything
-    @Override
-    public void destroy() {
-        this.loadedControllers.values().forEach(c -> c.getSubGroups().values().forEach(IControllerGroup::destroy));
-        this.loadedControllers.keySet().forEach(this::destroy);
-    }
-
-    @Override
-    public Class<?> getActiveController() {
-        if (this.activeController == null) {
-            return null;
-        }
-        return this.activeController.get().getControllerClass();
-    }
-
-    @Override
-    public ControllerGroupContext getContextFor(String groupId) {
-        return ControllerRegistry.getContextFor(groupId);
-    }
-
-    @Override
-    public ObjectProperty<VisibilityState> visibilityProperty() {
-        return this.visibility;
-    }
-
-    private void setController(IController controller, IWrapperAnimationFactory factory) {
+    private void setController(IController controller, IWrapperAnimation animation) {
         if (controller.visibilityProperty().get().equals(VisibilityState.UNDEFINED)) {
-            controller.getSubGroups().values().forEach(group ->
-                    group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
-                        final VisibilityState controllerState = controller.visibilityProperty().get();
-                        if (controllerState.type().equals(VisibilityState.HIDDEN)) {
-                            return VisibilityState.GROUP_HIDDEN;
-                        } else if (controllerState.type().equals(VisibilityState.SHOWN)) {
-                            return VisibilityState.GROUP_SHOWN;
-                        }
-                        return VisibilityState.UNDEFINED;
-                    }, controller.visibilityProperty())));
+            controller.visibilityProperty().addListener((obs, oldVal, newVal) -> controller.getSubGroups().values()
+                    .forEach(group -> {
+                        group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
+                            final VisibilityState controllerState = controller.visibilityProperty().get();
+                            if (controllerState.type().equals(VisibilityState.HIDDEN)) {
+                                return VisibilityState.GROUP_HIDDEN;
+                            } else if (controllerState.type().equals(VisibilityState.SHOWN)) {
+                                return VisibilityState.GROUP_SHOWN;
+                            }
+                            return VisibilityState.UNDEFINED;
+                        }, controller.visibilityProperty()));
+                    }));
             this.visibility.addListener((obs, oldVal, newVal) -> {
                 if (activeController.get().equals(controller)) {
                     controller.visibilityProperty().set(newVal);
@@ -171,6 +194,9 @@ public final class ControllerGroupImpl implements IControllerGroup {
         }
         if (this.activeController.get() == null) {
             this.activeController.addListener((obs, oldVal, newVal) -> {
+                if (this.visibility.get().equals(VisibilityState.UNDEFINED)) {
+                    return;
+                }
                 if (oldVal != null) {
                     oldVal.visibilityProperty().set(VisibilityState.HIDDEN);
                 }
@@ -182,19 +208,13 @@ public final class ControllerGroupImpl implements IControllerGroup {
             this.groupWrapper.get().setController(controller);
         } else {
             this.activeController.set(controller);
-            this.groupWrapper.get().switchController(controller, factory);
+            this.groupWrapper.get().switchController(controller, animation);
         }
     }
 
-    private void postConstruct(Object instance) {
-        AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value);
-    }
-
-    private IController getOrCreateController(Class<?> clazz) {
-        if (this.loadedControllers.containsKey(clazz)) {
-            return this.loadedControllers.get(clazz);
-        }
-        return this.constructController(clazz, null);
+    @Override
+    public ObjectProperty<VisibilityState> visibilityProperty() {
+        return this.visibility;
     }
 
 }

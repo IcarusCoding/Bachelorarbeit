@@ -2,6 +2,7 @@ package de.intelligence.bachelorarbeit.demoapplications.testapp.controllers.main
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.util.Duration;
 
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
@@ -11,8 +12,9 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.FadeAnimation;
 
-@Controller(fxml = "/controllers/fxml/MainControllerTwo.fxml", css = "controllers/css/main.css")
+@Controller(fxml = "/legacy/controllers/fxml/MainControllerTwo.fxml", css = "legacy/controllers/css/main.css")
 public final class MainControllerTwo {
 
     @FXML
@@ -23,12 +25,13 @@ public final class MainControllerTwo {
     @Setup
     private void setup(ControllerSetupContext ctx) {
         this.ctx = ctx;
+        ctx.preloadController(MainController.class);
     }
 
     @PostConstruct
     private void afterConstruction() {
         System.out.println("MainControllerTwo: Post-Construct!");
-        this.testBtn.setOnAction(e -> this.ctx.switchController(MainController.class));
+        this.testBtn.setOnAction(e -> this.ctx.switchController(MainController.class, new FadeAnimation(Duration.millis(800))));
     }
 
     @OnShow

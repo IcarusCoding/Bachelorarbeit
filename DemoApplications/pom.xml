@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bachelorarbeit</artifactId>
         <groupId>de.intelligence</groupId>
-        <version>1.3</version>
+        <version>1.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,6 +22,16 @@
             <groupId>de.intelligence</groupId>
             <artifactId>simplifx-spring</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.intelligence</groupId>
+            <artifactId>simplifx-guice</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>9.0.10</version>
         </dependency>
         <dependency>
             <groupId>de.intelligence</groupId>
@@ -55,6 +65,11 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${source.version}</version>
             <classifier>mac</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>16</version>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" id="testControllerRoot" xmlns="http://javafx.com/javafx/11.0.1"
+           fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers$TestControllerTwo"
+           prefWidth="150" prefHeight="150">
+    <StackPane.margin>
+        <Insets topRightBottomLeft="50"/>
+    </StackPane.margin>
+    <Label text="%testControllerTwo.label"/>
+</StackPane>

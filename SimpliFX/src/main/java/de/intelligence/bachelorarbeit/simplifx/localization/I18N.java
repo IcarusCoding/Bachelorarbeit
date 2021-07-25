@@ -1,6 +1,7 @@
 package de.intelligence.bachelorarbeit.simplifx.localization;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,12 @@ import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 
 import org.apache.commons.lang3.ArrayUtils;
+
+import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
 public final class I18N implements II18N {
 
@@ -50,7 +55,7 @@ public final class I18N implements II18N {
     public Optional<Locale> getByLanguageSpoken(String language) {
         Locale toReturn = null;
         for (final Locale l : this.getSupportedLanguages()) {
-            if (l.getDisplayLanguage(l).equalsIgnoreCase(language)) {
+            if (l.getDisplayLanguage(this.currentLocale.get()).equalsIgnoreCase(language)) {
                 toReturn = l;
                 break;
             }
@@ -75,14 +80,37 @@ public final class I18N implements II18N {
 
     @Override
     public StringBinding createObservedBinding(String key, Object... params) {
+        System.out.println(Arrays.toString(params));
         return Bindings.createStringBinding(
-                () -> MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key),
-                        Arrays.stream(params)
-                                .map(o -> o instanceof ObservableValue ? ((ObservableValue<?>) o).getValue() :
-                                        Objects.requireNonNullElse(o, "null").toString()).toArray()),
+                () -> {
+                    Object[] nulls = Arrays.stream(params).map(o -> o instanceof ObservableValue
+                            ? ((ObservableValue<?>) o).getValue() : Objects.requireNonNullElse(o, "null").toString()).toArray();
+                    System.out.println(Arrays.toString(nulls));
+                    System.out.println(MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key), nulls));
+                    return MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key), nulls);
+                },
                 ArrayUtils.addAll(Arrays.stream(params)
                         .filter(ObservableValue.class::isInstance).map(ObservableValue.class::cast)
-                        .toArray(ObservableValue[]::new), currentLocale));
+                        .toArray(ObservableValue[]::new), this.currentLocale));
+    }
+
+    @Override
+    public Map<Locale, StringBinding> createBindings() {
+        return this.getSupportedLanguages().stream().collect(Collectors.toMap(Function.identity(),
+                l -> Bindings.createStringBinding(() -> l.getDisplayLanguage(this.currentLocale.get()), this.currentLocale)));
+    }
+
+    @Override
+    public void setupMenu(Menu menu) {
+        Conditions.checkNull(menu, "menu must not be null.");
+        final List<MenuItem> items = new ArrayList<>();
+        this.createBindings().forEach((l, s) -> {
+            final MenuItem item = new MenuItem();
+            item.textProperty().bind(s);
+            this.getByLanguageSpoken(item.getText()).ifPresent(lang -> item.setOnAction(e -> this.setLocale(lang)));
+            items.add(item);
+        });
+        menu.getItems().setAll(items);
     }
 
     @Override
@@ -94,6 +122,9 @@ public final class I18N implements II18N {
 
     @Override
     public boolean containsKey(String key) {
+        if (!this.bundles.containsKey(this.currentLocale.get())) {
+            return false;
+        }
         return this.bundles.get(this.currentLocale.get()).containsKey(key);
     }
 

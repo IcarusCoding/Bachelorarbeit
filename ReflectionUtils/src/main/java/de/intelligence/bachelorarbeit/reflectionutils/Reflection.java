@@ -3,11 +3,16 @@ package de.intelligence.bachelorarbeit.reflectionutils;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import lombok.experimental.UtilityClass;
+
+import sun.misc.Unsafe;
 
 /**
  * Utility class for accessing the Reflection API in a simple way.
@@ -95,6 +100,29 @@ public class Reflection {
      */
     public static InstanceReflection reflect(Object instance) {
         return new InstanceReflection(instance);
+    }
+
+    public static void addOpens(List<String> fullyQualifiedPackageNames, String module, Module currentModule)
+            throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
+        final Unsafe unsafe = Reflection.reflect(Unsafe.class).reflectField("theUnsafe").forceAccess().getUnsafe();
+        if (unsafe == null) {
+            throw new ReflectionException("Could not retrieve unsafe!");
+        }
+        final ModuleLayer bootModuleLayer = Reflection.reflect(Class.forName("java.lang.ModuleLayer"))
+                .reflectMethod("boot").invokeUnsafe();
+        final Optional<Module> moduleOpt = bootModuleLayer.findModule(module);
+        if (moduleOpt.isEmpty()) {
+            throw new ReflectionException("Could not find module with name " + module);
+        }
+        final Module fMod = moduleOpt.get();
+        final Class<?> moduleImpl = Class.forName("java.lang.Module");
+        final Method addOpensMethodImpl = Reflection.reflect(moduleImpl)
+                .reflectMethod("implAddOpens", String.class, moduleImpl).getReflectable();
+        long firstFieldOffset = unsafe.objectFieldOffset(OffsetProvider.class.getDeclaredField("firstField"));
+        unsafe.putBooleanVolatile(addOpensMethodImpl, firstFieldOffset, true);
+        for (final String pkgName : fullyQualifiedPackageNames) {
+            addOpensMethodImpl.invoke(fMod, pkgName, currentModule);
+        }
     }
 
     @SuppressWarnings("unchecked")
