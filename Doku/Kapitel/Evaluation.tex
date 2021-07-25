@@ -1,11 +1,46 @@
 \chapter{Evaluation}
 \label{evaluation}
-
+Im folgenden Kapitel werden Kernkonzepte von \texttt{SimpliFX} durch Quelltextbeispiele und eine Beispielanwendung erklärt. Außerdem wird eine Applikation erstellt, welche äquivalente Funktionalitäten wie die Beispielanwendung aufweist, aber vollständig auf die Nutzung von \texttt{SimpliFX} verzichtet. Beide Anwendungen werden in verschiedenen Aspekten wie der Benutzerfreundlichkeit oder dem Zeitaufwand verglichen und die Ergebnisse werden abschließend in einem Fazit zusammengefasst. 
 \add{Intro}
 
 \section{Entwicklung von Beispielsoftware}
 \label{entwicklung_von_beispielsoftware}
-
+%\subsection{Voraussetzungen}
+\add{maybe add comment}
+\noindent Bevor die Entwicklung der eigentlichen Software begonnen werden kann, müssen etwaige externe Bibliotheken wie JavaFX für \texttt{SimpliFX} bereitgestellt werden. Außerdem muss \texttt{SimpliFX} zur Kompilierzeit im Klassenpfad der zu entwickelnden Anwendung existieren. Da die Bibliothek im Github Maven-Repository verfügbar ist, wird der folgende Entwicklungsprozess sowie die Verwaltung von externen Bibliotheken durch die Verwendung von Maven unterstützt. In der \texttt{pom.xml} müssen für eine volle Funktionalität folgende Artefakte als Abhängigkeiten deklariert werden:
+\begin{itemize}
+	\item \texttt{de.intelligence:simplifx-guice} für das Nutzen aller Basisfunktionen von \texttt{SimpliFX} und der Kompatibilität zu Guice für die Abhängigkeitsinjektion.
+	\item \texttt{org.openjfx:javafx-controls:16} für Kontrollkomponenten wie z.B. Schaltflächen.
+	\item \texttt{org.openjfx:javafx-fxml:16} für das Verwenden von FXML Dateien.
+	\item \texttt{org.openjfx:javafx-graphics:16} für das Darstellen von Komponenten im Szenengraph. Außerdem muss bei der Artefaktdeklaration die jeweilige Zielplattform als \texttt{classifier} angegeben werden. Ein Beispiel für die Windows-Plattform ist nachfolgend dargestellt.
+	\begin{lstlisting}[language=XML, frame=none, belowskip=0pt]
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-graphics</artifactId>
+    <version>16</version>
+    <classifier>win</classifier>
+</dependency>	
+	\end{lstlisting}
+	\item \texttt{com.jfoenix:jfoenix:9.0.10} für erweiterte Designkomponenten.\footnote{Die neuste Version von JFoenix ist aufgrund der Jigsaw-API nicht direkt mit Java 16 kompatibel. Um die Bibliothek dennoch zu verwenden, werden eventuelle, auf das Modularitätssystem zurückführbare, Probleme durch das Nutzen der Reflection-Schnittstelle gelöst.}
+\end{itemize}
+Die vollständige \texttt{pom.xml} sowie alle in diesem Unterkapitel erstellten Klassen und Dateien sind im öffentlichen Github Maven-Repository unter dem Artefakt \texttt{de.intelligence:demo-applications} einsehbar.
+\subsection{Struktur und Funktion der Beispielanwendung}
+Die Anwendung soll weitgehend alle Funktionen von \texttt{SimpliFX} in Anspruch nehmen. Um die Konfigurationsschnittstelle sowie die Abhängigkeitsinjektion demonstrativ zu zeigen, wird eine Konfigurationsdatei definiert, welche Zugangsdaten und Verbindungsparameter zu einem imaginären Server enthält. Dazu wird ein Service erstellt, welcher für die Behandlung des Loginprozesses verantwortlich ist und durch ein Guice Modul zur Verfügung gestellt wird. Für die dynamische Lokalisierungsfunktion wird ein \texttt{ResourceBundle} mit dem Basisnamen \texttt{Messages} in sowohl der deutschen als auch der englischen Sprache erstellt. Wenn die Anwendung gestartet wird, soll eine grafische Schnittstelle für ein exemplarisches Einloggen angezeigt werden, welche Standardfunktionen wie das Eingeben der Zugangsdaten sowie die Änderung der Standardsprache zulassen soll. Die Funktion zur Sprachänderung kann dabei durch eine JavaFX \texttt{MenuBar} erfolgen. Wenn ein eventueller Login erfolgreich war, soll dem Entwickler eine Seitenleiste sowie ein Bereich, dessen Inhalt durch ebendiese kontrolliert wird, präsentiert werden. Die Seitenleiste soll vier Schaltflächen zur Navigation durch die Testapplikation, sowie ein Textfeld, welches die Verbindungsdaten zum Server anzeigt, enthalten. Der Startcontroller wird im folgenden als \texttt{MainController} bezeichnet. 
+Dieser Controller hat als Wurzelelement eine \texttt{BorderPane} und erstellt zwei Controller Untergruppen in dieser. Im oberen Bereich wird die \texttt{titleBar} Gruppe initialisiert, welche Anwendungseinstellungen unabhängig vom aktuell angezeigten Controller bereitstellt und im Mittelbereich die \texttt{mainContent} Gruppe, welche die Darstellung der eigentlichen Anwendung übernimmt und beim Start den \texttt{LoginController} als aktiven Controller anzeigt. Die \texttt{mainContent} Gruppe beinhaltet außerdem den \texttt{MainMenuController}, welche wiederum eine linke Seitenleiste sowie einen Bereich für andere Inhalte neben dieser verwaltet. Eine Übersicht aller verwendeten Controller und Controllergruppen ist in \autoref{fig:controller_relations} abgebildet. Blaue Kreise sind dabei Gruppen und Linien welche einen oder mehrere Controller verbinden, spezifizieren das Subcontroller Verhalten. Wenn beispielsweise der \texttt{MainMenuController} der aktive Controller in der \texttt{mainContent} Gruppe ist und zum \texttt{LoginController} gewechselt wird, so werden auch entsprechende Lebenszyklusmethoden im aktiven Controller von \texttt{sidebarContent} und \texttt{sidebar} aufgerufen.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/Controller Relations.png}
+	\caption{Diagramm -- Controller und Controllergruppen.}
+	\label{fig:controller_relations}
+\end{figure}
+\subsection{Implementierung der Beispielanwendung}
+Damit eine \texttt{SimpliFX} Anwendung als solche erkannt wird, muss eine Klasse definiert werden, welche als Einstiegspunkt dienen soll. Diese muss die Annotation \texttt{@ApplicationEntryPoint} aufweisen und als Parameter den Startcontroller (\texttt{MainController}) übergeben. Für die Abhängigkeitsinjektion mit Guice muss der Einstiegspunkt auch mit \texttt{@GuiceInjection} annotiert werden und die Klasse eines Guice-Moduls übergeben. Wie in der Einleitung bereits beschrieben, wird das Modul nur die Implementierung des Login Services bereitstellen (siehe \autoref{fig:login_service}). 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth-5cm]{Abbildungen/Login Service.png}
+	\caption{Diagramm -- Login Service.}
+	\label{fig:login_service}
+\end{figure}
 \add{Entwicklung von Beispielsoftware}
 
 \section{Vergleich konventioneller Methoden mit entwickeltem System}

@@ -45,6 +45,7 @@ Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_stru
 		[de.intelligence.bachelorarbeit.simplifx
 			[application]
 			[classpath]
+			[config]
 			[controller]
 			[css]
 			[dagger1]
@@ -100,7 +101,7 @@ Das vollständige Controller-System ist im \texttt{controller} Paket enthalten. 
 	\caption{Diagramm -- Einstiegspunkt des Controller-Systems.}
 	\label{fig:controller_group_def}
 \end{figure}
-Controllergruppen werden anhand eines \texttt{String}s eindeutig identifiziert und bei Konstruktion in einer globalen \texttt{ControllerRegistry} registriert, um doppelte Identifikatoren zu vermeiden. Dazu werden Controllerklassen vor der Konstruktion validiert, so ist es beispielsweise nicht erlaubt, eine nicht-statische, innere Klasse als Controller zu definieren, da eine direkte Instanziierung der Klasse durch \texttt{SimpliFX} in diesem Fall ausgeschlossen ist.
+\noindent Controllergruppen werden anhand eines \texttt{String}s eindeutig identifiziert und bei Konstruktion in einer globalen \texttt{ControllerRegistry} registriert, um doppelte Identifikatoren zu vermeiden. Dazu werden Controllerklassen vor der Konstruktion validiert, so ist es beispielsweise nicht erlaubt, eine nicht-statische, innere Klasse als Controller zu definieren, da eine direkte Instanziierung der Klasse durch \texttt{SimpliFX} in diesem Fall ausgeschlossen ist.
 \subsection{Paket: exception}
 Eigene Ausnahme-Klassen sind im \texttt{exception} Paket aufzufinden. Dazu gehören spezielle Ausnahmen für das Controller-System oder generelle Ausnahmen, welche von einer Vielzahl der \texttt{SimpliFX}-Komponenten genutzt werden.
 \subsection{Paket: css}
@@ -151,6 +152,8 @@ Die von \texttt{SimpliFX} verwalteten JavaFX Applikation- und Preloader-Klassen 
 	\caption{Diagramm -- Applikation und Preloader.}
 	\label{fig:app_package}
 \end{figure}
+\subsection{Paket: config}
+Klassen für das Verwalten von Konfigurationsdateien und deren Injektion in Controllern, sind im \texttt{config} Paket aufzufinden. Dabei werden ausschließlich Dateiformate unterstützt, welche mit der Java Properties API kompatibel sind.
 \section{Essentielle Quelltextausschnitte}
 In den folgenden Unterkapiteln werden wichtige Quelltextausschnitte, welche für Basisfunktionen von \texttt{SimpliFX} verantwortlich sind dargestellt und näher erklärt.
 \subsection{SimpliFXMLLoader}
@@ -207,7 +210,7 @@ if (annotation.annotationType().isAnnotationPresent(DIAnnotation.class)) {
 					(Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
 					.getActualTypeArguments()[0]);
 	// Erstelle eine neue DIEnvironment Instanz
-	SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
+	DIEnvironment env = methodRef.invokeUnsafe(applicationListener, annotation);
 	break;
 }
 	\end{lstlisting}
