@@ -19,4 +19,7 @@ public class Prefix {
     public static final String JAR_PREFIX = "jar:";
     public static final String JAR_SEPARATOR = "!/";
 
+    public static final String XML_FILE_EXTENSION = ".xml";
+    public static final String PROPERTIES_FILE_EXTENSION = ".properties";
+
 }

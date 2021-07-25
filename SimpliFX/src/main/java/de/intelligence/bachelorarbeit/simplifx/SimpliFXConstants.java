@@ -1,8 +1,8 @@
 package de.intelligence.bachelorarbeit.simplifx;
 
-import lombok.experimental.UtilityClass;
+import java.util.Map;
+import java.util.function.Function;
 
-@UtilityClass
 public final class SimpliFXConstants {
 
     static final byte[] BANNER = {
@@ -25,5 +25,19 @@ public final class SimpliFXConstants {
             32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
             32, 32, 32
     };
+
+    public static final Map<Class<?>, Function<String, Object>> OBJECT_CONVERSION_MAP =
+            Map.of(Boolean.class, Boolean::parseBoolean, Byte.class, Byte::parseByte, Double.class, Double::parseDouble,
+                    Float.class, Float::parseFloat, Integer.class, Integer::parseInt, Long.class, Long::parseLong,
+                    Short.class, Short::parseShort);
+
+    public static final Map<Class<?>, Class<?>> PRIMITIVES_MAP =
+            Map.of(byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class,
+                    boolean.class, Boolean.class, char.class, Character.class, float.class, Float.class, double.class,
+                    Double.class);
+
+    private SimpliFXConstants() {
+        throw new UnsupportedOperationException();
+    }
 
 }

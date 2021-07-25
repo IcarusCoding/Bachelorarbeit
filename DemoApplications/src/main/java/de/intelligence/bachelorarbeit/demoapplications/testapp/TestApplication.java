@@ -1,9 +1,9 @@
 package de.intelligence.bachelorarbeit.demoapplications.testapp;
 
 import javax.inject.Inject;
+import java.util.Properties;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.stage.StageStyle;
 
 import de.intelligence.bachelorarbeit.demoapplications.ITestService;
@@ -13,6 +13,7 @@ import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigSource;
 import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
@@ -24,7 +25,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
-        resizeable = false, iconPath = "/icon.png")
+        resizeable = true, iconPath = "/icon/icon.png")
 @ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
@@ -32,9 +33,12 @@ public final class TestApplication {
     @Inject
     private ITestService service;
 
-    @ResourceBundle("test/Messages")
-    @ResourceBundle("TestBundle")
+    @ResourceBundle("legacy/test/Messages")
+    @ResourceBundle("legacy/TestBundle")
     private II18N language;
+
+    @ConfigSource({"legacy/test1.properties", "legacy/props/test2.properties"})
+    private Properties props;
 
     @Shared
     private SharedResources resources;
@@ -42,23 +46,20 @@ public final class TestApplication {
     @Shared
     private SharedReference<String> testReference;
 
-    @Shared("test")
+    @Shared("legacy/test")
     private ReadOnlyObjectProperty<String> dasdfgg;
-
-    @Shared
-    private ReadOnlyStringProperty testProperty;
 
     @PostConstruct
     private void postConstructTest() {
         service.test();
         System.out.println("RESOURCES: " + resources);
-        testReference.set("test");
+        testReference.set("legacy/test");
         System.out.println("BOOL REFERENCE: " + testReference.get());
-        testProperty.addListener((obs, oldV, newV) -> {
-            System.out.println("NEW VAL: " + newV);
-        });
         System.out.println("OBJECT PROPERTY: " + dasdfgg);
-        System.out.println("TESTIUS PROPERTY: " + testProperty);
+        System.out.println("-----------------------------------");
+        System.out.println("PROPS: " + props);
+        System.out.println("HOST: " + props.getProperty("host"));
+        System.out.println("-----------------------------------");
     }
 
     @EventHandler

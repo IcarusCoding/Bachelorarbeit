@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import javafx.scene.layout.Pane;
 
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
+
 //TODO interfaces
 public final class ControllerSetupContext {
 
@@ -17,16 +19,24 @@ public final class ControllerSetupContext {
         this.groupCtx = groupCtx;
     }
 
+    public ControllerGroupContext getGroupContext() {
+        return this.groupCtx;
+    }
+
     public void createSubGroup(Class<?> clazz, String groupId, Consumer<Pane> readyConsumer) {
-        this.group.registerSubGroup(controllerClass, clazz, groupId, readyConsumer);
+        this.group.createSubGroup(controllerClass, clazz, groupId, readyConsumer);
     }
 
     public void switchController(Class<?> clazz) {
         groupCtx.switchController(clazz);
     }
 
-    public void switchController(Class<?> clazz, IWrapperAnimationFactory factory) {
+    public void switchController(Class<?> clazz, IWrapperAnimation factory) {
         groupCtx.switchController(clazz, factory);
+    }
+
+    public void preloadController(Class<?> clazz) {
+        this.group.getOrConstructController(clazz);
     }
 
     public ControllerGroupContext getContextFor(String groupId) {

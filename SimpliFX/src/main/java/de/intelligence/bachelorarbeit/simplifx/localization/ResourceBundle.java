@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(ResourceBundles.class)
-public @interface ResourceBundle {
+public @interface ResourceBundle { //TODO remove repeatable ability and switch to array usage instead
 
     String value() default "";
 

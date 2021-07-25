@@ -15,7 +15,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.VisibilityContext;
 
-@Controller(fxml = "/controllers/fxml/MainController.fxml", css = "controllers/css/main.css")
+@Controller(fxml = "/legacy/controllers/fxml/MainController.fxml", css = "legacy/controllers/css/main.css")
 public final class MainController {
 
     @FXML
@@ -23,9 +23,9 @@ public final class MainController {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
-        ctx.createSubGroup(LeftControllerOne.class, "left", root::setLeft);
-        ctx.createSubGroup(CenterController.class, "center", root::setCenter);
-        ctx.createSubGroup(RightControllerOne.class, "right", root::setRight);
+        ctx.createSubGroup(LeftControllerOne.class, "left", this.root::setLeft);
+        ctx.createSubGroup(CenterController.class, "center", this.root::setCenter);
+        ctx.createSubGroup(RightControllerOne.class, "right", this.root::setRight);
     }
 
     @PostConstruct

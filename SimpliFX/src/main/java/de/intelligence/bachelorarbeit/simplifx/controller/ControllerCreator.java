@@ -7,6 +7,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Optional;
 
 import javafx.css.Stylesheet;
@@ -18,6 +19,8 @@ import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
+import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
+import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
@@ -29,21 +32,23 @@ import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
-final class ControllerCreator {
+public final class ControllerCreator {
 
     private static final SimpliFXLogger LOG = SimpliFXLogger.create(ControllerGroupImpl.class);
 
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
     private final SharedResources resources;
+    private final PropertyRegistry registry;
 
-    ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources) {
+    public ControllerCreator(IControllerFactoryProvider provider, II18N ii18N, SharedResources resources, PropertyRegistry registry) {
         this.provider = provider;
         this.ii18N = ii18N;
         this.resources = resources;
+        this.registry = registry;
     }
 
-    IController createController(Class<?> clazz) {
+    public IController createController(Class<?> clazz) {
         final ControllerLoadContext ctx = this.validateController(clazz);
         boolean validControllerAttribSpecified = false;
 
@@ -69,8 +74,8 @@ final class ControllerCreator {
         try {
             pane = loader.load();
         } catch (IOException e) {
-            //TODO error handling
-            throw new RuntimeException("TODO ERROR HANDLING");
+            //TODO error handling with controller name etc
+            throw new RuntimeException("TODO ERROR HANDLING", e);
         }
         final Object instance = loader.getController();
         pane.getStylesheets().add(ctx.cssLocation);
@@ -80,8 +85,8 @@ final class ControllerCreator {
             System.out.println("HANDLE EXCEPTION");
             //TODO HANDLE
         });
-        final SharedFieldInjector injector = new SharedFieldInjector(instance);
-        injector.inject(this.resources);
+        new ConfigValueInjector(instance).inject(this.registry);
+        new SharedFieldInjector(instance).inject(this.resources);
         return new ControllerImpl(instance, pane);
     }
 
@@ -97,7 +102,7 @@ final class ControllerCreator {
         final Controller annotation = controllerOpt.get();
         final String fxmlPath = annotation.fxml();
         URL fxmlLocation = null;
-        if (fxmlPath.isBlank() || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
+        if (fxmlPath.isBlank() || !fxmlPath.toLowerCase(Locale.ROOT).endsWith(".fxml") || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
             throw new InvalidControllerDefinitionException("Could not resolve fxml path (\"" + fxmlPath + "\") for controller \"" + clazz.getSimpleName() + "\".");
         }
         final String cssPath = annotation.css();
