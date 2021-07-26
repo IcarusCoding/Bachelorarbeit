@@ -32,6 +32,11 @@
 \contentsline {lstlisting}{\numberline {5.3}Implementierung -- Ressourcenbehandlung im \texttt {SimpliFXMLLoader}.}{61}{lstlisting.5.3}%
 \contentsline {lstlisting}{\numberline {5.4}Implementierung -- Abhängigkeitsinjektion.}{62}{lstlisting.5.4}%
 \addvspace {10\p@ }
+\contentsline {lstlisting}{\numberline {6.1}Demo -- Minimaler Einstiegspunkt.}{65}{lstlisting.6.1}%
+\contentsline {lstlisting}{\numberline {6.2}Demo -- Benötigte Felder.}{66}{lstlisting.6.2}%
+\contentsline {lstlisting}{\numberline {6.3}Demo -- Start EventHandler.}{66}{lstlisting.6.3}%
+\contentsline {lstlisting}{\numberline {6.4}Demo -- \texttt {main} Methode.}{66}{lstlisting.6.4}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

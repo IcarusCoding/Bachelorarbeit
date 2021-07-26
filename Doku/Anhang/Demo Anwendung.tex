@@ -1,0 +1,33 @@
+\chapter{Implementierung und Beziehungen des Controller-Systems}
+\label{appendix:demo_application}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Minimaler Einstiegspunkt., captionpos=b, label=lst:entry_point_demo_full, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@StageConfig(title = "Login", icons = "icon.png")
+#@ApplicationEntryPoint(MainController.class)
+#@GuiceInjection(MainModule.class)
+public final class DemoApplication {
+
+    public static void main(String[] args) throws Exception {
+        Reflection.addOpens("java.lang.reflect", "java.base",
+				JFXTextFieldSkin.class.getModule());
+        SimpliFX.launch();
+    }
+
+    #@ResourceBundle("lang.Messages")
+    private II18N ii18N;
+
+    #@ConfigSource("config/connection")
+    private Properties properties;
+
+    #@Shared
+    private SharedReference<StringProperty> titleRef;
+
+    #@EventHandler
+    private void onStart(StartEvent event) {
+        this.titleRef.set(event.getStage().titleProperty());
+        event.getStage().show();
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
