@@ -1,4 +1,4 @@
-\chapter{Implementierung und Beziehungen des Controller-Systems}
+\chapter{Demo Anwendung}
 \label{appendix:demo_application}
 \begin{figure}[H]
 	\begin{lstlisting}[caption=Demo -- Minimaler Einstiegspunkt., captionpos=b, label=lst:entry_point_demo_full, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
@@ -27,6 +27,30 @@ public final class DemoApplication {
         this.titleRef.set(event.getStage().titleProperty());
         event.getStage().show();
     }
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainController}., captionpos=b, label=lst:main_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/MainController.fxml", 
+#					 css = "css/main.css")
+public final class MainController {
+
+	#@FXML
+	private BorderPane root;
+	
+	#@Setup
+	private void setup(ControllerSetupContext ctx) {
+		// Erstelle Untergruppe "titleBar" mit TitleBarController 
+		// als Startcontroller
+	    ctx.createSubGroup(TitleBarController.class, "titleBar", 
+				this.root::setTop);
+		// Erstelle Untergruppe "mainContent" mit LoginController
+		// als Startcontroller
+	    ctx.createSubGroup(LoginController.class, "mainContent",
+				this.root::setCenter);
+	}
 
 }
 	\end{lstlisting}

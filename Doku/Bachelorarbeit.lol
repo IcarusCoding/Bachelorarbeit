@@ -36,6 +36,9 @@
 \contentsline {lstlisting}{\numberline {6.2}Demo -- Benötigte Felder.}{66}{lstlisting.6.2}%
 \contentsline {lstlisting}{\numberline {6.3}Demo -- Start EventHandler.}{66}{lstlisting.6.3}%
 \contentsline {lstlisting}{\numberline {6.4}Demo -- \texttt {main} Methode.}{66}{lstlisting.6.4}%
+\contentsline {lstlisting}{\numberline {6.5}Demo -- \texttt {MainController} Klassenkopf.}{67}{lstlisting.6.5}%
+\contentsline {lstlisting}{\numberline {6.6}Demo -- \texttt {MainController} Setup-Phase.}{67}{lstlisting.6.6}%
+\contentsline {lstlisting}{\numberline {6.7}Demo -- Injizierte Felder des \texttt {LoginController}s.}{68}{lstlisting.6.7}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

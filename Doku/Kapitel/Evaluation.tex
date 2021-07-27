@@ -89,7 +89,7 @@ private void onStart(StartEvent event) {
 }
 	\end{lstlisting}
 \end{figure}
-\noindent Zum Starten der Anwendung muss der Hauptcontroller korrekt deklariert werden und eine \texttt{main} Methode existieren, welche \texttt{SimpliFX\#launch} aufruft. Außerdem muss, aufgrund der Inkompatibilität zwischen JFoenix und Java 16, per Reflection-Schnittstelle eine \texttt{add-opens} Direktive vor der eigentlichen Initialisierung von \texttt{SimpliFX} und \texttt{JavaFX} hinzugefügt werden.\footnote{JFoenix Issue: \url{https://github.com/sshahine/JFoenix/issues/1052}} Der Einfachheit halber wird die \texttt{main} Methode in der \texttt{DemoApplication} Klasse deklariert (\autoref{lst:main_method_demo}).
+\noindent Zum Starten der Anwendung muss der Hauptcontroller korrekt deklariert werden und eine \texttt{main} Methode existieren, welche \texttt{SimpliFX\#launch} aufruft. Außerdem muss, aufgrund der Inkompatibilität zwischen JFoenix und Java 16, per Reflection-Schnittstelle eine \texttt{add-opens} Direktive vor der eigentlichen Initialisierung von \texttt{SimpliFX} und \texttt{JavaFX} hinzugefügt werden.\footnote{JFoenix Issue: \url{https://github.com/sshahine/JFoenix/issues/1052}} Der Einfachheit halber wird die \texttt{main} Methode in der \texttt{DemoApplication} Klasse definiert (\autoref{lst:main_method_demo}).
 \begin{figure}[H]
 \begin{lstlisting}[caption=Demo -- \texttt{main} Methode., captionpos=b, label=lst:main_method_demo]
 public static void main(String[] args) throws Exception {
@@ -101,11 +101,55 @@ public static void main(String[] args) throws Exception {
 \end{figure}
 \noindent Der funktionsfähige Einstiegspunkt der Anwendung ist noch einmal vollständig in \autoref{lst:entry_point_demo_full} dargestellt.\\
 Wird zu diesem Zeitpunkt versucht, die Applikation zu starten, so wird diese mit einem Fehler terminieren, da der angegebene Hauptcontroller noch nicht erstellt und konfiguriert wurde.
-\add{TODO CONTINUE}
-\noindent...\\
-...\\
-...\\
-\notebox{Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem aktuell angezeigten Controller. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth} Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.}
+Für eine valide Konfiguration muss die \texttt{MainController} Klasse die \texttt{@Controller} Annotation aufweisen, sowie mindestens den Pfad zu einer FXML Datei als Parameter enthalten. Außerdem wird für das Design des Layouts eine globale \ac{css} Datei angegeben. In \autoref{lst:main_controller_demo} ist der Klassenkopf des Hauptcontrollers mit allen nötigen Konfigurationen der Annotation abgebildet.\footnote{Für alle weiteren Controller wird der Klassenkopf, aufgrund der fast identischen Struktur, weggelassen.}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainController} Klassenkopf., captionpos=b, label=lst:main_controller_demo]
+#@Controller(fxml = "/fxml/MainController.fxml", 
+#					 css = "css/main.css")
+public final class MainController {}
+	\end{lstlisting}
+\end{figure}
+\noindent Das Wurzelelement ist eine \texttt{BorderPane}, welche in der Setup-Phase des Controllers mit der \texttt{titleBar} und \texttt{mainContent} Untergruppe initialisiert wird. Erstere Gruppe findet ihren Ursprung im oberen Teil und letztere im mittleren Bereich der \texttt{BorderPane}. Das Setzen der Elemente zur Aufbauphase wird in \autoref{lst:main_controller_setup} gezeigt.
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainController} Setup-Phase., captionpos=b, label=lst:main_controller_setup]
+#@FXML
+private BorderPane root;
+
+#@Setup
+private void setup(ControllerSetupContext ctx) {
+	// Erstelle Untergruppe "titleBar" mit TitleBarController 
+	// als Startcontroller
+    ctx.createSubGroup(TitleBarController.class, "titleBar", 
+			this.root::setTop);
+	// Erstelle Untergruppe "mainContent" mit LoginController
+	// als Startcontroller
+    ctx.createSubGroup(LoginController.class, "mainContent",
+			this.root::setCenter);
+}
+	\end{lstlisting}
+\end{figure}
+\noindent Der vollständige Quelltext des Hauptcontrollers ist in \autoref{lst:main_controller} zu finden.
+\notebox{Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem aktuell angezeigten Controller. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth}-Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.}
+\noindent Der \texttt{LoginController} übernimmt die Aufgabe eines Loginvorgangs bei einem imaginären Server. Die Zugangsdaten zu ebendiesem sind in der Konfigurationsdatei enthalten, welche im Einstiegspunkt der Anwendung mit \texttt{SimpliFX} verbunden wurde. Die Eingabefelder für den Benutzernamen und das Passwort werden durch den \texttt{SimpliFXMLLoader}, der \texttt{ILoginService} durch Guice und verschiedene geteilte Ressourcen durch \texttt{SimpliFX} in den Controller injiziert (siehe \autoref{lst:login_controller_fields}). Das \texttt{titleRef} Feld wird aufgrund des Feldnamens, dieselbe geteilte Ressource erhalten, welche in \autoref{lst:fields_demo} deklariert wurde.
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Injizierte Felder des \texttt{LoginController}s., captionpos=b, label=lst:login_controller_fields]
+#@FXML
+private JFXTextField usernameField;
+
+#@FXML
+private JFXPasswordField passwordField;
+
+#@Shared
+private SharedReference<String> usernameRef;
+
+#@Shared
+private SharedReference<StringProperty> titleRef;
+
+#@Inject
+private ILoginService loginService;
+	\end{lstlisting}
+\end{figure}
+\noindent
 \section{Vergleich konventioneller Methoden mit entwickeltem System}
 \label{vergleich_system_javafx}
 
