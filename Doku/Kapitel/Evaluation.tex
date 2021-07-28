@@ -129,7 +129,22 @@ private void setup(ControllerSetupContext ctx) {
 	\end{lstlisting}
 \end{figure}
 \noindent Der vollständige Quelltext des Hauptcontrollers ist in \autoref{lst:main_controller} zu finden.
-\notebox{Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem aktuell angezeigten Controller. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth}-Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.}
+\notebox{Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem Startcontroller dieser. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth}-Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.}
+\noindent Der für das Ändern der Sprache verantwortliche \texttt{TitleBarController} benötigt ein JavaFX \texttt{Menu}, welches durch die FXML Datei zur Verfügung gestellt wird und eine PostConstruct Methode, welche dieses initialisiert (\autoref{lst:titlebar_controller_content}).
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Felder und Methoden im \texttt{TitleBarController}., captionpos=b, label=lst:titlebar_controller_content]
+#@FXML
+private Menu languageMenu;
+
+#@ResourceBundle
+private II18N ii18N;
+
+#@PostConstruct
+private void initMenu() {
+    this.ii18N.setupMenu(this.languageMenu);
+}
+	\end{lstlisting}
+\end{figure}
 \noindent Der \texttt{LoginController} übernimmt die Aufgabe eines Loginvorgangs bei einem imaginären Server. Die Zugangsdaten zu ebendiesem sind in der Konfigurationsdatei enthalten, welche im Einstiegspunkt der Anwendung mit \texttt{SimpliFX} verbunden wurde. Die Eingabefelder für den Benutzernamen und das Passwort werden durch den \texttt{SimpliFXMLLoader}, der \texttt{ILoginService} durch Guice und verschiedene geteilte Ressourcen durch \texttt{SimpliFX} in den Controller injiziert (siehe \autoref{lst:login_controller_fields}). Das \texttt{titleRef} Feld wird aufgrund des Feldnamens, dieselbe geteilte Ressource erhalten, welche in \autoref{lst:fields_demo} deklariert wurde.
 \begin{figure}[H]
 	\begin{lstlisting}[caption=Demo -- Injizierte Felder des \texttt{LoginController}s., captionpos=b, label=lst:login_controller_fields]
@@ -149,7 +164,46 @@ private SharedReference<StringProperty> titleRef;
 private ILoginService loginService;
 	\end{lstlisting}
 \end{figure}
-\noindent
+\noindent Damit der Titel der \texttt{Stage} geändert wird, sobald der \texttt{LoginController} angezeigt wird, muss eine Methode erstellt werden, welche bei der OnShow-Phase aufgerufen wird und dabei den eigentlichen Titel abändert. Des Weiteren müssen die Textfelder für das Eingeben des Benutzernamens und des Passwortes, bei einem Verstecken des Controller aus Sicherheitsgründen gelöscht werden. Analog zur ersteren Methode kann dies in der \texttt{OnHide} Phase erfolgen (siehe \autoref{lst:login_controller_visibility_methods}).
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- OnShow und OnHide Methoden., captionpos=b, label=lst:login_controller_visibility_methods]
+#@OnShow
+private void onShow() {
+    this.titleRef.get().set("Login");
+}
+
+#@OnHide
+private void onHide() {
+    this.usernameField.clear();
+    this.passwordField.clear();
+}
+	\end{lstlisting}
+\end{figure}
+\noindent Zu diesem Zeitpunkt kann die Anwendung das erste Mal ohne einen Konfigurationsfehler gestartet werden. Der aktuelle Stand der Applikation ist in \autoref{fig:login_controller_demo} dargestellt. Alle bis hierhin verwendeten Controller wurden hervorgehoben.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/Login Screen.png}
+	\caption{Diagramm -- Erster Start der Anwendung.}
+	\label{fig:login_controller_demo}
+\end{figure}
+\noindent Nach einem Login muss der aktive Controller der \texttt{mainContent} Gruppe zum \texttt{MainMenuController} gewechselt werden. Dazu muss der \texttt{LoginController} zur Setup-Phase den \texttt{ControllerSetupContext} speichern und bei einem Klick auf die Login-Schaltfläche einen Wechsel initiieren. Die dafür nötigen Erweiterungen der Klasse sind in \autoref{lst:login_controller} abgebildet. Der \texttt{MainMenuController} kapselt eine \texttt{BorderPane}, welche im linken Bereich die \texttt{sidebar} und im Mittelbereich die \texttt{sidebarContent} Gruppe darstellt (\autoref{lst:mainmenu_controller_setup}). Bei einem Wechsel soll der Stagetitel den aktuell eingeloggten Nutzer begrüßen. Die dafür benötigten Felder und Methoden sind in der vollständigen Implementierung der Klasse zu finden (\autoref{lst:mainmenu_controller}).
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Subgruppen Einrichtung., captionpos=b, label=lst:mainmenu_controller_setup]
+#@FXML
+private BorderPane root;
+
+#@FXML
+private StackPane contentCenter;
+
+#@Setup
+private void setup(ControllerSetupContext ctx) {
+    ctx.createSubGroup(SidebarController.class, "sidebar",
+			this.root::setLeft);
+    ctx.createSubGroup(TestControllerOne.class, "sidebarContent",
+			this.contentCenter.getChildren()::setAll);
+}
+	\end{lstlisting}
+\end{figure}
 \section{Vergleich konventioneller Methoden mit entwickeltem System}
 \label{vergleich_system_javafx}
 

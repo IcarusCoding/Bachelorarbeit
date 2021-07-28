@@ -55,3 +55,101 @@ public final class MainController {
 }
 	\end{lstlisting}
 \end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{LoginController}., captionpos=b, label=lst:login_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/LoginController.fxml")
+public final class LoginController {
+
+	#@FXML
+    private JFXTextField usernameField;
+
+    #@FXML
+    private JFXPasswordField passwordField;
+
+    #@Shared
+    private SharedReference<String> usernameRef;
+
+    #@Shared
+    private SharedReference<StringProperty> titleRef;
+
+    #@Inject
+    private ILoginService loginService;
+
+    private ControllerGroupContext ctx;
+
+    #@Setup
+    private void setup(ControllerSetupContext ctx) {
+        ctx.preloadController(MainMenuController.class);
+        this.ctx = ctx.getGroupContext();
+    }
+
+    #@OnShow
+    private void onShow() {
+        this.titleRef.get().set("Login");
+    }
+
+    #@OnHide
+    private void onHide() {
+        this.usernameField.clear();
+        this.passwordField.clear();
+    }
+
+    #@FXML
+    private void onLogin() {
+        if (loginService.login(this.usernameField.getText(),
+				this.passwordField.getText())) {
+            this.usernameRef.set(this.usernameField.getText());
+            this.ctx.switchController(MainMenuController.class,
+					new FadeAnimation(Duration.millis(250)));
+        }
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainMenuController}., captionpos=b, label=lst:mainmenu_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/MainMenuController.fxml")
+public final class MainMenuController {
+
+    #@FXML
+    private BorderPane root;
+
+    #@FXML
+    private StackPane contentCenter;
+
+    #@ResourceBundle
+    private II18N ii18N;
+
+    #@Shared
+    private SharedResources resources;
+
+    private StringBinding binding;
+
+    #@Setup
+    private void setup(ControllerSetupContext ctx) {
+        ctx.createSubGroup(SidebarController.class, "sidebar",
+				this.root::setLeft);
+        ctx.createSubGroup(TestControllerOne.class,
+				"sidebarContent",
+				this.contentCenter.getChildren()::setAll);
+    }
+
+    #@PostConstruct
+    private void afterConstruction() {
+        this.binding = this.ii18N
+				.createObservedBinding("mainMenu.welcome",
+						this.resources.getForName("username")
+						.asProperty());
+    }
+
+    #@OnShow
+    private void onShow() {
+        final SharedReference<StringProperty> prop = 
+				this.resources.getForName("title");
+        prop.get().set(this.binding.get());
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
