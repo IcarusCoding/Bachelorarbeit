@@ -22,7 +22,7 @@
 \contentsline {lstlisting}{\numberline {3.4}Repräsentation als XML Datei.}{21}{lstlisting.3.4}%
 \contentsline {lstlisting}{\numberline {3.5}Repräsentation als Java Objekt.}{21}{lstlisting.3.5}%
 \addvspace {10\p@ }
-\contentsline {lstlisting}{\numberline {4.1}{\ignorespaces Nutzung des Schlüssels in einer FXML Datei.\relax }}{26}{figure.caption.42}%
+\contentsline {lstlisting}{\numberline {4.1}{\ignorespaces Nutzung des Schlüssels in einer FXML Datei.\relax }}{26}{figure.caption.41}%
 \contentsline {lstlisting}{\numberline {4.2}Beispiel -- Controller mit injizierten Diensten.}{27}{lstlisting.4.2}%
 \contentsline {lstlisting}{\numberline {4.3}Beispiel -- Instanziierungsablauf.}{29}{lstlisting.4.3}%
 \contentsline {lstlisting}{\numberline {4.4}Beispiel -- Verwendung der Reflection Schnittstelle.}{41}{lstlisting.4.4}%
@@ -42,6 +42,7 @@
 \contentsline {lstlisting}{\numberline {6.8}Demo -- Injizierte Felder des \texttt {LoginController}s.}{68}{lstlisting.6.8}%
 \contentsline {lstlisting}{\numberline {6.9}Demo -- OnShow und OnHide Methoden.}{69}{lstlisting.6.9}%
 \contentsline {lstlisting}{\numberline {6.10}Demo -- Subgruppen Einrichtung.}{70}{lstlisting.6.10}%
+\contentsline {lstlisting}{\numberline {6.11}Demo -- \texttt {@LocalizeValue} und \texttt {@ConfigValue}.}{70}{lstlisting.6.11}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

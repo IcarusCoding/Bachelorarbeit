@@ -5,8 +5,6 @@ Im folgenden Kapitel werden Kernkonzepte von \texttt{SimpliFX} durch Quelltextbe
 
 \section{Entwicklung von Beispielsoftware}
 \label{entwicklung_von_beispielsoftware}
-%\subsection{Voraussetzungen}
-\add{maybe add comment}
 \noindent Bevor die Entwicklung der eigentlichen Software begonnen werden kann, müssen etwaige externe Bibliotheken wie JavaFX für \texttt{SimpliFX} bereitgestellt werden. Außerdem muss \texttt{SimpliFX} zur Kompilierzeit im Klassenpfad der zu entwickelnden Anwendung existieren. Da die Bibliothek im Github Maven-Repository verfügbar ist, wird der folgende Entwicklungsprozess sowie die Verwaltung von externen Bibliotheken durch die Verwendung von Maven unterstützt. In der \texttt{pom.xml} müssen für eine volle Funktionalität folgende Artefakte als Abhängigkeiten deklariert werden:
 \begin{itemize}
 	\item \texttt{de.intelligence:simplifx-guice} für das Nutzen aller Basisfunktionen von \texttt{SimpliFX} und der Kompatibilität zu Guice für die Abhängigkeitsinjektion.
@@ -203,6 +201,32 @@ private void setup(ControllerSetupContext ctx) {
 			this.contentCenter.getChildren()::setAll);
 }
 	\end{lstlisting}
+\end{figure}
+\noindent Die \texttt{sidebarContent} Gruppe beinhaltet drei mögliche Controller, von welchen keiner besondere Methoden oder Felder benötigt und ein leerer Klassenrumpf teilweise für Testzwecke genügt. Aus Vollständigkeitsgründen sind diese dennoch in \autoref{lst:test_controllers} dargestellt.\\
+Der \texttt{SidebarController} setzt sich aus zwei Komponenten zusammen:
+\begin{itemize}
+	\item Die Serveranzeige, welche den aktuellen Server aus der Konfigurationsdatei anzeigt und per \texttt{@LocalizeValue} aktualisiert werden kann.
+	\item Die Schaltflächengruppe, welche für das Wechseln des aktuellen Controller der \texttt{sidebarContent} Gruppe zuständig ist und ein Ausloggen ermöglicht. Beim Ausloggen wird dabei zum \texttt{LoginController} gewechselt.
+\end{itemize}
+Das Verwenden der \texttt{@LocalizeValue} und der \texttt{@ConfigValue} Annotation werden im folgenden beispielhaft anhand des Hostnames demonstriert (\autoref{lst:sidebar_controller_localize}).
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{@LocalizeValue} und \texttt{@ConfigValue}., captionpos=b, label=lst:sidebar_controller_localize]
+#@FXML
+private Label connectionLbl;
+
+#@ConfigValue("host")
+private String hostname;
+
+#@LocalizeValue(id = "connectionLbl", property = "text")
+private StringProperty hostProperty = new SimpleStringProperty();
+	\end{lstlisting}
+\end{figure}
+\noindent Nach der Konstruktion des Controller muss der Stringwert der \texttt{hostProperty} geändert werden, um die \texttt{textProperty} des \texttt{connectionLbl} Labels mit dem aktuellen Hostnamen zu aktualisieren. Die Implementierung der Seitenleiste ist in \autoref{lst:sidebar_controller} und der aktuelle Zustand der Anwendung nach dem Loginvorgang in \autoref{fig:mainmenu_controller_demo} dargestellt.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Abbildungen/MainMenu Screen.png}
+	\caption{Diagramm -- Anwendung nach Login.}
+	\label{fig:mainmenu_controller_demo}
 \end{figure}
 \section{Vergleich konventioneller Methoden mit entwickeltem System}
 \label{vergleich_system_javafx}

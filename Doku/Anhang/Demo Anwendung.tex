@@ -153,3 +153,90 @@ public final class MainMenuController {
 }
 	\end{lstlisting}
 \end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Alle \texttt{TestController}., captionpos=b, label=lst:test_controllers, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/TestControllerOne.fxml")
+public static final class TestControllerOne {
+
+    #@Setup
+    private void onSetup(ControllerSetupContext ctx) {
+        ctx.preloadController(TestControllerTwo.class);
+        ctx.preloadController(TestControllerThree.class);
+    }
+
+}
+
+#@Controller(fxml = "/fxml/TestControllerTwo.fxml")
+public static final class TestControllerTwo {}
+
+#@Controller(fxml = "/fxml/TestControllerThree.fxml")
+public static final class TestControllerThree {}
+	\end{lstlisting}
+\end{figure}
+%\begin{figure}
+	\begin{lstlisting}[caption=Demo -- \texttt{SidebarController}., captionpos=b, label=lst:sidebar_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol, basicstyle=\footnotesize\ttfamily, float=]
+#@Controller(fxml = "/fxml/SidebarController.fxml")
+public final class SidebarController {
+
+    #@FXML
+    private Label connectionLbl;
+
+    #@ConfigValue("host")
+    private String hostname;
+
+    #@ConfigValue(value = "port")
+    private int port;
+
+    #@LocalizeValue(id = "connectionLbl", property = "text")
+    private StringProperty hostProperty = new SimpleStringProperty();
+
+    #@LocalizeValue(id = "connectionLbl", index = 1, property = "text")
+    private IntegerProperty portProperty = new SimpleIntegerProperty();
+
+    private ControllerGroupContext mainCtx;
+    private ControllerGroupContext sidebarContentCtx;
+
+    #@Setup
+    private void onSetup(ControllerSetupContext ctx) {
+        this.mainCtx = ctx.getContextFor("mainContent");
+        this.sidebarContentCtx = ctx.getContextFor("sidebarContent");
+    }
+
+    #@PostConstruct
+    private void afterConstruction() {
+        this.hostProperty.set(this.hostname);
+        this.portProperty.set(this.port);
+    }
+
+    #@OnHide
+    private void onHide() {
+        sidebarContentCtx.switchController(TestControllerOne.class);
+    }
+
+    #@FXML
+    private void onLogoutPressed() {
+        this.mainCtx.switchController(LoginController.class, 
+				new BottomSlideAnimation(Duration.millis(250)));
+    }
+	(@\newpage\clearpage@)
+    #@FXML
+    private void onOnePressed() {
+        sidebarContentCtx.switchController(TestControllerOne.class, 
+				new TopSlideAnimation(Duration.millis(250)));
+    }
+
+    #@FXML
+    private void onTwoPressed() {
+        sidebarContentCtx.switchController(TestControllerTwo.class,
+				new RightSlideAnimation(Duration.millis(250)));
+    }
+
+    #@FXML
+    private void onThreePressed() {
+        sidebarContentCtx.switchController(TestControllerThree.class, 
+				new LeftSlideAnimation(Duration.millis(250)));
+    }
+
+}
+	\end{lstlisting}
+%\end{figure}

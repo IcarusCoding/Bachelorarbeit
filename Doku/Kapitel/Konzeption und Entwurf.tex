@@ -31,7 +31,7 @@ login.user = Benutzername
 \end{figure}
 \noindent Das Problem bei dieser Art der Übersetzung ist, dass eine Änderung der Sprache zur Laufzeit des Programms nicht dynamisch möglich ist. Die FXML Datei bzw. der dazugehörige Controller muss nach einer Sprachänderung durch beispielsweise eine Schaltfläche oder ein Dropdown-Menü durch einen FXML-Loader neu geladen werden, damit eventuelle Änderungen übernommen werden können. Das dynamische Ändern der Sprache zur Laufzeit ist nur mit einem Modifizierung des Ladeprozesses von FXML Dateien durch eine eigene Version des \texttt{FXMLLoader}s oder durch eine vom \texttt{FXMLLoader} unabhängige Implementierung durch Properties und Bindings möglich. Die erste Variante sorgt für ein automatisches Binden der nötigen Properties und die Letztere für ein manuelles Binden wenn nötig, weshalb eine Fusion beider Möglichkeiten in eine hohe Anpassbarkeit des Systems resultiert. Außerdem ist es auf diese Weise möglich, verschiedene Bindings zu aktualisieren, falls ein bestimmtes Event auftritt, welches eine Änderung des übersetzten Textes hervorruft. Parameterisierte Schlüssel aus der \texttt{.properties} Datei können somit automatisch an die parameterverändernden Events gebunden werden.
 \subsection{Abhängigkeitsinjektion für Controller}
-Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit des Programms bestimmt und zur Verfügung gestellt. Meist konfiguriert der Entwickler mithilfe einer externen Bibliothek die Bereitstellung der Abhängigkeiten in einer Konfigurationsdatei oder Konfigurationsklasse. Bei dem Nutzen einer Art von Abhängigkeitsinjektion ist die eigentliche Implementierung der Abhängigkeiten durch die abhängigen Objekte nicht bekannt. Diese kennen nur die Schnittstellen, weshalb ein Auswechseln der Schnittstellenimplementierung durch eine Änderung der jeweiligen Konfigurationsdatei/Konfigurationsklasse möglich ist. Durch diese explizite Trennung von Schnittstelle und Implementierung ist eine lose Kopplung der Komponenten gewährleistet, was wiederum zu einer hohen Flexibilität und zu einer hohen Wartbarkeit sowie Testbarkeit führt. Eine Injektion ist dabei durch Felder (Feldinjektion), Konstruktoren (Konstruktorinjektion) oder Setter (Setterinjektion) möglich. Die Funktionalität einer Injektion von Abhängigkeiten in einen Controller ist nicht direkt in JavaFX enthalten, kann aber durch das Verwenden von zum Beispiel Afterburner.fx\footref{ft:afterburner} hinzugefügt werden. Eine Unterstützung von etablierten externen Bibliotheken zur Realisierung des Abhängigkeitsinjektionsmusters wie Spring\footnote{Spring: \url{https://spring.io}}, Dagger\footnote{Dagger: \url{https://square.github.io/dagger/}} oder Guice\footnote{\label{ft:guice}Guice: \url{https://github.com/google/guice}} ist dadurch jedoch nicht gegeben. Aufgrund der Tatsache, dass alle drei genannten Bibliotheken mit der \texttt{jakarta.inject.Inject} Annotation\add{validate}, eine grundlegende Abhängigkeitsinjektion bereitstellen, kann ebendiese Annotation für eine Injektion innerhalb von Controllern verwendet werden. Ein Beispiel eines Controllers mit verschiedenen injizierten Diensten ist in \autoref{lst:controllerinjection} zu erkennen.
+Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit des Programms bestimmt und zur Verfügung gestellt. Meist konfiguriert der Entwickler mithilfe einer externen Bibliothek die Bereitstellung der Abhängigkeiten in einer Konfigurationsdatei oder Konfigurationsklasse. Bei dem Nutzen einer Art von Abhängigkeitsinjektion ist die eigentliche Implementierung der Abhängigkeiten durch die abhängigen Objekte nicht bekannt. Diese kennen nur die Schnittstellen, weshalb ein Auswechseln der Schnittstellenimplementierung durch eine Änderung der jeweiligen Konfigurationsdatei/Konfigurationsklasse möglich ist. Durch diese explizite Trennung von Schnittstelle und Implementierung ist eine lose Kopplung der Komponenten gewährleistet, was wiederum zu einer hohen Flexibilität und zu einer hohen Wartbarkeit sowie Testbarkeit führt. Eine Injektion ist dabei durch Felder (Feldinjektion), Konstruktoren (Konstruktorinjektion) oder Setter (Setterinjektion) möglich. Die Funktionalität einer Injektion von Abhängigkeiten in einen Controller ist nicht direkt in JavaFX enthalten, kann aber durch das Verwenden von zum Beispiel Afterburner.fx\footref{ft:afterburner} hinzugefügt werden. Eine Unterstützung von etablierten externen Bibliotheken zur Realisierung des Abhängigkeitsinjektionsmusters wie Spring\footnote{Spring: \url{https://spring.io}}, Dagger\footnote{Dagger: \url{https://square.github.io/dagger/}} oder Guice\footnote{\label{ft:guice}Guice: \url{https://github.com/google/guice}} ist dadurch jedoch nicht gegeben. Aufgrund der Tatsache, dass alle drei genannten Bibliotheken mit der \texttt{jakarta.inject.Inject} bzw. \texttt{javax.inject.Inject} Annotation, eine grundlegende Abhängigkeitsinjektion bereitstellen, kann ebendiese Annotation für eine Injektion innerhalb von Controllern verwendet werden. Ein Beispiel eines Controllers mit verschiedenen injizierten Diensten ist in \autoref{lst:controllerinjection} zu erkennen.
 \begin{figure}[H]
 	\centering
 	\begin{lstlisting}[caption=Beispiel -- Controller mit injizierten Diensten., captionpos=b, label=lst:controllerinjection]
@@ -96,34 +96,28 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 %	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --\label{freq\arabic{fcounter}}}}%
 %}
 
-\newcounter{freq}
-\newcommand*{\freqautorefname}{Anforderung}
+\newcounter{req}
+\newcommand*{\reqautorefname}{Anforderung}
 
 \newenvironment{freq}[2][]{%
-	\def\realfreq{\number\numexpr\value{freq}+1\relax}
-	\subsubsection*{\ifblank{#1}{[FA--\ifnum\realfreq<10 0\fi\realfreq] #2}{(FA--\ifnum\realfreq<10 0\fi\realfreq) Optional -- #2}}%
-	\refstepcounter{freq}%
-	\label{freq\thefreq}
+	\def\realreq{\number\numexpr\value{req}+1\relax}
+	\subsubsection*{\ifblank{#1}{[FA--\ifnum\realreq<10 0\fi\realreq] #2}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #2}}%
+	\refstepcounter{req}%
+	\label{freq\thereq}
 }{%
 }
-
-%\newcommand*{\freq}[2][]{\refstepcounter{fcounter}\subsubsection*{[FA--\thefcounter %#1]}\label{freq\thefcounter}}
-
-% counter for nonfunctional requirements
-\newcounter{ncounter}
-\setcounter{ncounter}{0}
-\newcommand*{\nreq}[1]{%
-	\protecting{\stepcounter{ncounter}\ifblank{#1}{[NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}]}{(NFA--\ifnum\value{ncounter}<10 0\fi\arabic{ncounter}) Optional --}\label{nreq\arabic{ncounter}}}%
+\newenvironment{nreq}[2][]{%
+	\def\realreq{\number\numexpr\value{req}+1\relax}
+	\subsubsection*{\ifblank{#1}{[NFA--\ifnum\realreq<10 0\fi\realreq] #2}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #2}}%
+	\refstepcounter{req}%
+	\label{nreq\thereq}
+}{%
 }
-
-
 
 \subsection{Funktionale Anforderungen}
 \label{anforderungsanalyse_funktional}
 
 Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben alle gewünschten Funktionen des Endproduktes.
-\add{Maybe add}
-%\subsubsection{\freq{} Vordefinierte Preloader-Zustandsänderungsbenachrichtigungen}
 \begin{freq}{Ermitteln und Konfiguration des JavaFX-Einstiegspunktes}
 	Der Erstellen einer Applikationsklasse sowie eines optionalen Preloaders soll automatisch stattfinden, da der Erstellungsprozess von auf JavaFX basierten Anwendungen in den meisten Fällen ähnlich oder identisch ist. Das Definieren dieser Elemente soll mithilfe von Annotationen geschehen und durch das Absuchen des Klassenpfades durch die entwickelte Bibliothek gefunden werden. Alternativ soll der Entwickler die Möglichkeit haben, den Einstiegspunkt sowie den Preloader explizit zu spezifizieren, falls eine automatische Identifikation nicht erwünscht oder benötigt ist. Die vordefinierten Einstiegspunkte sollen eine Standardkonfiguration der Applikation und der zugrunde liegenden \texttt{Stage} Instanz bereitstellen, welche durch den Entwickler bei Bedarf auch manuell überschrieben werden kann. Dieses Überschreiben soll durch die Nutzung von Annotationen erfolgen. Die Standardkonfiguration umfasst grundsätzliche Applikationseigenschaften wie den Titel, die Fenstergröße oder Designelemente wie den \texttt{StageStyle} und die benötigten Titelleistenschaltflächen.
 \end{freq}
@@ -201,19 +195,24 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 \subsection{Nichtfunktionale Anforderungen}
 \label{anforderungsanalyse_nichtfunktional}
 Im Folgenden werden alle nichtfunktionalen Anforderungen definiert. Sie beschreiben Qualitätseigenschaften an das System wie Möglichkeiten der Erweiterbarkeit und Wartbarkeit und spezifizieren Maßstäbe, welche zur Laufzeit der Anwendung eingehalten werden müssen. Darunter gehören beispielsweise die effiziente Ressourcennutzung, die Korrektheit des Systems sowie ein gewisser Grad an Zuverlässigkeit.
-\subsubsection{\nreq{} Benutzerfreundlichkeit}
-Das Erstellen von JavaFX Anwendungen soll durch das Nutzen der zu entwickelnden Bibliothek erleichtert werden. Um diese Erleichterung sicherzustellen, müssen implementierte Komponenten ausreichend dokumentiert sein und intuitiv durch den Entwickler nutzbar gemacht werden. Komplexe und überflüssige Strukturen sollen vermieden werden. Jedes durch diese Bibliothek bereitgestellte konfigurierbare System, muss Standardparameter zur Konfiguration bereitstellen und bei Bedarf eine Konfigurationsänderung durch einen Entwickler zulassen.
-\subsubsection{\nreq{} Performance \& Effizienz}
-Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead, minimal gehalten wird.
-\subsubsection{\nreq{} Wartbarkeit}
-Die Bibliothek soll ohne viel Aufwand an sich verändernde Anforderungen anpassbar sein. Dazu muss das System allgemein anerkannte, softwaretechnische und objektorientierte Prinzipien erfüllen.
-\subsubsection{\nreq{} Erweiterbarkeit}
-Die Architektur soll mit einer besonderen Fokussierung auf das Nutzen von Schnittstellen entwickelt werden. Annotationsbasierte Konzepte, welche nicht im Standardumfang der von der Bibliothek bereitgestellten Funktionalitäten enthalten sind, sollen ohne viel Aufwand durch externe Entwickler hinzugefügt werden können.
-\subsubsection{\nreq{} Softwarequalität}
-Eine hohe Softwarequalität ist ein essentieller Faktor für ein System, welches auch außerhalb der eigenen Entwicklungsumgebung genutzt werden soll. Andere Entwickler müssen mit einem geringen Zeitaufwand, einen Überblick über das System mit allen wichtigen Komponenten und deren Beziehung untereinander, gewinnen können. Um eine hohe Nachvollziehbarkeit zu gewährleisten, müssen etablierte Entwurfsmuster genutzt und auf komplexen Quelltext verzichtet werden. Klassen müssen gut strukturiert und leicht verständlich implementiert werden.
-\subsubsection{\nreq{} Lizenzierung}
-Die zu entwickelnde Bibliothek muss eine Konformität zu den von externen Bibliotheken genutzten Lizenzen aufweisen. Etwaige Lizenzverletzungen sind zu vermeiden.
-
+\begin{nreq}{Benutzerfreundlichkeit}
+	Das Erstellen von JavaFX Anwendungen soll durch das Nutzen der zu entwickelnden Bibliothek erleichtert werden. Um diese Erleichterung sicherzustellen, müssen implementierte Komponenten ausreichend dokumentiert sein und intuitiv durch den Entwickler nutzbar gemacht werden. Komplexe und überflüssige Strukturen sollen vermieden werden. Jedes durch diese Bibliothek bereitgestellte konfigurierbare System, muss Standardparameter zur Konfiguration bereitstellen und bei Bedarf eine Konfigurationsänderung durch einen Entwickler zulassen.
+\end{nreq}
+\begin{nreq}{Performance \& Effizienz}
+	Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead, minimal gehalten wird.
+\end{nreq}
+\begin{nreq}{Wartbarkeit}
+	Die Bibliothek soll ohne viel Aufwand an sich verändernde Anforderungen anpassbar sein. Dazu muss das System allgemein anerkannte, softwaretechnische und objektorientierte Prinzipien erfüllen.
+\end{nreq}
+\begin{nreq}{Erweiterbarkeit}
+	Die Architektur soll mit einer besonderen Fokussierung auf das Nutzen von Schnittstellen entwickelt werden. Annotationsbasierte Konzepte, welche nicht im Standardumfang der von der Bibliothek bereitgestellten Funktionalitäten enthalten sind, sollen ohne viel Aufwand durch externe Entwickler hinzugefügt werden können.
+\end{nreq}
+\begin{nreq}{Softwarequalität}
+	Eine hohe Softwarequalität ist ein essentieller Faktor für ein System, welches auch außerhalb der eigenen Entwicklungsumgebung genutzt werden soll. Andere Entwickler müssen mit einem geringen Zeitaufwand, einen Überblick über das System mit allen wichtigen Komponenten und deren Beziehung untereinander, gewinnen können. Um eine hohe Nachvollziehbarkeit zu gewährleisten, müssen etablierte Entwurfsmuster genutzt und auf komplexen Quelltext verzichtet werden. Klassen müssen gut strukturiert und leicht verständlich implementiert werden.
+\end{nreq}
+\begin{nreq}{Lizenzierung}
+	Die zu entwickelnde Bibliothek muss eine Konformität zu den von externen Bibliotheken genutzten Lizenzen aufweisen. Etwaige Lizenzverletzungen sind zu vermeiden.
+\end{nreq}
 \section{Konzept und Modellierung}
 \label{konzept_und_modellierung}
 Im Folgenden wird die, für das Erfüllen aller vorher genannten Anforderungen, benötigte Architektur konstruiert. Dabei werden ähnliche Systemanforderungen in Gruppen unterteilt und in Form von allgemeinen Zielen an das System zusammengefasst. Für jedes daraus resultierende Ziel, werden theoretische Implementierungsmöglichkeiten identifiziert, bei welchen benötigte Komponenten, die Beziehung zwischen den Komponenten und die eventuelle Nutzung von Entwurfsmustern ermittelt werden. Dabei wird besonders auf eine hochwertige Softwarequalität und Usability geachtet. Grundlegende, notwendige Entscheidungen wie die Namensgebung der Bibliothek und die Nutzung von externen Bibliotheken für eine effizientere und leichtere Implementierung werden ebenfalls getroffen. 
@@ -328,7 +327,7 @@ Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref
 \end{figure}
 \noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird.
 \subsubsection{Schnittstelle: \texttt{SimpliFXMLLoader}}
-Damit Funktionalitäten wie die dynamische Übersetzung für \autoref{freq3} und das Initialisieren sowie die Generierung von \ac{css} Metadaten für \autoref{freq5} möglich sind, muss der herkömmliche \texttt{FXMLLoader} durch eigene Konstrukte erweitert werden. Die Implementierung neuer Methoden und die Modifikation von bereits existierenden Methoden wird in Kapitel \add{chapter to implementation} beschrieben. Die Erweiterung der \texttt{FXMLLoader} Klasse wird im Folgenden als \texttt{SimpliFXMLLoader} bezeichnet.
+Damit Funktionalitäten wie die dynamische Übersetzung für \autoref{freq3} und das Initialisieren sowie die Generierung von \ac{css} Metadaten für \autoref{freq5} möglich sind, muss der herkömmliche \texttt{FXMLLoader} durch eigene Konstrukte erweitert werden. Die Implementierung neuer Methoden und die Modifikation von bereits existierenden Methoden wird in \autoref{simplifxmlloader} beschrieben. Die Erweiterung der \texttt{FXMLLoader} Klasse wird im Folgenden als \texttt{SimpliFXMLLoader} bezeichnet.
 \subsubsection{Schnittstelle: \texttt{SimpliFX} Einstiegspunkt}
 \texttt{SimpliFX} übernimmt die Konstruktion und die anschließende Verwaltung der JavaFX-Anwendungsklasse. Essentielle Methoden, welche durch die Java \texttt{Application} Klasse zur Verfügung gestellt werden, können per Annotation an den spezifizierten Einstiegspunkt delegiert werden und sind somit nachfolgend für den Entwickler zugänglich (\autoref{freq2}). Der Entwickler kann, vor einem Start der Anwendung, \texttt{SimpliFX} konfigurieren und Eigenschaften wie das Verhalten des Klassenpfadscanners (global, paketlokal) modifizieren. Der Entwickler muss zum Starten von \texttt{SimpliFX} eine der vordefinierten \texttt{launch}-Methoden verwenden (siehe \autoref{fig:simplifx_launch}). 
 \begin{figure}[H]
@@ -374,10 +373,7 @@ Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Ev
 \subsubsection{Annotation: @ResourceBundle}
 Die Registrierung von \texttt{ResourceBundle}s aus dem Klassenpfad erfolgt durch die \texttt{@ResourceBundle} Annotation, welche als notwendigen Parameter den Basisnamen bzw. den relativen Pfad ausgehend vom \texttt{resources} Verzeichnis akzeptiert. Nur Felder, die \texttt{II18N} oder eine Implementierung dieser Schnittstelle als Typen aufweisen, können mit \texttt{@ResourceBundle} annotiert werden.
 \subsubsection{Annotation: @LocalizeValue}
-Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Komponenten handeln, welche eine Form von übersetzbarem Text darstellen können. Dazu gehören beispielsweise die \texttt{Button} und die \texttt{Label} Klasse.
-\add{Maybe add functionality}
-%Textbasierte Properties und Bindings sind hiervon ausgeschlossen. Der Annotation muss mindestens der Übersetzungsschlüssel übergeben werden und dieser muss in einem von \texttt{SimpliFX} zugänglichen \texttt{ResourceBundle} enthalten sein.
-Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden.
+Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Komponenten handeln, welche eine Form von übersetzbarem Text darstellen können. Dazu gehören beispielsweise die \texttt{Button} und die \texttt{Label} Klasse. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden.
 \subsubsection{Annotation: @CssProperty}
 Felder, welche einen \texttt{Collection}-Typen aufweisen, können mit der \texttt{CssProperty} Annotation annotiert werden. Dadurch wird automatisch eine neue \texttt{CssMetaData} Instanz erstellt und der Liste hinzugefügt. Der Entwickler muss den Namen der neuen \ac{css} Property und die Konvertierungsklasse als Parameter angeben. Dazu ist es möglich, ein Feld anzugeben, welches an den konvertierten Wert der \ac{css} Property gebunden wird und somit in der jeweiligen Klasseninstanz verfügbar ist. Die Annotation ist \texttt{Repeatable} und kann mehrmals an einem Feld angebracht werden.
 \subsubsection{Annotation: @DIAnnotation}
