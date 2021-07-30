@@ -18,13 +18,12 @@ import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
-import de.intelligence.bachelorarbeit.simplifx.controller.animation.BottomSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.LeftSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.RightSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.TopSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
-@Controller(fxml = "/fxml/SidebarController.fxml", css = "css/sidebarController.css")
+@Controller(fxml = "/fxml/SidebarController.fxml")
 public final class SidebarController {
 
     @FXML
@@ -33,7 +32,7 @@ public final class SidebarController {
     @ConfigValue("host")
     private String hostname;
 
-    @ConfigValue("port")
+    @ConfigValue(value = "port")
     private int port;
 
     @LocalizeValue(id = "connectionLbl", property = "text")
@@ -64,7 +63,8 @@ public final class SidebarController {
 
     @FXML
     private void onLogoutPressed() {
-        this.mainCtx.switchController(LoginController.class, new BottomSlideAnimation(Duration.millis(250)));
+        this.sidebarContentCtx.getContextFor("main").destroyGroup();
+        //this.mainCtx.switchController(LoginController.class, new BottomSlideAnimation(Duration.millis(250)));
     }
 
     @FXML

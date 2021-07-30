@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 
@@ -29,6 +30,13 @@ public final class Conditions {
             throw new NullPointerException(message);
         }
         return t;
+    }
+
+    public <T> T computeIfNull(Object t, Supplier<T> then, T other) {
+        if (t != null) {
+            return then.get();
+        }
+        return other;
     }
 
     public void checkCondition(boolean condition) {
@@ -67,11 +75,12 @@ public final class Conditions {
         }
     }
 
-    public static <S, T> T returnIfNotNullReturn(S s, ExceptionSupplier<T> action) {
+    public static <S, T> T returnIfNotNull(S s, ExceptionSupplier<T> action) {
         if (s != null) {
             try {
                 return action.get();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return null;
     }

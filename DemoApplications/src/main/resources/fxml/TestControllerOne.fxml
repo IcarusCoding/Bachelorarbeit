@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.StackPane?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" id="testControllerRoot" xmlns="http://javafx.com/javafx/11.0.1"
            fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers$TestControllerOne"
-           prefWidth="150" prefHeight="150">
+           prefWidth="150" prefHeight="150" styleClass="testController">
     <StackPane.margin>
         <Insets topRightBottomLeft="50"/>
     </StackPane.margin>

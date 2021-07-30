@@ -22,6 +22,7 @@ public final class RightControllerOne {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
+        ctx.preloadController(RightControllerTwo.class);
         this.switchBtn.setOnAction(evt -> ctx.switchController(RightControllerTwo.class, new BottomSlideAnimation(Duration.millis(400))));
     }
 

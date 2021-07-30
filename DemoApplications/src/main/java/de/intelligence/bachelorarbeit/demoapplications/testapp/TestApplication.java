@@ -25,7 +25,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.spring.SpringInjection;
 
 @StageConfig(title = "Test", style = StageStyle.DECORATED, alwaysTop = true,
-        resizeable = true, iconPath = "/icon/icon.png")
+        resizeable = true, icons = "/icon/icon.png")
 @ApplicationEntryPoint(MainController.class)
 @SpringInjection(TestSpringModule.class)
 public final class TestApplication {
@@ -33,8 +33,7 @@ public final class TestApplication {
     @Inject
     private ITestService service;
 
-    @ResourceBundle("legacy/test/Messages")
-    @ResourceBundle("legacy/TestBundle")
+    @ResourceBundle({"legacy/test/Messages", "legacy/TestBundle"})
     private II18N language;
 
     @ConfigSource({"legacy/test1.properties", "legacy/props/test2.properties"})

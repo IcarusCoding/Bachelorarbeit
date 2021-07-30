@@ -33,7 +33,6 @@ public final class ConfigValueInjector {
             final Class<?> fieldType = SimpliFXConstants.PRIMITIVES_MAP.getOrDefault(field.getType(), field.getType());
             final ConfigValue configValue = entry.getValue();
             final String value = registry.getForKey(configValue.value(), configValue.defaultValue());
-            System.out.println(value);
             if (fieldType.isAssignableFrom(String.class)) {
                 fieldRef.set(value);
                 continue;

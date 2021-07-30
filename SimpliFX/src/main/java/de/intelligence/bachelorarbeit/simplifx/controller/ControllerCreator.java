@@ -49,6 +49,7 @@ public final class ControllerCreator {
     }
 
     public IController createController(Class<?> clazz) {
+        System.out.println("CREATE " + clazz.getSimpleName());
         final ControllerLoadContext ctx = this.validateController(clazz);
         boolean validControllerAttribSpecified = false;
 

@@ -36,7 +36,6 @@ public final class CssMetaDataAdapter {
                 methodRef.set(Reflection.reflectStatic(m));
             }
         });
-        //System.out.println(methodRef);
         final FieldReflection fieldRef = Reflection.reflectStatic(field).forceAccess();
         if (!fieldRef.isAnnotationPresent(StyleProperty.class)) {
             LOG.warn("Invalid field detected (@CssProperty missing): " + field);

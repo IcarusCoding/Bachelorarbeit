@@ -6,7 +6,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 
 public final class TestControllers {
 
-    @Controller(fxml = "/fxml/TestControllerOne.fxml", css = "css/testController.css")
+    @Controller(fxml = "/fxml/TestControllerOne.fxml")
     public static final class TestControllerOne {
 
         @Setup
@@ -17,11 +17,11 @@ public final class TestControllers {
 
     }
 
-    @Controller(fxml = "/fxml/TestControllerTwo.fxml", css = "css/testController.css")
+    @Controller(fxml = "/fxml/TestControllerTwo.fxml")
     public static final class TestControllerTwo {
     }
 
-    @Controller(fxml = "/fxml/TestControllerThree.fxml", css = "css/testController.css")
+    @Controller(fxml = "/fxml/TestControllerThree.fxml")
     public static final class TestControllerThree {
     }
 

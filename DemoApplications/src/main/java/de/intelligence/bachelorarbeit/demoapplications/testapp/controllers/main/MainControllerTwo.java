@@ -25,7 +25,6 @@ public final class MainControllerTwo {
     @Setup
     private void setup(ControllerSetupContext ctx) {
         this.ctx = ctx;
-        ctx.preloadController(MainController.class);
     }
 
     @PostConstruct

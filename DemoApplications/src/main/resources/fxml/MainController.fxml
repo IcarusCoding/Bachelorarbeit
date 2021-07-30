@@ -5,5 +5,6 @@
             xmlns="http://javafx.com/javafx"
             fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.MainController"
             prefHeight="450.0" prefWidth="700.0"
-            fx:id="root">
+            fx:id="root"
+            id="mainRoot">
 </BorderPane>

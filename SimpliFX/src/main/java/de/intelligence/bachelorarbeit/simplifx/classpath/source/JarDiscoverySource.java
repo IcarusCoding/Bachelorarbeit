@@ -57,7 +57,7 @@ public final class JarDiscoverySource extends AbstractDiscoverySource {
             } while (currentEntry != null && (currentEntry.isDirectory() ||
                     !currentEntry.getName().startsWith(JarDiscoverySource.super.pathPrefix)));
             final JarEntry fCurrentEntry = currentEntry;
-            return Conditions.returnIfNotNullReturn(currentEntry, () -> new ResourceContext(new URL(Prefix.JAR_PREFIX +
+            return Conditions.returnIfNotNull(currentEntry, () -> new ResourceContext(new URL(Prefix.JAR_PREFIX +
                     JarDiscoverySource.super.sourceURL.toString() + Prefix.JAR_SEPARATOR + fCurrentEntry.getName()),
                     new URI(fCurrentEntry.getName())));
         }

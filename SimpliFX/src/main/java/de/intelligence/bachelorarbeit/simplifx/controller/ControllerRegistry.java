@@ -42,7 +42,7 @@ public final class ControllerRegistry {
     }
 
     public static boolean removeGroup(String groupId) {
-        if (controllerToIdMap.values().stream().noneMatch(groupId::equals)) {
+        if (controllerToIdMap.values().stream().anyMatch(groupId::equals)) {
             return false;
         }
         registeredIds.remove(groupId);

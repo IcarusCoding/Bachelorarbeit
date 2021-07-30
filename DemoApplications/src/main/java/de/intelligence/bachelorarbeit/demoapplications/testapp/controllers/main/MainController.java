@@ -23,6 +23,7 @@ public final class MainController {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
+        ctx.preloadController(MainControllerTwo.class);
         ctx.createSubGroup(LeftControllerOne.class, "left", this.root::setLeft);
         ctx.createSubGroup(CenterController.class, "center", this.root::setCenter);
         ctx.createSubGroup(RightControllerOne.class, "right", this.root::setRight);

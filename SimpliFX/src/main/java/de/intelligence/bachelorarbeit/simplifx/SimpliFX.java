@@ -16,11 +16,11 @@ import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
 import javafx.application.Preloader;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -51,6 +51,8 @@ import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
 import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupImpl;
 import de.intelligence.bachelorarbeit.simplifx.controller.IControllerGroup;
+import de.intelligence.bachelorarbeit.simplifx.controller.INotificationDialog;
+import de.intelligence.bachelorarbeit.simplifx.controller.NotificationDialog;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.FXMLControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
@@ -84,9 +86,14 @@ public final class SimpliFX {
     private static DIEnvironment appDIEnv;
     private static SharedResources globalResources;
     private static PropertyRegistry globalPropertyRegistry;
+    private static Function<Pane, INotificationDialog> defaultNotificationHandler = NotificationDialog::new;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
+    }
+
+    public static void setDefaultNotificationHandler(Function<Pane, INotificationDialog> defaultNotificationHandler) {
+        SimpliFX.defaultNotificationHandler = defaultNotificationHandler;
     }
 
     public static void launch() {
@@ -240,8 +247,8 @@ public final class SimpliFX {
         bundleDetector.findAllFields((f, a) -> f.canAccept(I18N.class));
         final Map<Locale, List<java.util.ResourceBundle>> bundleMap = new HashMap<>();
         bundleDetector.getAnnotations()
-                .stream().filter(b -> !b.value().isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
-                .map(locale -> java.util.ResourceBundle.getBundle(b.value(), locale))
+                .stream().flatMap(b -> Arrays.stream(b.value())).filter(b -> !b.isBlank()).forEach(b -> Arrays.stream(Locale.getAvailableLocales())
+                .map(locale -> java.util.ResourceBundle.getBundle(b, locale))
                 .filter(Conditions.distinct(java.util.ResourceBundle::getLocale)).forEach(bundle -> {
                     if (bundle.getLocale().getLanguage().isBlank()) {
                         return; // filter default
@@ -390,13 +397,14 @@ public final class SimpliFX {
             applicationImpl.init();
             final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
                     SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry, null, null);
-            final Pane root = mainGroup.start();
+                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry,
+                    SimpliFX.defaultNotificationHandler, null, null);
+            mainGroup.getOrConstructController(mainGroup.getStartControllerClass());
             this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
             PlatformImpl.runAndWait(() -> {
                 this.currAppState.set(LaunchState.START);
                 final Stage primary = new Stage();
-                primary.setScene(new Scene(root)); // TRY CATCH EVERYTHING AND ABORT CREATION TODO
+                mainGroup.start(primary); // TRY CATCH EVERYTHING AND ABORT CREATION TODO
                 this.createStage(primary, applicationListener.getClass());
                 StageHelper.setPrimary(primary, true);
                 try {
@@ -450,8 +458,8 @@ public final class SimpliFX {
                 stage.initStyle(config.style());
                 stage.setAlwaysOnTop(config.alwaysTop());
                 boolean iconError = false;
-                if (!config.iconPath().isBlank()) {
-                    try (InputStream stream = entrypointClass.getResourceAsStream(config.iconPath())) {
+                if (!config.icons().isBlank()) {
+                    try (InputStream stream = entrypointClass.getResourceAsStream(config.icons())) {
                         if (stream != null) {
                             stage.getIcons().add(new Image(stream));
                         } else {
@@ -462,7 +470,7 @@ public final class SimpliFX {
                     }
                 }
                 if (iconError) {
-                    LOG.error("Could not load icon from " + config.iconPath() + ".");
+                    LOG.error("Could not load icon from " + config.icons() + ".");
                 }
                 stage.setResizable(config.resizeable());
                 stage.setOnCloseRequest(w -> PlatformImpl.exit());
@@ -505,20 +513,6 @@ public final class SimpliFX {
                 Launcher.this.applicationExitSem.release();
             }
 
-        }
-
-    }
-
-    private static final class ApplicationContext {
-
-        private final Class<?> definingClass;
-        private final Class<?> mainController;
-        private final StageConfig stageConfig;
-
-        private ApplicationContext(Class<?> definingClass, Class<?> mainController, StageConfig stageConfig) {
-            this.definingClass = definingClass;
-            this.mainController = mainController;
-            this.stageConfig = stageConfig;
         }
 
     }

@@ -22,6 +22,7 @@ public final class LeftControllerOne {
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
+        ctx.preloadController(LeftControllerTwo.class);
         this.switchBtn.setOnAction(evt -> ctx.switchController(LeftControllerTwo.class, new TopSlideAnimation(Duration.millis(400))));
         ctx.createSubGroup(TestController.class, "legacy/test", p -> {
             System.out.println("READY");
