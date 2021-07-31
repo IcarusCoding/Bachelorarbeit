@@ -1,5 +1,6 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -35,6 +36,12 @@ public final class ControllerSetupContext implements Destructible {
     public void createSubGroup(Class<?> clazz, String groupId, Consumer<Pane> readyConsumer) {
         if (this.group != null) {
             this.group.createSubGroup(this.controllerClass, clazz, groupId, readyConsumer, null);
+        }
+    }
+
+    public void preloadControllers(Class<?>... clazz) {
+        if (this.group != null) {
+            Arrays.stream(clazz).forEach(this::preloadController);
         }
     }
 

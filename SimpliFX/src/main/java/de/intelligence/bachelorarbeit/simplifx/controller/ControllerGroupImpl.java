@@ -202,7 +202,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         this.loadedControllers.values().forEach(c -> c.getSubGroups().values().forEach(IControllerGroup::destroy));
         this.loadedControllers.keySet().forEach(this::destroy);
         if (!ControllerRegistry.removeGroup(this.groupId)) {
-            System.out.println("ERROR: UNABLE TO REMOVE GROUP " + this.groupId);
+            System.out.println("ERROR: UNABLE TO REMOVE GROUP " + this.groupId); //TODO
             return;
         }
         this.groupWrapper.unbind();
@@ -227,9 +227,11 @@ public final class ControllerGroupImpl implements IControllerGroup {
                 return;
             }
             if (newVal.type().equals(VisibilityState.SHOWN)) {
+                controller.getVisibilityContext().incrementShow();
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnShow.class, OnShow::value,
                         true, controller.getVisibilityContext());
             } else if (newVal.type().equals(VisibilityState.HIDDEN)) {
+                controller.getVisibilityContext().incrementHide();
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnHide.class, OnHide::value,
                         true, controller.getVisibilityContext());
             }
@@ -241,7 +243,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         final Object instance = controller.getControllerInstance();
         AnnotationUtils.invokeMethodsByAnnotation(instance, Setup.class, Setup::value, true, ctx);
         controller.getSubGroups().values().forEach(IControllerGroup::start);
-        FXThreadUtils.runOnFXThread(() -> AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value));
+        FXThreadUtils.waitOnFxThread(() -> AnnotationUtils.invokeMethodsByAnnotation(instance, PostConstruct.class, PostConstruct::value));
         return controller;
     }
 

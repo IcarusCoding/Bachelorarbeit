@@ -3,10 +3,12 @@ package de.intelligence.bachelorarbeit.simplifx.config;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.SimpliFXConstants;
+import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigValueTypeException;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 
@@ -38,8 +40,10 @@ public final class ConfigValueInjector {
                 continue;
             }
             if (!SimpliFXConstants.OBJECT_CONVERSION_MAP.containsKey(fieldType)) {
-                System.out.println("UNSUPPORTED TYPE");
-                continue;
+                throw new InvalidConfigValueTypeException("Invalid field type for field " + field + " detected. Found "
+                        + fieldType.getName() + ", expected one of ["
+                        + SimpliFXConstants.OBJECT_CONVERSION_MAP.keySet().stream().map(Class::getSimpleName)
+                        .collect(Collectors.joining(", ")) + ", String].");
             }
             fieldRef.set(SimpliFXConstants.OBJECT_CONVERSION_MAP.get(fieldType).apply(value));
         }

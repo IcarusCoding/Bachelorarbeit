@@ -11,8 +11,7 @@ public final class TestControllers {
 
         @Setup
         private void onSetup(ControllerSetupContext ctx) {
-            ctx.preloadController(TestControllerTwo.class); //TODO support varargs
-            ctx.preloadController(TestControllerThree.class);
+            ctx.preloadControllers(TestControllerTwo.class, TestControllerThree.class);
         }
 
     }

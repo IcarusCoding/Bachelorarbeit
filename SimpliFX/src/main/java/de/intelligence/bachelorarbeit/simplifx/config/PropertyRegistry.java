@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.xml.sax.SAXException;
 
+import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigFileException;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
@@ -28,7 +29,7 @@ public final class PropertyRegistry {
         if (!this.tryLoad(path)) {
             if (!path.endsWith(Prefix.XML_FILE_EXTENSION) && !path.endsWith(Prefix.PROPERTIES_FILE_EXTENSION)) {
                 if (!this.tryLoad(path + Prefix.XML_FILE_EXTENSION) & !this.tryLoad(path + Prefix.PROPERTIES_FILE_EXTENSION)) {
-                    System.out.println("COULD NOT LOAD " + path);
+                    throw new InvalidConfigFileException("Could not load configuration file " + path + ". Path or configuration file format was invalid.");
                 }
             }
         }
@@ -48,7 +49,6 @@ public final class PropertyRegistry {
                 this.properties.putAll(properties);
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
             return false;
         }
         return true;

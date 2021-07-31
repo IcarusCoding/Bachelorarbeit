@@ -27,6 +27,8 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
 public final class I18N implements II18N {
 
+    private static final String NOT_FOUND = "<key not found>";
+
     private final ReadOnlyObjectWrapper<Locale> currentLocale;
     private final Map<Locale, CompoundResourceBundle> bundles;
 
@@ -70,7 +72,7 @@ public final class I18N implements II18N {
 
     @Override
     public String get(String key, Object... args) {
-        return MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key), args);
+        return this.containsKey(key) ? MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key), args) : I18N.NOT_FOUND;
     }
 
     @Override
@@ -81,10 +83,10 @@ public final class I18N implements II18N {
     @Override
     public StringBinding createObservedBinding(String key, Object... params) {
         return Bindings.createStringBinding(
-                () -> MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key),
+                () -> this.containsKey(key) ? MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key),
                         Arrays.stream(params).map(o -> o instanceof ObservableValue ?
                                 ((ObservableValue<?>) o).getValue() : Objects.requireNonNullElse(o, "null")
-                                .toString()).toArray()),
+                                .toString()).toArray()) : I18N.NOT_FOUND,
                 ArrayUtils.addAll(Arrays.stream(params)
                         .filter(ObservableValue.class::isInstance).map(ObservableValue.class::cast)
                         .toArray(ObservableValue[]::new), this.currentLocale));
@@ -123,28 +125,5 @@ public final class I18N implements II18N {
         }
         return this.bundles.get(this.currentLocale.get()).containsKey(key);
     }
-
-  /*  public static Map<Locale, ResourceBundle> findAllBundlesWithBaseName(String directory, String base,
-                                                                         Consumer<Exception> exceptionConsumer) {
-        final List<Locale> foundLocales = FileUtils.getFilesFromClasspathDirectory(directory).stream().map(Path::toString)
-                .filter(c -> "properties".equals(FileUtils.getFileExtension(c)) && c.contains("_"))
-                .map(FileUtils::getNameWithoutExtension).filter(n -> n.contains(base)).map(n -> n.split("_"))
-                .filter(arr -> arr.length == 2).map(arr -> arr[1])
-                .map(Locale::forLanguageTag).distinct()
-                .collect(Collectors.toList());
-        final Map<Locale, ResourceBundle> result = new HashMap<>();
-        foundLocales.forEach(locale -> {
-            ResourceBundle bundle = null;
-            try {
-                bundle = new ClasspathResourceBundle(directory, base, locale);
-            } catch (Exception ex) {
-                exceptionConsumer.accept(ex);
-            }
-            if(bundle != null) {
-                result.put(locale, bundle);
-            }
-        });
-        return result;
-    }*/
 
 }

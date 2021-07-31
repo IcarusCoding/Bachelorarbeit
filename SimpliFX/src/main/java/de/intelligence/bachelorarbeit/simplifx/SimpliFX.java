@@ -8,11 +8,14 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -59,6 +63,8 @@ import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
+import de.intelligence.bachelorarbeit.simplifx.exception.ApplicationConstructionException;
+import de.intelligence.bachelorarbeit.simplifx.exception.SimpliFXException;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.CompoundResourceBundle;
@@ -71,8 +77,6 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
-//TODO prevent multiple launches
-//TODO check if I18N is required to launch application (bad)
 //TODO remove some static behaviour
 public final class SimpliFX {
 
@@ -87,6 +91,7 @@ public final class SimpliFX {
     private static SharedResources globalResources;
     private static PropertyRegistry globalPropertyRegistry;
     private static Function<Pane, INotificationDialog> defaultNotificationHandler = NotificationDialog::new;
+    private static boolean launched;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         SimpliFX.scanPolicy = scanPolicy;
@@ -143,6 +148,7 @@ public final class SimpliFX {
     }
 
     public static void launch(Class<?> appEntrypointClass) {
+        SimpliFX.checkLaunch();
         SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(appEntrypointClass, ApplicationEntryPoint.class)
                 .forceAccess().instantiate().getReflectable(), null);
     }
@@ -150,6 +156,7 @@ public final class SimpliFX {
     public static void launch(Class<?> applicationClass, Class<?> preloaderClass) {
         Conditions.checkCondition(applicationClass != preloaderClass,
                 "Different classes needed for application and preloader entrypoint!");
+        SimpliFX.checkLaunch();
         SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(applicationClass, ApplicationEntryPoint.class)
                         .forceAccess().instantiate().getReflectable(),
                 SimpliFX.validateEntrypointClass(preloaderClass, PreloaderEntryPoint.class)
@@ -158,6 +165,7 @@ public final class SimpliFX {
 
     public static void launch(Object applicationListener) {
         SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
+        SimpliFX.checkLaunch();
         SimpliFX.launchImpl(applicationListener, null);
     }
 
@@ -166,7 +174,15 @@ public final class SimpliFX {
                 "Different classes needed for application and preloader entrypoint!");
         SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
         SimpliFX.validateEntrypointInstance(preloaderListener, PreloaderEntryPoint.class);
+        SimpliFX.checkLaunch();
         SimpliFX.launchImpl(applicationListener, preloaderListener);
+    }
+
+    private static void checkLaunch() {
+        if (SimpliFX.launched) {
+            throw new SimpliFXException("Cannot start application more than once!");
+        }
+        SimpliFX.launched = true;
     }
 
     private static void launchImpl(Object applicationListener, Object preloaderListener) {
@@ -188,9 +204,8 @@ public final class SimpliFX {
         final AnnotatedFieldDetector<ResourceBundle> bundleDetector = new AnnotatedFieldDetector<>(ResourceBundle.class,
                 applicationListener, preloaderListener);
         SimpliFX.globalI18N = SimpliFX.setupI18N(bundleDetector);
-        bundleDetector.injectValue(SimpliFX.globalI18N, true, ex -> {
-            System.out.println("EXCEPTION");
-            //TODO handle
+        bundleDetector.injectValue(SimpliFX.globalI18N, true, (f, ex) -> {
+            throw new ApplicationConstructionException("Failed to inject resources into field " + f.getName(), ex);
         });
 
         // Configuration source setup
@@ -199,9 +214,8 @@ public final class SimpliFX {
         configDetector.findAllFields((fRef, a) -> fRef.getReflectable().getType().equals(Properties.class));
         configDetector.getAnnotations().stream().flatMap(a -> Arrays.stream(a.value())).distinct()
                 .forEach(path -> SimpliFX.globalPropertyRegistry.loadFrom(path));
-        configDetector.injectValue(SimpliFX.globalPropertyRegistry.getReadOnlyProperties(), true, ex -> {
-            System.out.println("ERROR");
-            ex.printStackTrace(); //TODO handle
+        configDetector.injectValue(SimpliFX.globalPropertyRegistry.getReadOnlyProperties(), true, (f, ex) -> {
+            throw new ApplicationConstructionException("Failed to inject properties into field " + f.getName(), ex);
         });
 
         // Configuration value setup
@@ -214,9 +228,7 @@ public final class SimpliFX {
         try {
             SimpliFX.setupDI(applicationListener);
         } catch (Exception ex) {
-            LOG.error("There was an error while trying to setup the DI framework:");
-            ex.printStackTrace();
-            return;
+            throw new ApplicationConstructionException("There was an error while trying to setup the DI framework: ", ex);
         }
 
         // PostConstruct invocation
@@ -227,19 +239,23 @@ public final class SimpliFX {
         AnnotationUtils.invokeMethodsByAnnotation(applicationListener,
                 PostConstruct.class, PostConstruct::value, true);
 
+        final AtomicReference<RuntimeException> launcherException = new AtomicReference<>();
         final Thread fxLauncherThread = new Thread(() -> {
             final Launcher l = new Launcher(appImpl, preImpl);
             try {
                 l.launchApplication(applicationListener, preloaderListener, null);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                launcherException.set(new RuntimeException("Launcher exception", ex));
             }
         }, "SimpliFX Launcher Thread");
         fxLauncherThread.start();
         try {
             fxLauncherThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ex) {
+            throw new RuntimeException("Unexpected exception thrown: ", ex);
+        }
+        if (launcherException.get() != null) {
+            throw launcherException.get();
         }
     }
 
@@ -346,6 +362,10 @@ public final class SimpliFX {
         private final Semaphore preloaderExitSem;
         private final AtomicReference<LaunchState> currAppState;
         private final AtomicReference<LaunchState> currPreState;
+        private final ExecutorService terminationService;
+        private final Map<String, Throwable> exceptions;
+
+        private boolean errored;
 
         private <T extends Application, S extends Preloader> Launcher(T applicationImpl, S preloaderImpl) {
             this.applicationImpl = applicationImpl;
@@ -354,9 +374,16 @@ public final class SimpliFX {
             this.preloaderExitSem = new Semaphore(0);
             this.currAppState = new AtomicReference<>(LaunchState.INIT);
             this.currPreState = new AtomicReference<>(LaunchState.INIT);
+            this.terminationService = Executors.newSingleThreadExecutor(r -> {
+                final Thread t = new Thread(r, "Application-Terminator");
+                t.setDaemon(true);
+                t.start();
+                return t;
+            });
+            this.exceptions = new LinkedHashMap<>();
         }
 
-        private void launchApplication(Object applicationListener, Object preloaderListener, String[] args) throws
+        private void launchApplication(Object applicationListener, Object preloaderListener, String[] args) throws //TODO args
                 Exception {
             SimpliFX.globalInjector.getInstance(Key.get(IEventEmitter.class, Names.named("applicationEmitter")))
                     .register(applicationListener);
@@ -369,63 +396,104 @@ public final class SimpliFX {
                 PlatformImpl.startup(sem::release);
                 sem.acquire();
             }
+            PlatformImpl.runAndWait(() -> Thread.currentThread().setUncaughtExceptionHandler((t, th) -> {
+                errored = true;
+                this.exceptions.put("Exception on FX thread", th);
+                Platform.exit();
+            }));
             final ExitListener exitListener = new ExitListener();
             PlatformImpl.addListener(exitListener);
-            if (preloaderListener != null) {
-                PlatformImpl.runAndWait(
-                        () -> ParametersImpl.registerParameters(this.preloaderImpl, new ParametersImpl(args)));
-                this.preloaderImpl.init();
-                PlatformImpl.runAndWait(() -> {
-                    this.currPreState.set(LaunchState.START);
-                    final Stage primary = this.createStage(new Stage(), preloaderListener.getClass());
-                    StageHelper.setPrimary(primary, true);
+            try {
+                if (preloaderListener != null) {
+                    ParametersImpl.registerParameters(this.preloaderImpl, new ParametersImpl(args));
                     try {
-                        this.preloaderImpl.start(primary);
+                        this.preloaderImpl.init();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        this.exceptions.put("Exception while handling preloader init event", ex);
+                        this.errored = true;
                     }
-                });
-                this.doNotifyProgress(0);
-            }
-            this.doNotifyProgress(1); //TODO correct behaviour? (direct after 0.0?)
-            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_LOAD);
-            PlatformImpl.runAndWait(() -> {
-                ParametersImpl.registerParameters(applicationImpl, new ParametersImpl(args));
-                PlatformImpl.setApplicationName(applicationImpl.getClass());
-            });
-            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
-            applicationImpl.init();
-            final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
-                    SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                    SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry,
-                    SimpliFX.defaultNotificationHandler, null, null);
-            mainGroup.getOrConstructController(mainGroup.getStartControllerClass());
-            this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
-            PlatformImpl.runAndWait(() -> {
-                this.currAppState.set(LaunchState.START);
-                final Stage primary = new Stage();
-                mainGroup.start(primary); // TRY CATCH EVERYTHING AND ABORT CREATION TODO
-                this.createStage(primary, applicationListener.getClass());
-                StageHelper.setPrimary(primary, true);
-                try {
-                    applicationImpl.start(primary);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    if (!this.errored && !currAppState.get().equals(LaunchState.EXIT)) {
+                        PlatformImpl.runAndWait(() -> {
+                            this.currPreState.set(LaunchState.START);
+                            final Stage primary = this.createStage(new Stage(), preloaderListener.getClass());
+                            StageHelper.setPrimary(primary, true);
+                            try {
+                                this.preloaderImpl.start(primary);
+                            } catch (Exception ex) {
+                                this.exceptions.put("Exception while handling preloader start event", ex);
+                                this.errored = true;
+                            }
+                        });
+                    }
+                    if (!this.errored && !currAppState.get().equals(LaunchState.EXIT)) {
+                        this.doNotifyProgress(0);
+                    }
                 }
-            });
-            this.applicationExitSem.acquire();
-            if (this.currAppState.get().id >= LaunchState.EXIT.id) {
-                PlatformImpl.runAndWait(() -> {
+                if (!errored && !currAppState.get().equals(LaunchState.EXIT)) {
+                    this.doNotifyProgress(1);
+                    this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_LOAD);
+                    PlatformImpl.runAndWait(() -> {
+                        ParametersImpl.registerParameters(applicationImpl, new ParametersImpl(args));
+                        PlatformImpl.setApplicationName(applicationImpl.getClass());
+                    });
+                }
+                if (!this.errored && !currAppState.get().equals(LaunchState.EXIT)) {
+                    this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_INIT);
                     try {
-                        mainGroup.destroy();
-                        applicationImpl.stop();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        applicationImpl.init();
+                    } catch (Exception ex) {
+                        this.exceptions.put("Exception while handling application init event", ex);
+                        this.errored = true;
                     }
-                });
+                }
+                final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
+                        SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
+                        SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry,
+                        SimpliFX.defaultNotificationHandler, null, null);
+                if (!this.errored && !currAppState.get().equals(LaunchState.EXIT)) {
+                    this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
+                    PlatformImpl.runAndWait(() -> {
+                        try {
+                            mainGroup.getOrConstructController(mainGroup.getStartControllerClass());
+                            this.currAppState.set(LaunchState.START);
+                            final Stage primary = new Stage();
+                            mainGroup.start(primary);
+                            this.createStage(primary, applicationListener.getClass());
+                            StageHelper.setPrimary(primary, true);
+                            this.applicationImpl.start(primary);
+                        } catch (Exception ex) {
+                            this.exceptions.put("Exception while starting application", ex);
+                            this.errored = true;
+                        }
+                    });
+                }
+                if (!errored) {
+                    this.applicationExitSem.acquire();
+                }
+                if (this.currAppState.get().id >= LaunchState.EXIT.id) {
+                    PlatformImpl.runAndWait(() -> {
+                        try {
+                            mainGroup.destroy();
+                            applicationImpl.stop();
+                        } catch (Exception ex) {
+                            this.exceptions.put("Exception while handling application stop event", ex);
+                            this.errored = true;
+                        }
+                    });
+                }
+                if (errored) {
+                    final Map.Entry<String, Throwable> ex = this.exceptions.entrySet().iterator().next();
+                    throw new RuntimeException(ex.getKey(), ex.getValue());
+                }
+            } finally {
+                PlatformImpl.removeListener(exitListener);
+                PlatformImpl.tkExit();
             }
-            PlatformImpl.removeListener(exitListener);
+        }
+
+        private void terminate(String msg, Throwable ex) {
             PlatformImpl.tkExit();
+            throw new RuntimeException(msg, ex);
         }
 
         private void doNotifyProgress(double progress) {

@@ -13,6 +13,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
+import de.intelligence.bachelorarbeit.simplifx.exception.IllegalSharedFieldException;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 
@@ -27,7 +28,6 @@ public class SharedFieldInjector {
     }
 
     public void inject(SharedResources resources) {
-        // find all fields
         this.sharedDetector.findAllFields((f, a) -> f.forceAccess().get() == null);
         final Map<FieldReflection, Shared> fields = new LinkedHashMap<>();
         for (final Map.Entry<Object, Map<Field, Shared[]>> entry : this.sharedDetector.getFieldMap().entrySet()) {
@@ -53,13 +53,11 @@ public class SharedFieldInjector {
             SharedReference<?> ref = resources.getForName(key);
             if (fieldType.equals(SharedReference.class) || fieldType.isAssignableFrom(ReadOnlyObjectProperty.class)) {
                 final Class<?> clazzType = this.validateGenericParameter(field);
-                if (clazzType == null) {
-                    continue;
-                }
                 if (ref != null) {
                     if (!clazzType.equals(ref.getType())) {
-                        System.out.println("Unable to accept type ERROR");
-                        continue;
+                        throw new IllegalSharedFieldException(field, "Shared resource with id \"" + key
+                                + "\" expects field type " + ref.getType().getName() + " but received "
+                                + clazzType.getName() + ".");
                     }
                 } else {
                     ref = SharedReference.empty(clazzType);
@@ -81,19 +79,17 @@ public class SharedFieldInjector {
         if (field.getGenericType() instanceof ParameterizedType type) {
             genericArg = type.getActualTypeArguments()[0];
             if (genericArg instanceof WildcardType) {
-                System.out.println("WILDCARD ERROR");
-                // wild card disallowed
-                return null;
+                throw new IllegalSharedFieldException(field, "Wildcard types are not supported.");
             }
+            // generic shared resources can be supported but will cause problems at runtime due to type erasure
+            /*if (genericArg instanceof ParameterizedType subParam && subParam.getRawType() instanceof Class<?> c) {
+                return c;
+            }*/
             if (!(genericArg instanceof Class<?>)) {
-                System.out.println("INVALID TYPE ERROR");
-                // type cant be applied
-                return null;
+                throw new IllegalSharedFieldException(field, "Generic shared resources are currently not supported.");
             }
         } else {
-            System.out.println("RAW USE ERROR");
-            // raw use is disallowed
-            return null;
+            throw new IllegalSharedFieldException(field, "Raw use is disallowed.");
         }
         return (Class<?>) genericArg;
     }

@@ -18,4 +18,8 @@ public final class FXThreadUtils {
         Platform.runLater(runnable);
     }
 
+    public static void waitOnFxThread(Runnable runnable) {
+        PlatformImpl.runAndWait(runnable);
+    }
+
 }

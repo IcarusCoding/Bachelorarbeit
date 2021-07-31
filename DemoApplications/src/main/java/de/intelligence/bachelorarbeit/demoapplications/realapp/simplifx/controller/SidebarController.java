@@ -18,6 +18,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
+import de.intelligence.bachelorarbeit.simplifx.controller.animation.BottomSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.LeftSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.RightSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.TopSlideAnimation;
@@ -63,8 +64,7 @@ public final class SidebarController {
 
     @FXML
     private void onLogoutPressed() {
-        this.sidebarContentCtx.getContextFor("main").destroyGroup();
-        //this.mainCtx.switchController(LoginController.class, new BottomSlideAnimation(Duration.millis(250)));
+        this.mainCtx.switchController(LoginController.class, new BottomSlideAnimation(Duration.millis(250)));
     }
 
     @FXML
