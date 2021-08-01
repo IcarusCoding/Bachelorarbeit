@@ -9,8 +9,6 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
-import lombok.experimental.UtilityClass;
-
 import sun.misc.Unsafe;
 
 /**
@@ -18,7 +16,6 @@ import sun.misc.Unsafe;
  *
  * @author Deniz Groenhoff
  */
-@UtilityClass
 public class Reflection {
 
     static final BiPredicate<Class<?>, Class<?>> PRIMITIVE_CHECK = (wantedType, foundType) ->
@@ -177,4 +174,9 @@ public class Reflection {
         }
         return found;
     }
+
+    private Reflection() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -18,11 +18,12 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.application.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.DefaultWrapperAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
+import de.intelligence.bachelorarbeit.simplifx.exception.ControllerDestructionException;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerGroupDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
@@ -198,12 +199,16 @@ public final class ControllerGroupImpl implements IControllerGroup {
     }
 
     @Override
+    public String getGroupId() {
+        return this.groupId;
+    }
+
+    @Override
     public void destroy() {
         this.loadedControllers.values().forEach(c -> c.getSubGroups().values().forEach(IControllerGroup::destroy));
         this.loadedControllers.keySet().forEach(this::destroy);
         if (!ControllerRegistry.removeGroup(this.groupId)) {
-            System.out.println("ERROR: UNABLE TO REMOVE GROUP " + this.groupId); //TODO
-            return;
+            throw new ControllerDestructionException("Could not destroy group " + this.groupId + ".");
         }
         this.groupWrapper.unbind();
         this.visibility.unbind();

@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.events.ErrorEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
+import de.intelligence.bachelorarbeit.simplifx.events.PreloaderNotificationEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.ProgressEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
@@ -24,7 +25,7 @@ public final class PreloaderImpl extends Preloader {
 
     @Override
     public void init() {
-        this.emitter.emit(new InitEvent(super.getParameters()));
+        this.emitter.emit(new InitEvent(null, super.getParameters()));
     }
 
     @Override
@@ -42,16 +43,15 @@ public final class PreloaderImpl extends Preloader {
         this.emitter.emit(new StateChangeEvent(info.getType(), info.getApplication(), super.getParameters()));
     }
 
-    //TODO let user call this somehow
     @Override
     public void handleApplicationNotification(PreloaderNotification info) {
-        super.handleApplicationNotification(info);
+        this.emitter.emit(new PreloaderNotificationEvent(info, super.getParameters()));
     }
 
     @Override
     public boolean handleErrorNotification(ErrorNotification info) {
-        this.emitter
-                .emit(new ErrorEvent(info.getCause(), info.getDetails(), info.getLocation(), super.getParameters()));
+        this.emitter.emit(new ErrorEvent(info.getCause(), info.getDetails(), info.getLocation(),
+                super.getParameters()));
         return true;
     }
 

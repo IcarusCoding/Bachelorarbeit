@@ -1,6 +1,6 @@
 package de.intelligence.bachelorarbeit.simplifx.events;
 
-public final class InvalidEvent extends AbstractEvent {
+public final class InvalidEvent {
 
     private final Object event;
 

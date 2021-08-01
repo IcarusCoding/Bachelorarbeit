@@ -8,46 +8,41 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import lombok.experimental.UtilityClass;
-
 /**
  * A utility class that provides basic conditional operations
  *
  * @author Deniz Groenhoff
  */
-@UtilityClass
 public final class Conditions {
 
-    public <T> T checkNull(T t) {
+    private Conditions() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static <T> T checkNull(T t) {
         if (t == null) {
             throw new NullPointerException("Parameter is null.");
         }
         return t;
     }
 
-    public <T> T checkNull(T t, String message) {
+    public static <T> T checkNull(T t, String message) {
         if (t == null) {
             throw new NullPointerException(message);
         }
         return t;
     }
 
-    public <T> T computeIfNull(Object t, Supplier<T> then, T other) {
+    public static <T> T computeIfNull(Object t, Supplier<T> then, T other) {
         if (t != null) {
             return then.get();
         }
         return other;
     }
 
-    public void checkCondition(boolean condition) {
+    public static void checkCondition(boolean condition) {
         if (!condition) {
             throw new IllegalArgumentException("Illegal argument specified.");
-        }
-    }
-
-    public void checkCondition(boolean condition, String message) {
-        if (!condition) {
-            throw new IllegalArgumentException(message);
         }
     }
 
@@ -94,6 +89,12 @@ public final class Conditions {
     public static <T> Predicate<T> distinct(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public static void checkCondition(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
 }

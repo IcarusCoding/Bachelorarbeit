@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigFileException;
@@ -15,6 +17,8 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
 public final class PropertyRegistry {
+
+    private static final Logger LOG = LogManager.getLogger(PropertyRegistry.class);
 
     private final ClassLoader sourceLoader;
     private final Properties properties;
@@ -43,7 +47,8 @@ public final class PropertyRegistry {
                 final Properties properties = this.load(input);
                 properties.forEach((k, v) -> {
                     if (this.properties.containsKey(k)) {
-                        System.out.println("WARNING: REPLACING VALUE " + this.properties.get(k) + " WITH " + v + " FOR KEY " + k);
+                        LOG.warn("Detected duplicate configuration value! Replacing value \"{}\" with \"{}\" for key \"{}\".",
+                                this.properties.get(k), v, k);
                     }
                 });
                 this.properties.putAll(properties);

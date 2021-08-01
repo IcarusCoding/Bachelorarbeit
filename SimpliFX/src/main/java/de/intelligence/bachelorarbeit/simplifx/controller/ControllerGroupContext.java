@@ -25,7 +25,6 @@ public final class ControllerGroupContext implements Destructible {
         }
     }
 
-    //TODO optionals
     public ControllerGroupContext getContextFor(String groupId) {
         if (this.group != null) {
             return this.group.getContextFor(groupId);

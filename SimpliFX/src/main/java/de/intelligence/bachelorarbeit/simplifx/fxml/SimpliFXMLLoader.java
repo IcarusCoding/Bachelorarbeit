@@ -1591,7 +1591,6 @@ public class SimpliFXMLLoader {
         return type;
     }
 
-    // TODO Rename to loadType() when deprecated static version is removed
     private Class<?> loadTypeForPackage(String packageName, String className) throws ClassNotFoundException {
         return getClassLoader().loadClass(packageName + "." + className.replace('.', '$'));
     }
@@ -2269,8 +2268,6 @@ public class SimpliFXMLLoader {
                     throw constructLoadException("Cannot bind to untyped object.");
                 }
 
-                // TODO We may want to identify binding properties in processAttribute()
-                // and apply them after build() has been called
                 if (this.value instanceof Builder) {
                     throw constructLoadException("Cannot bind to builder property.");
                 }
@@ -2363,7 +2360,6 @@ public class SimpliFXMLLoader {
                     return aValue;
                 } else {
                     if (aValue.charAt(0) == '/') {
-                        // FIXME: JIGSAW -- use Class.getResourceAsStream if resource is in a module
                         final URL res = getClassLoader().getResource(aValue.substring(1));
                         if (res == null) {
                             throw constructLoadException("Invalid resource: " + aValue + " not found on the classpath");
@@ -3157,7 +3153,6 @@ public class SimpliFXMLLoader {
             URL location;
             final ClassLoader cl = getClassLoader();
             if (source.charAt(0) == '/') {
-                // FIXME: JIGSAW -- use Class.getResourceAsStream if resource is in a module
                 location = cl.getResource(source.substring(1));
                 if (location == null) {
                     throw constructLoadException("Cannot resolve path: " + source);
@@ -3567,7 +3562,6 @@ public class SimpliFXMLLoader {
                 try {
                     URL location;
                     if (source.charAt(0) == '/') {
-                        // FIXME: JIGSAW -- use Class.getResourceAsStream if resource is in a module
                         location = cl.getResource(source.substring(1));
                     } else {
                         if (SimpliFXMLLoader.this.location == null) {

@@ -9,7 +9,6 @@ import javafx.scene.layout.Pane;
 
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
 
-//TODO interfaces
 public final class ControllerSetupContext implements Destructible {
 
     private final Class<?> controllerClass;

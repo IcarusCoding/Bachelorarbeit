@@ -39,4 +39,6 @@ public interface IControllerGroup extends Destructible {
 
     void showNotification(StringBinding title, StringBinding content, NotificationKind kind);
 
+    String getGroupId();
+
 }

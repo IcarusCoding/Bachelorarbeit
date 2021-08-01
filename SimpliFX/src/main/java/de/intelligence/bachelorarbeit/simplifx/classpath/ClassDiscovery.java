@@ -27,7 +27,6 @@ public final class ClassDiscovery implements IClassDiscovery {
         this.results = new HashMap<>();
     }
 
-    //TODO check if OS independence is still given
     private String convertPackage(String pkg) {
         return pkg.replace('\\', Prefix.FILE_SEPARATOR_C).replace('.', Prefix.FILE_SEPARATOR_C);
     }

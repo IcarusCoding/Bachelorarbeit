@@ -2,6 +2,7 @@ package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx;
 
 import java.util.Properties;
 
+import javafx.application.Preloader;
 import javafx.beans.property.StringProperty;
 
 import com.jfoenix.skins.JFXTextFieldSkin;
@@ -10,10 +11,11 @@ import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controll
 import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.di.MainModule;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.SimpliFX;
-import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigSource;
+import de.intelligence.bachelorarbeit.simplifx.event.EventHandler;
+import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.guice.GuiceInjection;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
@@ -39,6 +41,16 @@ public final class DemoApplication {
 
     @Shared
     private SharedReference<StringProperty> titleRef;
+
+    @EventHandler
+    private void onInit(InitEvent event) {
+        event.getNotificationAccess().notifyPreloader(new Preloader.ErrorNotification(null, "TEST", null));
+       /* try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+    }
 
     @EventHandler
     private void onStart(StartEvent event) {

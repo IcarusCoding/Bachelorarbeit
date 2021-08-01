@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-//TODO exceptions on invalid access
 public final class ControllerRegistry {
 
     private static final Set<String> registeredIds = new HashSet<>();

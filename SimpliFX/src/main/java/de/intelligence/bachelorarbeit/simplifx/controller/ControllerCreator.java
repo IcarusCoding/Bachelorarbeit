@@ -12,6 +12,8 @@ import java.util.Optional;
 
 import javafx.scene.layout.Pane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
@@ -26,13 +28,13 @@ import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
-import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
+import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
 public final class ControllerCreator {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(ControllerGroupImpl.class);
+    private static final Logger LOG = LogManager.getLogger(ControllerGroupImpl.class);
 
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
@@ -103,7 +105,7 @@ public final class ControllerCreator {
         if (fxmlPath.isBlank() || !fxmlPath.toLowerCase(Locale.ROOT).endsWith(".fxml") || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
             throw new InvalidControllerDefinitionException("Could not resolve fxml path (\"" + fxmlPath + "\") for controller \"" + clazz.getSimpleName() + "\".");
         }
-        String cssPath = annotation.css().startsWith("/") ? annotation.css() : "/" + annotation.css();
+        String cssPath = annotation.css().isBlank() ? "" : (annotation.css().startsWith(Prefix.FILE_SEPARATOR) ? annotation.css() : Prefix.FILE_SEPARATOR + annotation.css());
         boolean validCSS = true;
         if (!cssPath.isBlank() && clazz.getResource(cssPath) == null) {
             validCSS = false;

@@ -6,7 +6,8 @@ import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClasspathDiscoveryException;
 import de.intelligence.bachelorarbeit.simplifx.utils.CloseableIterator;
@@ -20,8 +21,9 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
  * @see de.intelligence.bachelorarbeit.simplifx.classpath.source.IDiscoverySource
  * @see de.intelligence.bachelorarbeit.simplifx.classpath.source.AbstractDiscoverySource
  */
-@Log4j2
 public final class JarDiscoverySource extends AbstractDiscoverySource {
+
+    private static Logger LOG = LogManager.getLogger(JarDiscoverySource.class);
 
     public JarDiscoverySource(URL sourceURL, String pathPrefix) {
         super(sourceURL, pathPrefix);
@@ -79,7 +81,7 @@ public final class JarDiscoverySource extends AbstractDiscoverySource {
         @Override
         public void close() {
             Conditions.doIfNotNull(this.jarIn, this.jarIn::close,
-                    ex -> JarDiscoverySource.log.error("Could not close resource: ", ex));
+                    ex -> JarDiscoverySource.LOG.error("Could not close resource", ex));
         }
 
     }

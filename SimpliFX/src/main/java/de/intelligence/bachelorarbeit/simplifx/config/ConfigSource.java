@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ConfigSource {
+public @interface ConfigSource { //TODO add support for outside classpath
 
     String[] value();
 
