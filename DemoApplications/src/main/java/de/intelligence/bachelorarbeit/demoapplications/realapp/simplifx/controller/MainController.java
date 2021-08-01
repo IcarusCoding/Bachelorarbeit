@@ -7,7 +7,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 
-@Controller(fxml = "/fxml/MainController.fxml")
+@Controller(fxml = "/fxml/MainController.fxml", css = "css/main.css")
 public final class MainController {
 
     @FXML

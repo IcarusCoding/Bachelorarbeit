@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.simplifx.annotation;
+package de.intelligence.bachelorarbeit.simplifx.application;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EventHandler {
+public @interface PostConstruct {
 
-    int priority() default 0;
+    int value() default 0;
 
 }

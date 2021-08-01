@@ -1,0 +1,114 @@
+* {
+    -primary: #212121;
+    -secondary: #55a630;
+    -accent: #80b918
+}
+
+#loginRoot {
+    -fx-background-color: #212121;
+    -fx-border-color: #ff00fa;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+.testController {
+    -fx-border-color: #ffbf00;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+#sidebarRoot {
+    -fx-border-color: #00ffaf;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+#mainMenuRoot {
+    -fx-border-color: #ff00fa;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+#mainRoot {
+    -fx-border-color: #54ff00;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+#titleBarRoot {
+    -fx-border-color: #0096ff;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+
+#title {
+    -fx-font-size: 25;
+    -fx-text-fill: white;
+}
+
+#loginRoot JFXButton {
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-background-color: -primary;
+    -fx-border-color: -secondary;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+#loginRoot JFXTextField, #loginRoot JFXPasswordField {
+    -fx-text-fill: derive(-secondary, 45%);
+    -fx-prompt-text-fill: white;
+    -fx-accent: -accent;
+    -jfx-focus-color: -secondary;
+    -fx-font-size: 16px;
+}
+
+#loginRoot JFXButton:focused {
+    -fx-border-color: -secondary;
+    -fx-background-color: derive(-secondary, 5%);
+    -fx-text-fill: -primary;
+}
+
+#loginRoot JFXButton:hover {
+    -fx-border-color: -secondary;
+    -fx-background-color: -secondary;
+    -fx-text-fill: -primary;
+}
+
+.error-label {
+    -fx-font-size: 10pt;
+}
+
+#contentCenter {
+    -fx-background-color: #423F3E;
+}
+
+#sidebarRoot {
+    -fx-background-color: #212121;
+}
+
+#connectionLbl {
+    -fx-text-fill: white;
+}
+
+#sidebarRoot JFXButton {
+    -fx-background-color: #212121;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+#sidebarRoot JFXButton:hover {
+    -fx-border-color: white;
+    -fx-background-color: #55a630;
+    -fx-text-fill: white;
+}
+
+#testControllerRoot {
+    -fx-background-color: #3C5186;
+}
+
+#testControllerRoot Label {
+    -fx-font-size: 20;
+    -fx-text-fill: white;
+}

@@ -15,19 +15,21 @@ import javafx.css.Styleable;
 import javafx.css.StyleableProperty;
 import javafx.scene.Node;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.MethodReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 
 public final class CssMetaDataAdapter {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(CssMetaDataAdapter.class);
+    private static final Logger LOG = LogManager.getLogger(CssMetaDataAdapter.class);
 
     public static void createStaticMetaData(Class<?> clazz, Field field) {
         if (!Reflection.reflect(Node.class).canAccept(clazz)) {
-            LOG.warn("Class does not inherit from Node, skipping: " + clazz.getSimpleName());
+            LOG.warn("Class does not inherit from Node, skipping: {}.", clazz.getSimpleName());
             return;
         }
         final AtomicReference<MethodReflection> methodRef = new AtomicReference<>();
@@ -36,10 +38,9 @@ public final class CssMetaDataAdapter {
                 methodRef.set(Reflection.reflectStatic(m));
             }
         });
-        //System.out.println(methodRef);
         final FieldReflection fieldRef = Reflection.reflectStatic(field).forceAccess();
         if (!fieldRef.isAnnotationPresent(StyleProperty.class)) {
-            LOG.warn("Invalid field detected (@CssProperty missing): " + field);
+            LOG.warn("Invalid field detected (@CssProperty missing): {}.", field);
             return;
         }
         final ParameterizedType parameterizedType = ((ParameterizedType) ((ParameterizedType) fieldRef.getReflectable().getGenericType()).getActualTypeArguments()[0]);
@@ -47,11 +48,11 @@ public final class CssMetaDataAdapter {
                 && Arrays.stream(parameterizedType.getActualTypeArguments()).allMatch(t -> t instanceof WildcardType)
                 && ((WildcardType) parameterizedType.getActualTypeArguments()[0]).getUpperBounds()[0] == Styleable.class
                 && ((WildcardType) parameterizedType.getActualTypeArguments()[1]).getUpperBounds()[0] == Object.class) {
-            LOG.warn("Invalid field detected (Field type is not List<CssMetaData<? extends Styleable, ?>): " + field);
+            LOG.warn("Invalid field detected (Field type is not List<CssMetaData<? extends Styleable, ?>): {}.", field);
             return;
         }
         if (fieldRef.get() != null) {
-            LOG.warn("Invalid field detected (Field is already initialized): " + field);
+            LOG.warn("Invalid field detected (Field is already initialized): {}.", field);
             return;
         }
         final List<CssMetaData<? extends Styleable, ?>> list = new ArrayList<>();
@@ -60,7 +61,7 @@ public final class CssMetaDataAdapter {
             final Class<? extends StyleConverter<?, ?>> converterClass = property.converterClass();
             final Optional<MethodReflection> getInstanceRef = Reflection.reflect(converterClass).hasMethod("getInstance");
             if (getInstanceRef.isEmpty()) {
-                LOG.warn("Invalid field detected (Could not initialize SizeConverter instance): " + converterClass.getSimpleName());
+                LOG.warn("Invalid field detected (Could not initialize SizeConverter instance): {}.", converterClass.getSimpleName());
                 return;
             }
             final StyleConverter<?, ?> converterInstance = getInstanceRef.get().invokeUnsafe();
@@ -86,7 +87,7 @@ public final class CssMetaDataAdapter {
             }
             final Optional<FieldReflection> localFieldRefOpt = CssMetaDataAdapter.validateField(obj, prop.localPropertyField());
             if (localFieldRefOpt.isEmpty()) {
-                LOG.warn("Specified property field \"" + prop.localPropertyField() + "\" not available in class: " + obj.getClass().getSimpleName());
+                LOG.warn("Specified property field \"{}\" not available in class: {}.", prop.localPropertyField(), obj.getClass().getSimpleName());
                 return;
             }
             if (localFieldRefOpt.get().forceAccess().get() != null) {
@@ -99,13 +100,13 @@ public final class CssMetaDataAdapter {
                 //TODO maybe switch case + anonymous own
                 propertyClassImpl = Class.forName(propertyClassSimpleImpl);
             } catch (ClassNotFoundException e) {
-                LOG.warn("Could not instantiate field: \"" + prop.localPropertyField() + "\". Reason: No implementation for \"" + propertyClassSimpleImpl + "\"was found");
+                LOG.warn("Could not instantiate field: \"{}\". Reason: No implementation for \"{}\" was found", prop.localPropertyField(), propertyClassSimpleImpl);
                 return;
             }
             final Optional<ConstructorReflection> conRefProp = Reflection.reflect(propertyClassImpl)
                     .hasConstructor(CssMetaData.class, Object.class, String.class);
             if (conRefProp.isEmpty()) {
-                LOG.warn("Class \"" + propertyClassSimpleImpl + "\" has no appropriate constructor");
+                LOG.warn("Class \"{}\" has no appropriate constructor", propertyClassSimpleImpl);
                 return;
             }
             final List<CssMetaData<? extends Styleable, ?>> metaData = Reflection.reflectStatic(field).forceAccess().getUnsafe();

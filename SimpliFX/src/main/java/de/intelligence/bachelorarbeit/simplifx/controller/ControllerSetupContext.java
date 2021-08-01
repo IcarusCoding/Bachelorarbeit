@@ -1,17 +1,19 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import javafx.beans.binding.StringBinding;
 import javafx.scene.layout.Pane;
 
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnimation;
 
-//TODO interfaces
-public final class ControllerSetupContext {
+public final class ControllerSetupContext implements Destructible {
 
     private final Class<?> controllerClass;
-    private final IControllerGroup group;
     private final ControllerGroupContext groupCtx;
+    private IControllerGroup group;
 
     public ControllerSetupContext(Class<?> controllerClass, IControllerGroup group, ControllerGroupContext groupCtx) {
         this.controllerClass = controllerClass;
@@ -23,28 +25,58 @@ public final class ControllerSetupContext {
         return this.groupCtx;
     }
 
+    public void createSubGroup(Class<?> clazz, String groupId, Consumer<Pane> readyConsumer,
+                               Function<Pane, INotificationDialog> notificationHandler) {
+        if (this.group != null) {
+            this.group.createSubGroup(this.controllerClass, clazz, groupId, readyConsumer, notificationHandler);
+        }
+    }
+
     public void createSubGroup(Class<?> clazz, String groupId, Consumer<Pane> readyConsumer) {
-        this.group.createSubGroup(controllerClass, clazz, groupId, readyConsumer);
+        if (this.group != null) {
+            this.group.createSubGroup(this.controllerClass, clazz, groupId, readyConsumer, null);
+        }
     }
 
-    public void switchController(Class<?> clazz) {
-        groupCtx.switchController(clazz);
-    }
-
-    public void switchController(Class<?> clazz, IWrapperAnimation factory) {
-        groupCtx.switchController(clazz, factory);
+    public void preloadControllers(Class<?>... clazz) {
+        if (this.group != null) {
+            Arrays.stream(clazz).forEach(this::preloadController);
+        }
     }
 
     public void preloadController(Class<?> clazz) {
-        this.group.getOrConstructController(clazz);
+        if (this.group != null) {
+            this.group.getOrConstructController(clazz);
+        }
+    }
+
+    public void showNotification(String title, String content, NotificationKind kind) {
+        this.groupCtx.showNotification(title, content, kind);
+    }
+
+    public void showNotification(StringBinding title, StringBinding content, NotificationKind kind) {
+        this.groupCtx.showNotification(title, content, kind);
+    }
+
+    public void switchController(Class<?> clazz) {
+        this.groupCtx.switchController(clazz);
+    }
+
+    public void switchController(Class<?> clazz, IWrapperAnimation factory) {
+        this.groupCtx.switchController(clazz, factory);
     }
 
     public ControllerGroupContext getContextFor(String groupId) {
-        return groupCtx.getContextFor(groupId);
+        return this.groupCtx.getContextFor(groupId);
     }
 
     public Class<?> getActiveController() {
-        return groupCtx.getActiveController();
+        return this.groupCtx.getActiveController();
+    }
+
+    @Override
+    public void destroy() {
+        this.group = null;
     }
 
 }

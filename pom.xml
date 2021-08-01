@@ -5,7 +5,7 @@
 
     <groupId>de.intelligence</groupId>
     <artifactId>bachelorarbeit</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <build>
         <plugins>
             <plugin>
@@ -36,17 +36,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>${source.version}</maven.compiler.source>
         <maven.compiler.target>${source.version}</maven.compiler.target>
-        <project.version>1.4</project.version>
+        <project.version>1.5</project.version>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
     
     <distributionManagement>
         <repository>

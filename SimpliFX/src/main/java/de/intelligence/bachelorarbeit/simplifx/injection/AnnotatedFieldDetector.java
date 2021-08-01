@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
@@ -57,10 +57,10 @@ public final class AnnotatedFieldDetector<T extends Annotation> implements IAnno
     }
 
     @Override
-    public void injectValue(Object value, boolean forceAccess, Consumer<Exception> exceptionConsumer) {
+    public void injectValue(Object value, boolean forceAccess, BiConsumer<Field, Exception> exceptionConsumer) {
         this.foundFields.forEach((obj, map) -> map.keySet().forEach(f -> {
             final FieldReflection fieldReflection = Reflection.reflect(f, obj);
-            fieldReflection.setExceptionHandler(exceptionConsumer::accept);
+            fieldReflection.setExceptionHandler(ex -> exceptionConsumer.accept(f, ex));
             if (forceAccess) {
                 fieldReflection.forceAccess();
             }

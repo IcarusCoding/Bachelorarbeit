@@ -10,11 +10,10 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Optional;
 
-import javafx.css.Stylesheet;
 import javafx.scene.layout.Pane;
 
-import com.sun.javafx.css.StyleManager;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
@@ -22,19 +21,20 @@ import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
 import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
+import de.intelligence.bachelorarbeit.simplifx.exception.ControllerConstructionException;
 import de.intelligence.bachelorarbeit.simplifx.exception.InvalidControllerDefinitionException;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
-import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedFieldInjector;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
+import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
 public final class ControllerCreator {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(ControllerGroupImpl.class);
+    private static final Logger LOG = LogManager.getLogger(ControllerGroupImpl.class);
 
     private final IControllerFactoryProvider provider;
     private final II18N ii18N;
@@ -73,17 +73,17 @@ public final class ControllerCreator {
         Pane pane = null;
         try {
             pane = loader.load();
-        } catch (IOException e) {
-            //TODO error handling with controller name etc
-            throw new RuntimeException("TODO ERROR HANDLING", e);
+        } catch (IOException ex) {
+            throw new ControllerConstructionException("Failed to load FXML file \"" + ctx.fxmlLocation + "\" for controller \"" + clazz.getSimpleName() + "\".", ex);
         }
         final Object instance = loader.getController();
-        pane.getStylesheets().add(ctx.cssLocation);
+        if (ctx.validCSS) {
+            pane.getStylesheets().add(ctx.cssLocation);
+        }
         final IAnnotatedFieldDetector<ResourceBundle> detector = new AnnotatedFieldDetector<>(ResourceBundle.class, instance);
         detector.findAllFields();
-        detector.injectValue(this.ii18N, true, ex -> {
-            System.out.println("HANDLE EXCEPTION");
-            //TODO HANDLE
+        detector.injectValue(this.ii18N, true, (f, ex) -> {
+            throw new ControllerConstructionException("Failed to inject resources into field " + f, ex);
         });
         new ConfigValueInjector(instance).inject(this.registry);
         new SharedFieldInjector(instance).inject(this.resources);
@@ -105,15 +105,16 @@ public final class ControllerCreator {
         if (fxmlPath.isBlank() || !fxmlPath.toLowerCase(Locale.ROOT).endsWith(".fxml") || (fxmlLocation = clazz.getResource(fxmlPath)) == null) {
             throw new InvalidControllerDefinitionException("Could not resolve fxml path (\"" + fxmlPath + "\") for controller \"" + clazz.getSimpleName() + "\".");
         }
-        final String cssPath = annotation.css();
-        Stylesheet sheet = null; //TODO maybe remove check to avoid loading every css file 2x
-        if (!cssPath.isBlank() && (sheet = StyleManager.loadStylesheet(cssPath)) == null) {
+        String cssPath = annotation.css().isBlank() ? "" : (annotation.css().startsWith(Prefix.FILE_SEPARATOR) ? annotation.css() : Prefix.FILE_SEPARATOR + annotation.css());
+        boolean validCSS = true;
+        if (!cssPath.isBlank() && clazz.getResource(cssPath) == null) {
+            validCSS = false;
             LOG.warn("Invalid stylesheet (\"" + cssPath + "\") found for controller \"" + clazz.getSimpleName() + "\".");
         }
-        return new ControllerLoadContext(fxmlLocation, annotation.css());
+        return new ControllerLoadContext(fxmlLocation, annotation.css(), validCSS);
     }
 
-    private static final record ControllerLoadContext(URL fxmlLocation, String cssLocation) {
+    private static final record ControllerLoadContext(URL fxmlLocation, String cssLocation, boolean validCSS) {
     }
 
 }

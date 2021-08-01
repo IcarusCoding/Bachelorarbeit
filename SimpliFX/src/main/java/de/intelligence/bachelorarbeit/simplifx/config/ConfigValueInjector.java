@@ -3,10 +3,12 @@ package de.intelligence.bachelorarbeit.simplifx.config;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.SimpliFXConstants;
+import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigValueTypeException;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 
@@ -33,17 +35,36 @@ public final class ConfigValueInjector {
             final Class<?> fieldType = SimpliFXConstants.PRIMITIVES_MAP.getOrDefault(field.getType(), field.getType());
             final ConfigValue configValue = entry.getValue();
             final String value = registry.getForKey(configValue.value(), configValue.defaultValue());
-            System.out.println(value);
             if (fieldType.isAssignableFrom(String.class)) {
                 fieldRef.set(value);
                 continue;
             }
             if (!SimpliFXConstants.OBJECT_CONVERSION_MAP.containsKey(fieldType)) {
-                System.out.println("UNSUPPORTED TYPE");
+                throw new InvalidConfigValueTypeException("Invalid field type for field " + field + " detected. Found "
+                        + fieldType.getName() + ", expected one of ["
+                        + SimpliFXConstants.OBJECT_CONVERSION_MAP.keySet().stream().map(Class::getSimpleName)
+                        .collect(Collectors.joining(", ")) + ", String].");
+            }
+            if (!registry.getReadOnlyProperties().containsKey(configValue.value()) && configValue.defaultValue().isBlank()) {
                 continue;
             }
-            fieldRef.set(SimpliFXConstants.OBJECT_CONVERSION_MAP.get(fieldType).apply(value));
+            try {
+                fieldRef.set(SimpliFXConstants.OBJECT_CONVERSION_MAP.get(fieldType).apply(value));
+            } catch (Exception ex) {
+                throw new InvalidConfigValueTypeException("There was an error while trying to load config value for field "
+                        + field.getDeclaringClass().getName() + "." + field.getName() + ".", ex);
+            }
         }
+    }
+
+    private Object getDefault(Class<?> expected) {
+        if (expected.isAssignableFrom(Number.class)) {
+            return 0;
+        }
+        if (expected.equals(Boolean.class)) {
+            return false;
+        }
+        return "";
     }
 
 }

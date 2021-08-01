@@ -1,6 +1,5 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -14,15 +13,15 @@ public class VisibilityContext {
 
     public VisibilityContext(ObjectProperty<VisibilityState> visibility) {
         this.visibility = new ReadOnlyObjectWrapper<>(VisibilityState.UNDEFINED);
-        this.visibility.bind(Bindings.createObjectBinding(() -> {
-            final VisibilityState state = visibility.get();
-            if (state.equals(VisibilityState.SHOWN)) {
-                this.showCount++;
-            } else if (state.equals(VisibilityState.HIDDEN)) {
-                this.hideCount++;
-            }
-            return state;
-        }, visibility));
+        this.visibility.bind(visibility);
+    }
+
+    public void incrementShow() {
+        this.showCount++;
+    }
+
+    public void incrementHide() {
+        this.hideCount++;
     }
 
     public boolean isFirstShow() {
@@ -31,6 +30,14 @@ public class VisibilityContext {
 
     public boolean isFirstHide() {
         return this.hideCount == 1;
+    }
+
+    public int getHideCount() {
+        return this.hideCount;
+    }
+
+    public int getShowCount() {
+        return this.showCount;
     }
 
     public VisibilityState getVisibility() {

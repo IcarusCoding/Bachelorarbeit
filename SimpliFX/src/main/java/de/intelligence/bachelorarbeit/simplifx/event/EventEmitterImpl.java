@@ -10,8 +10,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
-import de.intelligence.bachelorarbeit.simplifx.annotation.EventHandler;
 import de.intelligence.bachelorarbeit.simplifx.events.InvalidEvent;
 import de.intelligence.bachelorarbeit.simplifx.utils.AnnotatedMethodCache;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
@@ -19,7 +21,8 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Pair;
 
 public class EventEmitterImpl implements IEventEmitter {
 
-    // TODO convert to a registry which makes accessing and checking more simple
+    private static final Logger LOG = LogManager.getLogger(EventEmitterImpl.class);
+
     private final ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<EventListener>> handlerMethods;
 
     private final ThreadLocal<Queue<Pair<Object, List<EventListener>>>> threadLocalQueue;
@@ -43,7 +46,7 @@ public class EventEmitterImpl implements IEventEmitter {
         Conditions.checkNull(obj);
         for (final Method m : AnnotatedMethodCache.getMethodsAnnotatedBy(EventHandler.class, obj.getClass())) {
             if (m.getParameterCount() != 1) {
-                // TODO warning
+                LOG.warn("Found invalid @EventHandler method \"{}\". Only one method parameter is allowed!", m);
                 continue;
             }
             final Class<?> eventParamType = m.getParameterTypes()[0];
@@ -57,7 +60,17 @@ public class EventEmitterImpl implements IEventEmitter {
 
     @Override
     public void unregister(Object obj) {
-        // TODO
+        Conditions.checkNull(obj);
+        for (final Method m : AnnotatedMethodCache.getMethodsAnnotatedBy(EventHandler.class, obj.getClass())) {
+            if (m.getParameterCount() != 1) {
+                continue;
+            }
+            final Class<?> eventParamType = m.getParameterTypes()[0];
+            if (!this.handlerMethods.containsKey(eventParamType)) {
+                continue;
+            }
+            this.handlerMethods.get(eventParamType).removeIf(e -> e.method.equals(m));
+        }
     }
 
     private boolean emit0(Object obj) {

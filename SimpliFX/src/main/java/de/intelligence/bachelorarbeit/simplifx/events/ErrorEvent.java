@@ -8,6 +8,8 @@ public final class ErrorEvent extends AbstractApplicationEvent {
     private final String details;
     private final String location;
 
+    private boolean handled;
+
     public ErrorEvent(Throwable cause, String details, String location, Application.Parameters parameters) {
         super(parameters);
         this.cause = cause;
@@ -25,6 +27,14 @@ public final class ErrorEvent extends AbstractApplicationEvent {
 
     public String getLocation() {
         return this.location;
+    }
+
+    public void setHandled() {
+        this.handled = true;
+    }
+
+    public boolean wasHandled() {
+        return this.handled;
     }
 
 }

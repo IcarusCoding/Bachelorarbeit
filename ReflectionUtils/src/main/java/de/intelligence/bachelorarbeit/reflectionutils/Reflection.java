@@ -6,11 +6,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-
-import lombok.experimental.UtilityClass;
 
 import sun.misc.Unsafe;
 
@@ -19,7 +16,6 @@ import sun.misc.Unsafe;
  *
  * @author Deniz Groenhoff
  */
-@UtilityClass
 public class Reflection {
 
     static final BiPredicate<Class<?>, Class<?>> PRIMITIVE_CHECK = (wantedType, foundType) ->
@@ -102,7 +98,7 @@ public class Reflection {
         return new InstanceReflection(instance);
     }
 
-    public static void addOpens(List<String> fullyQualifiedPackageNames, String module, Module currentModule)
+    public static void addOpens(String fullyQualifiedPackageName, String module, Module currentModule)
             throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
         final Unsafe unsafe = Reflection.reflect(Unsafe.class).reflectField("theUnsafe").forceAccess().getUnsafe();
         if (unsafe == null) {
@@ -120,9 +116,7 @@ public class Reflection {
                 .reflectMethod("implAddOpens", String.class, moduleImpl).getReflectable();
         long firstFieldOffset = unsafe.objectFieldOffset(OffsetProvider.class.getDeclaredField("firstField"));
         unsafe.putBooleanVolatile(addOpensMethodImpl, firstFieldOffset, true);
-        for (final String pkgName : fullyQualifiedPackageNames) {
-            addOpensMethodImpl.invoke(fMod, pkgName, currentModule);
-        }
+        addOpensMethodImpl.invoke(fMod, fullyQualifiedPackageName, currentModule);
     }
 
     @SuppressWarnings("unchecked")
@@ -180,4 +174,9 @@ public class Reflection {
         }
         return found;
     }
+
+    private Reflection() {
+        throw new UnsupportedOperationException();
+    }
+
 }

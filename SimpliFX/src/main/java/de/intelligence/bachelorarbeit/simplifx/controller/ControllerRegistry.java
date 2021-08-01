@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-//TODO exceptions on invalid access
 public final class ControllerRegistry {
 
     private static final Set<String> registeredIds = new HashSet<>();
@@ -42,7 +41,7 @@ public final class ControllerRegistry {
     }
 
     public static boolean removeGroup(String groupId) {
-        if (controllerToIdMap.values().stream().noneMatch(groupId::equals)) {
+        if (controllerToIdMap.values().stream().anyMatch(groupId::equals)) {
             return false;
         }
         registeredIds.remove(groupId);

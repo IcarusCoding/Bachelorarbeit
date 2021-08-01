@@ -5,15 +5,17 @@ import java.util.Optional;
 
 import com.google.inject.Module;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.intelligence.bachelorarbeit.reflectionutils.ConstructorReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
-import de.intelligence.bachelorarbeit.simplifx.logging.SimpliFXLogger;
 
 public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<GuiceInjection> {
 
-    private static final SimpliFXLogger LOG = SimpliFXLogger.create(GuiceEnvironmentFactory.class);
+    private static final Logger LOG = LogManager.getLogger(GuiceEnvironmentFactory.class);
 
     @Override
     public DIEnvironment create(Object obj, GuiceInjection guiceInjection) {
@@ -21,8 +23,8 @@ public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<Guic
                 .map(classRef -> {
                     final Optional<ConstructorReflection> conRefOpt = classRef.hasConstructor();
                     if (conRefOpt.isEmpty()) {
-                        LOG.warn("Could not create an instance of module " + classRef.getReflectable().getSimpleName()
-                                + ". Reason: Missing default constructor.");
+                        LOG.warn("Could not create an instance of module {}. Reason: Missing default constructor.",
+                                classRef.getReflectable().getSimpleName());
                     }
                     return conRefOpt;
                 })

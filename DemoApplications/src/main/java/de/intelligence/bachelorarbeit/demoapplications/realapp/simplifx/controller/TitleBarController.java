@@ -3,7 +3,7 @@ package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.control
 import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
 
-import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.application.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.localization.ResourceBundle;
