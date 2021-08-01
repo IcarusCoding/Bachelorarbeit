@@ -17,9 +17,9 @@ public @interface StageConfig {
 
     boolean alwaysTop() default false;
 
-    String iconPath() default "";
+    String[] icons() default "";
 
-    boolean resizeable() default true;
+    boolean resizeable() default false;
 
     boolean autoShow() default false;
 

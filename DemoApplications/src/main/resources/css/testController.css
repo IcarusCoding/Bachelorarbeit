@@ -1,8 +1,0 @@
-#testControllerRoot {
-    -fx-background-color: #3C5186;
-}
-
-Label {
-    -fx-font-size: 20;
-    -fx-text-fill: white;
-}

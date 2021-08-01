@@ -1,10 +1,14 @@
 package de.intelligence.bachelorarbeit.simplifx.controller;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.animation.Timeline;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Control;
@@ -19,11 +23,13 @@ import de.intelligence.bachelorarbeit.simplifx.controller.animation.IWrapperAnim
 public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
 
     private final ReadOnlyObjectWrapper<Pane> wrapper;
+    private final ObjectProperty<INotificationDialog> dialog;
 
     private Timeline running;
 
-    public ControllerGroupWrapperImpl() {
+    public ControllerGroupWrapperImpl(Function<Pane, INotificationDialog> dialog) {
         this.wrapper = new ReadOnlyObjectWrapper<>(new StackPane());
+        this.dialog = new SimpleObjectProperty<>(dialog.apply(this.wrapper.get()));
         final Rectangle clipRect = new Rectangle();
         clipRect.widthProperty().bind(this.wrapper.get().widthProperty());
         clipRect.heightProperty().bind(this.wrapper.get().heightProperty());
@@ -97,6 +103,27 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     @Override
     public Pane getWrapper() {
         return this.wrapper.get();
+    }
+
+    @Override
+    public void showNotification(StringBinding title, StringBinding content, NotificationKind kind) {
+        final INotificationDialog dialog = this.dialog.get();
+        if (dialog != null) {
+            dialog.showMessage(title, content, kind);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        this.dialog.get().close();
+        final Pane w = this.wrapper.get();
+        if (w != null && w.getParent() != null && w.getParent() instanceof Pane) {
+            ((Pane) w.getParent()).getChildren().remove(w);
+        }
+        this.dialog.unbind();
+        this.dialog.set(null);
+        this.wrapper.unbind();
+        this.wrapper.set(null);
     }
 
 }

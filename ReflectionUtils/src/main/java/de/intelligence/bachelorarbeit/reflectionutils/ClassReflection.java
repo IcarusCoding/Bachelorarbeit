@@ -28,7 +28,7 @@ public final class ClassReflection extends ReflectableScope<Class<?>> implements
         Arrays.stream(clazz.getDeclaredMethods()).filter(m -> identifier != null && identifier.check(m))
                 .forEach(callback::callback);
         if (clazz.isInterface()) {
-            Arrays.stream(clazz.getInterfaces()).forEach(m -> iterateMethods(clazz, identifier, callback));
+            Arrays.stream(clazz.getInterfaces()).forEach(c -> iterateMethods(c, identifier, callback));
             return;
         }
         if (clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class) {

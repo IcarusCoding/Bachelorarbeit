@@ -10,7 +10,7 @@
 <StackPane xmlns:fx="http://javafx.com/fxml/1"
            xmlns="http://javafx.com/javafx/11.0.1"
            fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.SidebarController"
-           id="root" prefWidth="150">
+           id="sidebarRoot" prefWidth="150">
     <BorderPane prefHeight="200.0" prefWidth="100.0" StackPane.alignment="CENTER">
         <top>
             <HBox alignment="CENTER">

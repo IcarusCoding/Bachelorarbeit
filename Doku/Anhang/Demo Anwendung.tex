@@ -1,0 +1,242 @@
+\chapter{Demo Anwendung}
+\label{appendix:demo_application}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Minimaler Einstiegspunkt., captionpos=b, label=lst:entry_point_demo_full, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@StageConfig(title = "Login", icons = "icon.png")
+#@ApplicationEntryPoint(MainController.class)
+#@GuiceInjection(MainModule.class)
+public final class DemoApplication {
+
+    public static void main(String[] args) throws Exception {
+        Reflection.addOpens("java.lang.reflect", "java.base",
+				JFXTextFieldSkin.class.getModule());
+        SimpliFX.launch();
+    }
+
+    #@ResourceBundle("lang.Messages")
+    private II18N ii18N;
+
+    #@ConfigSource("config/connection")
+    private Properties properties;
+
+    #@Shared
+    private SharedReference<StringProperty> titleRef;
+
+    #@EventHandler
+    private void onStart(StartEvent event) {
+        this.titleRef.set(event.getStage().titleProperty());
+        event.getStage().show();
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainController}., captionpos=b, label=lst:main_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/MainController.fxml", 
+#					 css = "css/main.css")
+public final class MainController {
+
+	#@FXML
+	private BorderPane root;
+	
+	#@Setup
+	private void setup(ControllerSetupContext ctx) {
+		// Erstelle Untergruppe "titleBar" mit TitleBarController 
+		// als Startcontroller
+	    ctx.createSubGroup(TitleBarController.class, "titleBar", 
+				this.root::setTop);
+		// Erstelle Untergruppe "mainContent" mit LoginController
+		// als Startcontroller
+	    ctx.createSubGroup(LoginController.class, "mainContent",
+				this.root::setCenter);
+	}
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{LoginController}., captionpos=b, label=lst:login_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/LoginController.fxml")
+public final class LoginController {
+
+	#@FXML
+    private JFXTextField usernameField;
+
+    #@FXML
+    private JFXPasswordField passwordField;
+
+    #@Shared
+    private SharedReference<String> usernameRef;
+
+    #@Shared
+    private SharedReference<StringProperty> titleRef;
+
+    #@Inject
+    private ILoginService loginService;
+
+    private ControllerGroupContext ctx;
+
+    #@Setup
+    private void setup(ControllerSetupContext ctx) {
+        ctx.preloadController(MainMenuController.class);
+        this.ctx = ctx.getGroupContext();
+    }
+
+    #@OnShow
+    private void onShow() {
+        this.titleRef.get().set("Login");
+    }
+
+    #@OnHide
+    private void onHide() {
+        this.usernameField.clear();
+        this.passwordField.clear();
+    }
+
+    #@FXML
+    private void onLogin() {
+        if (loginService.login(this.usernameField.getText(),
+				this.passwordField.getText())) {
+            this.usernameRef.set(this.usernameField.getText());
+            this.ctx.switchController(MainMenuController.class,
+					new FadeAnimation(Duration.millis(250)));
+        }
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- \texttt{MainMenuController}., captionpos=b, label=lst:mainmenu_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/MainMenuController.fxml")
+public final class MainMenuController {
+
+    #@FXML
+    private BorderPane root;
+
+    #@FXML
+    private StackPane contentCenter;
+
+    #@ResourceBundle
+    private II18N ii18N;
+
+    #@Shared
+    private SharedResources resources;
+
+    private StringBinding binding;
+
+    #@Setup
+    private void setup(ControllerSetupContext ctx) {
+        ctx.createSubGroup(SidebarController.class, "sidebar",
+				this.root::setLeft);
+        ctx.createSubGroup(TestControllerOne.class,
+				"sidebarContent",
+				this.contentCenter.getChildren()::setAll);
+    }
+
+    #@PostConstruct
+    private void afterConstruction() {
+        this.binding = this.ii18N
+				.createObservedBinding("mainMenu.welcome",
+						this.resources.getForName("username")
+						.asProperty());
+    }
+
+    #@OnShow
+    private void onShow() {
+        final SharedReference<StringProperty> prop = 
+				this.resources.getForName("title");
+        prop.get().set(this.binding.get());
+    }
+
+}
+	\end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Demo -- Alle \texttt{TestController}., captionpos=b, label=lst:test_controllers, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol]
+#@Controller(fxml = "/fxml/TestControllerOne.fxml")
+public static final class TestControllerOne {
+
+    #@Setup
+    private void onSetup(ControllerSetupContext ctx) {
+        ctx.preloadController(TestControllerTwo.class);
+        ctx.preloadController(TestControllerThree.class);
+    }
+
+}
+
+#@Controller(fxml = "/fxml/TestControllerTwo.fxml")
+public static final class TestControllerTwo {}
+
+#@Controller(fxml = "/fxml/TestControllerThree.fxml")
+public static final class TestControllerThree {}
+	\end{lstlisting}
+\end{figure}
+%\begin{figure}
+	\begin{lstlisting}[caption=Demo -- \texttt{SidebarController}., captionpos=b, label=lst:sidebar_controller, numbers=left, xleftmargin=1.7em, framexleftmargin=1.7em, nolol, basicstyle=\footnotesize\ttfamily, float=]
+#@Controller(fxml = "/fxml/SidebarController.fxml")
+public final class SidebarController {
+
+    #@FXML
+    private Label connectionLbl;
+
+    #@ConfigValue("host")
+    private String hostname;
+
+    #@ConfigValue(value = "port")
+    private int port;
+
+    #@LocalizeValue(id = "connectionLbl", property = "text")
+    private StringProperty hostProperty = new SimpleStringProperty();
+
+    #@LocalizeValue(id = "connectionLbl", index = 1, property = "text")
+    private IntegerProperty portProperty = new SimpleIntegerProperty();
+
+    private ControllerGroupContext mainCtx;
+    private ControllerGroupContext sidebarContentCtx;
+
+    #@Setup
+    private void onSetup(ControllerSetupContext ctx) {
+        this.mainCtx = ctx.getContextFor("mainContent");
+        this.sidebarContentCtx = ctx.getContextFor("sidebarContent");
+    }
+
+    #@PostConstruct
+    private void afterConstruction() {
+        this.hostProperty.set(this.hostname);
+        this.portProperty.set(this.port);
+    }
+
+    #@OnHide
+    private void onHide() {
+        sidebarContentCtx.switchController(TestControllerOne.class);
+    }
+
+    #@FXML
+    private void onLogoutPressed() {
+        this.mainCtx.switchController(LoginController.class, 
+				new BottomSlideAnimation(Duration.millis(250)));
+    }
+	(@\newpage\clearpage@)
+    #@FXML
+    private void onOnePressed() {
+        sidebarContentCtx.switchController(TestControllerOne.class, 
+				new TopSlideAnimation(Duration.millis(250)));
+    }
+
+    #@FXML
+    private void onTwoPressed() {
+        sidebarContentCtx.switchController(TestControllerTwo.class,
+				new RightSlideAnimation(Duration.millis(250)));
+    }
+
+    #@FXML
+    private void onThreePressed() {
+        sidebarContentCtx.switchController(TestControllerThree.class, 
+				new LeftSlideAnimation(Duration.millis(250)));
+    }
+
+}
+	\end{lstlisting}
+%\end{figure}

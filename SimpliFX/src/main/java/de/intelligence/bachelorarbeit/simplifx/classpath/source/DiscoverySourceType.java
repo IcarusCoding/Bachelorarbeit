@@ -5,8 +5,6 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.function.BiFunction;
 
-import lombok.Getter;
-
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClasspathDiscoveryException;
 import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
@@ -16,7 +14,6 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
  * @author Deniz Grenhoff
  * @see IDiscoverySource
  */
-@Getter
 public enum DiscoverySourceType {
 
     FILE(Prefix.FILE_SCHEME, FileDiscoverySource::new),
@@ -54,6 +51,14 @@ public enum DiscoverySourceType {
             }
         }
         throw new ClasspathDiscoveryException("Unsupported URL scheme: " + url.getProtocol());
+    }
+
+    public String getScheme() {
+        return this.scheme;
+    }
+
+    public BiFunction<URL, String, IDiscoverySource> getSourceCreator() {
+        return this.sourceCreator;
     }
 
 }

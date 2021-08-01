@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 
@@ -16,7 +16,7 @@ public interface IAnnotatedFieldDetector<T extends Annotation> {
 
     void findAllFields(BiPredicate<FieldReflection, T[]> predicate);
 
-    void injectValue(Object value, boolean forceAccess, Consumer<Exception> exceptionConsumer);
+    void injectValue(Object value, boolean forceAccess, BiConsumer<Field, Exception> exceptionConsumer);
 
     Map<Object, Map<Field, T[]>> getFieldMap();
 

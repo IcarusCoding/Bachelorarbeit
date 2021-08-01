@@ -6,40 +6,43 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import lombok.experimental.UtilityClass;
+import java.util.function.Supplier;
 
 /**
  * A utility class that provides basic conditional operations
  *
  * @author Deniz Groenhoff
  */
-@UtilityClass
 public final class Conditions {
 
-    public <T> T checkNull(T t) {
+    private Conditions() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static <T> T checkNull(T t) {
         if (t == null) {
             throw new NullPointerException("Parameter is null.");
         }
         return t;
     }
 
-    public <T> T checkNull(T t, String message) {
+    public static <T> T checkNull(T t, String message) {
         if (t == null) {
             throw new NullPointerException(message);
         }
         return t;
     }
 
-    public void checkCondition(boolean condition) {
-        if (!condition) {
-            throw new IllegalArgumentException("Illegal argument specified.");
+    public static <T> T computeIfNull(Object t, Supplier<T> then, T other) {
+        if (t != null) {
+            return then.get();
         }
+        return other;
     }
 
-    public void checkCondition(boolean condition, String message) {
+    public static void checkCondition(boolean condition) {
         if (!condition) {
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException("Illegal argument specified.");
         }
     }
 
@@ -67,11 +70,12 @@ public final class Conditions {
         }
     }
 
-    public static <S, T> T returnIfNotNullReturn(S s, ExceptionSupplier<T> action) {
+    public static <S, T> T returnIfNotNull(S s, ExceptionSupplier<T> action) {
         if (s != null) {
             try {
                 return action.get();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return null;
     }
@@ -85,6 +89,12 @@ public final class Conditions {
     public static <T> Predicate<T> distinct(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public static void checkCondition(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
 }

@@ -1,14 +1,12 @@
-package de.intelligence.bachelorarbeit.simplifx.localization;
+package de.intelligence.bachelorarbeit.simplifx.experimental;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResourceBundles {
-
-    ResourceBundle[] value();
+public @interface FXThread {
 
 }

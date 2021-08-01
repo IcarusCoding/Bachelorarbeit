@@ -13,14 +13,16 @@ import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.service.
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;
+import de.intelligence.bachelorarbeit.simplifx.controller.NotificationKind;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnHide;
 import de.intelligence.bachelorarbeit.simplifx.controller.OnShow;
 import de.intelligence.bachelorarbeit.simplifx.controller.Setup;
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.FadeAnimation;
+import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
 import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
 
-@Controller(fxml = "/fxml/LoginController.fxml", css = "css/loginController.css")
+@Controller(fxml = "/fxml/LoginController.fxml")
 public final class LoginController {
 
     @FXML
@@ -39,6 +41,9 @@ public final class LoginController {
     private ILoginService loginService;
 
     private ControllerGroupContext ctx;
+
+    @FXML
+    private II18N resources;
 
     @Setup
     private void setup(ControllerSetupContext ctx) {
@@ -63,7 +68,10 @@ public final class LoginController {
             if (this.loginService.login(this.usernameField.getText(), this.passwordField.getText())) {
                 this.usernameRef.set(this.usernameField.getText());
                 this.ctx.switchController(MainMenuController.class, new FadeAnimation(Duration.millis(250)));
+                return;
             }
+            this.ctx.showNotification(this.resources.createBindingForKey("notifications.loginErrorTitle"),
+                    this.resources.createBindingForKey("notifications.invalidCredentials"), NotificationKind.ERROR);
         }
     }
 

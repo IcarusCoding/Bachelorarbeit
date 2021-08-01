@@ -5,7 +5,8 @@
 <?import javafx.scene.layout.StackPane?>
 <StackPane xmlns:fx="http://javafx.com/fxml"
            xmlns="http://javafx.com/javafx"
-           fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TitleBarController">
+           fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TitleBarController"
+           id="titleBarRoot">
     <MenuBar>
         <Menu text="%titleBar.settingsMenu">
             <Menu text="%titleBar.settingsMenu.languageMenu" fx:id="languageMenu"/>

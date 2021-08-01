@@ -1,6 +1,6 @@
 package de.intelligence.bachelorarbeit.simplifx.exception;
 
-public final class SimpliFXException extends RuntimeException {
+public class SimpliFXException extends RuntimeException {
 
     public SimpliFXException() {
         super();
@@ -12,6 +12,10 @@ public final class SimpliFXException extends RuntimeException {
 
     public SimpliFXException(String message, Throwable throwable) {
         super(message, throwable);
+    }
+
+    public SimpliFXException(Throwable throwable) {
+        super(throwable);
     }
 
 }

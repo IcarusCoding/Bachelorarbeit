@@ -2,7 +2,7 @@ package de.intelligence.bachelorarbeit.simplifx.events;
 
 import javafx.application.Application;
 
-public abstract class AbstractApplicationEvent extends AbstractEvent {
+public abstract class AbstractApplicationEvent {
 
     private final Application.Parameters parameters;
 

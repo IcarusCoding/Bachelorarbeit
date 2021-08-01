@@ -2,7 +2,8 @@ package de.intelligence.bachelorarbeit.simplifx.utils;
 
 import java.util.Iterator;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An implementation of the {@link CloseableIterator} interface, which delegates
@@ -12,8 +13,9 @@ import lombok.extern.log4j.Log4j2;
  * @see java.util.Iterator
  * @see de.intelligence.bachelorarbeit.simplifx.utils.CloseableIterator
  */
-@Log4j2
 public final class CloseableWrappedIterator<T> implements CloseableIterator<T> {
+
+    private static final Logger LOG = LogManager.getLogger(CloseableWrappedIterator.class);
 
     private final Iterator<T> delegate;
 
@@ -47,7 +49,7 @@ public final class CloseableWrappedIterator<T> implements CloseableIterator<T> {
             try {
                 ((AutoCloseable) this.delegate).close();
             } catch (Exception ex) {
-                log.error("Failed to close iterator: ", ex);
+                CloseableWrappedIterator.LOG.error("Failed to close iterator", ex);
             }
         }
     }

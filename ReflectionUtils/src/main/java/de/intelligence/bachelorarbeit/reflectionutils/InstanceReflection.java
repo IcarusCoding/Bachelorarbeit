@@ -20,28 +20,28 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
         super(instance);
     }
 
-    private void iterateMethods(Object accessor, @Nullable Identifier<MethodReflection> identifier,
+    private void iterateMethods(Class<?> clazz, @Nullable Identifier<MethodReflection> identifier,
                                 Callback<MethodReflection> callback) {
-        Arrays.stream(accessor.getClass().getDeclaredMethods())
-                .map(m -> Reflection.setExceptionHandler(new MethodReflection(m, accessor), this.handler))
+        Arrays.stream(clazz.getDeclaredMethods())
+                .map(m -> Reflection.setExceptionHandler(new MethodReflection(m, super.reflectable), this.handler))
                 .filter(m -> identifier != null && identifier.check(m)).forEach(callback::callback);
-        if (accessor.getClass().isInterface()) {
-            Arrays.stream(accessor.getClass().getInterfaces())
-                    .forEach(m -> this.iterateMethods(accessor.getClass(), identifier, callback));
+        if (clazz.isInterface()) {
+            Arrays.stream(clazz.getInterfaces())
+                    .forEach(c -> this.iterateMethods(c, identifier, callback));
             return;
         }
-        if (accessor.getClass().getSuperclass() != null && accessor.getClass().getSuperclass() != Object.class) {
-            this.iterateMethods(accessor.getClass().getSuperclass(), identifier, callback);
+        if (clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class) {
+            this.iterateMethods(clazz.getSuperclass(), identifier, callback);
         }
+
     }
 
     private void iterateFields(Object accessor, @Nullable Identifier<FieldReflection> identifier,
                                Callback<FieldReflection> callback) {
-        Arrays.stream(accessor.getClass().getDeclaredFields())
-                .map(f -> Reflection.setExceptionHandler(new FieldReflection(f, accessor), this.handler))
-                .filter(f -> identifier != null && identifier.check(f)).forEach(callback::callback);
-        if (accessor.getClass().getSuperclass() != null && accessor.getClass().getSuperclass() != Object.class) {
-            this.iterateFields(accessor.getClass().getSuperclass(), identifier, callback);
+        for (Class<?> current = accessor.getClass(); current != null && current != Object.class; current = current.getSuperclass()) {
+            Arrays.stream(current.getDeclaredFields())
+                    .map(f -> Reflection.setExceptionHandler(new FieldReflection(f, accessor), this.handler))
+                    .filter(f -> identifier != null && identifier.check(f)).forEach(callback::callback);
         }
     }
 
@@ -114,7 +114,7 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
      * @return This instance
      */
     public InstanceReflection iterateMethods(@Nullable Identifier<MethodReflection> identifier, Callback<MethodReflection> callback) {
-        this.iterateMethods(super.reflectable, identifier, callback);
+        this.iterateMethods(super.reflectable.getClass(), identifier, callback);
         return this;
     }
 

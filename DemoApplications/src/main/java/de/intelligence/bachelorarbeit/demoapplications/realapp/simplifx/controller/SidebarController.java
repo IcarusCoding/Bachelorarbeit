@@ -11,7 +11,7 @@ import javafx.util.Duration;
 import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerOne;
 import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerThree;
 import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerTwo;
-import de.intelligence.bachelorarbeit.simplifx.annotation.PostConstruct;
+import de.intelligence.bachelorarbeit.simplifx.application.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigValue;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext;
@@ -24,7 +24,7 @@ import de.intelligence.bachelorarbeit.simplifx.controller.animation.RightSlideAn
 import de.intelligence.bachelorarbeit.simplifx.controller.animation.TopSlideAnimation;
 import de.intelligence.bachelorarbeit.simplifx.localization.LocalizeValue;
 
-@Controller(fxml = "/fxml/SidebarController.fxml", css = "css/sidebarController.css")
+@Controller(fxml = "/fxml/SidebarController.fxml")
 public final class SidebarController {
 
     @FXML
@@ -33,7 +33,7 @@ public final class SidebarController {
     @ConfigValue("host")
     private String hostname;
 
-    @ConfigValue("port")
+    @ConfigValue(value = "port")
     private int port;
 
     @LocalizeValue(id = "connectionLbl", property = "text")
@@ -45,7 +45,7 @@ public final class SidebarController {
     private ControllerGroupContext mainCtx;
     private ControllerGroupContext sidebarContentCtx;
 
-    @Setup //TODO direct ctx injection
+    @Setup
     private void onSetup(ControllerSetupContext ctx) {
         this.mainCtx = ctx.getContextFor("mainContent");
         this.sidebarContentCtx = ctx.getContextFor("sidebarContent");
