@@ -45,8 +45,26 @@ public final class ConfigValueInjector {
                         + SimpliFXConstants.OBJECT_CONVERSION_MAP.keySet().stream().map(Class::getSimpleName)
                         .collect(Collectors.joining(", ")) + ", String].");
             }
-            fieldRef.set(SimpliFXConstants.OBJECT_CONVERSION_MAP.get(fieldType).apply(value));
+            if (!registry.getReadOnlyProperties().containsKey(configValue.value()) && configValue.defaultValue().isBlank()) {
+                continue;
+            }
+            try {
+                fieldRef.set(SimpliFXConstants.OBJECT_CONVERSION_MAP.get(fieldType).apply(value));
+            } catch (Exception ex) {
+                throw new InvalidConfigValueTypeException("There was an error while trying to load config value for field "
+                        + field.getDeclaringClass().getName() + "." + field.getName() + ".", ex);
+            }
         }
+    }
+
+    private Object getDefault(Class<?> expected) {
+        if (expected.isAssignableFrom(Number.class)) {
+            return 0;
+        }
+        if (expected.equals(Boolean.class)) {
+            return false;
+        }
+        return "";
     }
 
 }

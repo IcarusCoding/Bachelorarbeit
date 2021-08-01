@@ -7,6 +7,7 @@ import javafx.stage.StageStyle;
 import de.intelligence.bachelorarbeit.simplifx.application.PreloaderEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.event.EventHandler;
+import de.intelligence.bachelorarbeit.simplifx.events.ErrorEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.PreloaderNotificationEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
@@ -32,6 +33,11 @@ public final class TestLoader {
     @EventHandler
     private void onPreloaderNotification(PreloaderNotificationEvent event) {
         System.out.println("SUCCESSFULLY RECEIVED " + event.getNotification());
+    }
+
+    @EventHandler
+    private void onError(ErrorEvent event) {
+        //event.setHandled();
     }
 
 }

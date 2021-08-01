@@ -50,9 +50,10 @@ public final class PreloaderImpl extends Preloader {
 
     @Override
     public boolean handleErrorNotification(ErrorNotification info) {
-        this.emitter.emit(new ErrorEvent(info.getCause(), info.getDetails(), info.getLocation(),
-                super.getParameters()));
-        return true;
+        final ErrorEvent event = new ErrorEvent(info.getCause(), info.getDetails(), info.getLocation(),
+                super.getParameters());
+        this.emitter.emit(event);
+        return event.wasHandled();
     }
 
 }

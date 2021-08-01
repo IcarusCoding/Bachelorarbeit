@@ -7,13 +7,16 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,7 +84,6 @@ import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Pair;
 
-//TODO remove some static behaviour
 public final class SimpliFX {
 
     private static final Logger LOG = LogManager.getLogger(SimpliFX.class);
@@ -194,7 +196,7 @@ public final class SimpliFX {
         Logging.getCSSLogger().disableLogging();
         SimpliFX.globalInjector = Guice.createInjector(new DIConfig());
         SimpliFX.globalResources = new SharedResources();
-        SimpliFX.globalPropertyRegistry = new PropertyRegistry(applicationListener.getClass().getClassLoader());
+        SimpliFX.globalPropertyRegistry = new PropertyRegistry(applicationListener);
         final Class<?> applicationClass = applicationListener.getClass();
 
         System.out.println(new String(SimpliFXConstants.BANNER));
@@ -215,8 +217,15 @@ public final class SimpliFX {
         final AnnotatedFieldDetector<ConfigSource> configDetector = new AnnotatedFieldDetector<>(ConfigSource.class,
                 applicationListener, preloaderListener);
         configDetector.findAllFields((fRef, a) -> fRef.getReflectable().getType().equals(Properties.class));
-        configDetector.getAnnotations().stream().flatMap(a -> Arrays.stream(a.value())).distinct()
-                .forEach(path -> SimpliFX.globalPropertyRegistry.loadFrom(path));
+        configDetector.getAnnotations().stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                        new TreeSet<>(Comparator.comparing(ConfigSource::value))), HashSet::new)).forEach(source -> {
+            if (source.source().equals(ConfigSource.Source.CLASSPATH)) {
+                SimpliFX.globalPropertyRegistry.loadFromClasspath(source.value());
+                return;
+            }
+            SimpliFX.globalPropertyRegistry.loadFromOutside(source.value());
+        });
         configDetector.injectValue(SimpliFX.globalPropertyRegistry.getReadOnlyProperties(), true, (f, ex) -> {
             throw new ApplicationConstructionException("Failed to inject properties into field " + f.getName(), ex);
         });
@@ -365,7 +374,7 @@ public final class SimpliFX {
         private final Semaphore preloaderExitSem;
         private final AtomicReference<LaunchState> currAppState;
         private final AtomicReference<LaunchState> currPreState;
-        private final Map<String, Throwable> exceptions;
+        private final Map<String, Pair<Throwable, Boolean>> exceptions;
 
         private boolean errored;
 
@@ -394,7 +403,7 @@ public final class SimpliFX {
             }
             PlatformImpl.runAndWait(() -> Thread.currentThread().setUncaughtExceptionHandler((t, th) -> {
                 errored = true;
-                this.exceptions.put("Exception on FX thread", th);
+                this.exceptions.put("Exception on FX thread", Pair.of(th, false));
                 Platform.exit();
             }));
             final ExitListener exitListener = new ExitListener();
@@ -405,7 +414,7 @@ public final class SimpliFX {
                     try {
                         this.preloaderImpl.init();
                     } catch (Exception ex) {
-                        this.exceptions.put("Exception while handling preloader init event", ex);
+                        this.exceptions.put("Exception while handling preloader init event", Pair.of(ex, false));
                         this.errored = true;
                     }
                     if (!this.errored && !currAppState.get().equals(LaunchState.EXIT)) {
@@ -420,7 +429,7 @@ public final class SimpliFX {
                                     primary.show();
                                 }
                             } catch (Exception ex) {
-                                this.exceptions.put("Exception while handling preloader start event", ex);
+                                this.exceptions.put("Exception while handling preloader start event", Pair.of(ex, false));
                                 this.errored = true;
                             }
                         });
@@ -442,7 +451,7 @@ public final class SimpliFX {
                     try {
                         applicationImpl.init();
                     } catch (Exception ex) {
-                        this.exceptions.put("Exception while handling application init event", ex);
+                        this.exceptions.put("Exception while handling application init event", Pair.of(ex, true));
                         this.errored = true;
                     }
                 }
@@ -466,7 +475,7 @@ public final class SimpliFX {
                                 primary.show();
                             }
                         } catch (Exception ex) {
-                            this.exceptions.put("Exception while starting application", ex);
+                            this.exceptions.put("Exception while starting application", Pair.of(ex, true));
                             this.errored = true;
                         }
                     });
@@ -480,14 +489,17 @@ public final class SimpliFX {
                             mainGroup.destroy();
                             applicationImpl.stop();
                         } catch (Exception ex) {
-                            this.exceptions.put("Exception while handling application stop event", ex);
+                            this.exceptions.put("Exception while handling application stop event", Pair.of(ex, true));
                             this.errored = true;
                         }
                     });
                 }
                 if (errored) {
-                    final Map.Entry<String, Throwable> ex = this.exceptions.entrySet().iterator().next();
-                    throw new RuntimeException(ex.getKey(), ex.getValue());
+                    final Map.Entry<String, Pair<Throwable, Boolean>> ex = this.exceptions.entrySet().iterator().next();
+                    if (ex.getValue().getRight() && this.doNotifyError(ex.getKey(), ex.getValue().getLeft())) {
+                        return;
+                    }
+                    throw new RuntimeException(ex.getKey(), ex.getValue().getLeft());
                 }
             } finally {
                 PlatformImpl.removeListener(exitListener);
@@ -524,19 +536,14 @@ public final class SimpliFX {
                     .handleStateChangeNotification(new Preloader.StateChangeNotification(type, this.applicationImpl)));
         }
 
-        private void doNotifyError(String message, Throwable cause) {
+        private boolean doNotifyError(String message, Throwable cause) {
             if (this.preloaderImpl == null) {
-                return;
+                return false;
             }
-            PlatformImpl.runAndWait(() -> this.preloaderImpl
-                    .handleErrorNotification(new Preloader.ErrorNotification(null, message, cause)));
-        }
-
-        private void notifyPreloader(Preloader.PreloaderNotification notification) {
-            if (this.preloaderImpl == null) {
-                return;
-            }
-            this.preloaderImpl.notifyPreloader(notification);
+            final AtomicBoolean retRef = new AtomicBoolean();
+            PlatformImpl.runAndWait(() -> retRef.set(this.preloaderImpl
+                    .handleErrorNotification(new Preloader.ErrorNotification(null, message, cause))));
+            return retRef.get();
         }
 
         private Pair<StageConfig, Stage> createStage(Stage stage, Class<?> entrypointClass) {

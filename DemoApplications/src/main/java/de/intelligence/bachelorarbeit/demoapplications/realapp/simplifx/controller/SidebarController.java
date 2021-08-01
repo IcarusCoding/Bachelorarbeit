@@ -45,7 +45,7 @@ public final class SidebarController {
     private ControllerGroupContext mainCtx;
     private ControllerGroupContext sidebarContentCtx;
 
-    @Setup //TODO direct ctx injection
+    @Setup
     private void onSetup(ControllerSetupContext ctx) {
         this.mainCtx = ctx.getContextFor("mainContent");
         this.sidebarContentCtx = ctx.getContextFor("sidebarContent");

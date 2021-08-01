@@ -2,7 +2,6 @@ package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx;
 
 import java.util.Properties;
 
-import javafx.application.Preloader;
 import javafx.beans.property.StringProperty;
 
 import com.jfoenix.skins.JFXTextFieldSkin;
@@ -36,7 +35,7 @@ public final class DemoApplication {
     @ResourceBundle("lang.Messages")
     private II18N ii18N;
 
-    @ConfigSource("config/connection")
+    @ConfigSource(value = "config/connection")
     private Properties properties;
 
     @Shared
@@ -44,7 +43,8 @@ public final class DemoApplication {
 
     @EventHandler
     private void onInit(InitEvent event) {
-        event.getNotificationAccess().notifyPreloader(new Preloader.ErrorNotification(null, "TEST", null));
+        // throw new RuntimeException("TEST EXCEPTION");
+        //  event.getNotificationAccess().notifyPreloader(new Preloader.ErrorNotification(null, "TEST", null));
        /* try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
