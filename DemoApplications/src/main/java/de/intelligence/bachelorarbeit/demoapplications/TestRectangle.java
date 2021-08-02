@@ -20,7 +20,11 @@ public final class TestRectangle extends Rectangle {
     //@CssProperty(property = "-fx-height", localPropertyField = "styleableHeight", converterClass = SizeConverter.class)
     public static List<CssMetaData<? extends Styleable, ?>> CLASS_CSS_META_DATA;
     private StyleableObjectProperty<Double> testius;
-    private StyleableObjectProperty<Double> testius2;
+    private StyleableObjectProperty<String> testius2;
+
+    public TestRectangle() {
+        super();
+    }
 
     public TestRectangle(double width, double height) {
         super(width, height);
