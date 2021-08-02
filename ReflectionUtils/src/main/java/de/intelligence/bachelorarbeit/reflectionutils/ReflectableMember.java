@@ -68,7 +68,7 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
 
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotation) {
-        return super.reflectable.isAnnotationPresent(annotation);
+        return super.reflectable.getAnnotationsByType(annotation).length != 0;
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(ConfigSources.class)
-public @interface ConfigSource { //TODO add support for outside classpath
+public @interface ConfigSource {
 
     String value();
 

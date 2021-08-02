@@ -4,7 +4,8 @@ import java.util.List;
 
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
-import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleablePropertyFactory;
 import javafx.css.converter.SizeConverter;
 import javafx.scene.shape.Rectangle;
 
@@ -12,27 +13,17 @@ import de.intelligence.bachelorarbeit.simplifx.css.CssProperty;
 
 public final class TestRectangle extends Rectangle {
 
-    //TODO maybe map for property -> meta data
-    //TODO maybe remove localPropert ability completely and bind to properties from superclass
-    @CssProperty(property = "-fx-width", localPropertyField = "styleableWidth", converterClass = SizeConverter.class)
-    @CssProperty(property = "-fx-height", localPropertyField = "styleableHeight", converterClass = SizeConverter.class)
+    private static final StyleablePropertyFactory<TestRectangle> factory = new StyleablePropertyFactory<>(Rectangle.getClassCssMetaData());
+    //TODO support null localProperty and only use temp vars then
+    @CssProperty(property = "-fx-width", localPropertyField = "testius", converterClass = SizeConverter.class, bindTo = "width")
+    @CssProperty(property = "-fx-height", localPropertyField = "testius2", converterClass = SizeConverter.class, bindTo = "height")
+    //@CssProperty(property = "-fx-height", localPropertyField = "styleableHeight", converterClass = SizeConverter.class)
     public static List<CssMetaData<? extends Styleable, ?>> CLASS_CSS_META_DATA;
-
-    private StyleableDoubleProperty styleableWidth;
-    private StyleableDoubleProperty styleableHeight;
-
-    //TODO maybe remove from fxmlloader and do it manually bc no binding is possible
-    public TestRectangle() {
-        super();
-        // StyleBootstrap.init(this, Rectangle.getClassCssMetaData()); // temporary solution
-        //System.out.println(styleableWidth);
-        //System.out.println(styleableHeight);
-    }
+    private StyleableObjectProperty<Double> testius;
+    private StyleableObjectProperty<Double> testius2;
 
     public TestRectangle(double width, double height) {
         super(width, height);
-        this.widthProperty().bind(this.styleableWidth);
-        this.heightProperty().bind(this.styleableHeight);
     }
 
     @Override

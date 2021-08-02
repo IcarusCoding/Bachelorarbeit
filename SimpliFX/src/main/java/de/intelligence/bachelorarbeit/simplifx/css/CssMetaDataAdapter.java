@@ -9,11 +9,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
 import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.scene.Node;
+
+import com.sun.javafx.fxml.BeanAdapter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +44,7 @@ public final class CssMetaDataAdapter {
             }
         });
         final FieldReflection fieldRef = Reflection.reflectStatic(field).forceAccess();
-        if (!fieldRef.isAnnotationPresent(StyleProperty.class)) {
+        if (!fieldRef.isAnnotationPresent(CssProperty.class)) {
             LOG.warn("Invalid field detected (@CssProperty missing): {}.", field);
             return;
         }
@@ -61,7 +66,7 @@ public final class CssMetaDataAdapter {
             final Class<? extends StyleConverter<?, ?>> converterClass = property.converterClass();
             final Optional<MethodReflection> getInstanceRef = Reflection.reflect(converterClass).hasMethod("getInstance");
             if (getInstanceRef.isEmpty()) {
-                LOG.warn("Invalid field detected (Could not initialize SizeConverter instance): {}.", converterClass.getSimpleName());
+                LOG.warn("Invalid field detected (Could not initialize StyleConverter instance): {}.", converterClass.getSimpleName());
                 return;
             }
             final StyleConverter<?, ?> converterInstance = getInstanceRef.get().invokeUnsafe();
@@ -76,7 +81,7 @@ public final class CssMetaDataAdapter {
     }
 
     public static Optional<FieldReflection> validateField(Object obj, String field) {
-        return Reflection.reflect(obj).hasField(field).filter(fieldRef -> Reflection.reflect(StyleableProperty.class)
+        return Reflection.reflect(obj).hasField(field).filter(fieldRef -> Reflection.reflect(StyleableObjectProperty.class)
                 .canAccept(fieldRef.getReflectable().getType()));
     }
 
@@ -87,11 +92,23 @@ public final class CssMetaDataAdapter {
             }
             final Optional<FieldReflection> localFieldRefOpt = CssMetaDataAdapter.validateField(obj, prop.localPropertyField());
             if (localFieldRefOpt.isEmpty()) {
-                LOG.warn("Specified property field \"{}\" not available in class: {}.", prop.localPropertyField(), obj.getClass().getSimpleName());
+                LOG.warn("Specified property field \"{}\" invalid or not available in class or superclass: {}.", prop.localPropertyField(), obj.getClass().getSimpleName());
                 return;
             }
             if (localFieldRefOpt.get().forceAccess().get() != null) {
                 return;
+            }
+            final BeanAdapter adapter = new BeanAdapter(obj);
+            AtomicReference<Property<?>> bindToProp = new AtomicReference<>();
+            if (!prop.bindTo().isBlank()) {
+                if (!adapter.containsKey(prop.bindTo())) {
+                    LOG.warn("Specified property field \"{}\" invalid or not available in class or superclass: {}.", prop.localPropertyField(), obj.getClass().getSimpleName());
+                    return;
+                }
+                final ObservableValue<?> val = adapter.getPropertyModel(prop.bindTo());
+                if (val instanceof Property<?> p) {
+                    bindToProp.set(p);
+                }
             }
             final Class<?> propertyClassInterface = localFieldRefOpt.get().getReflectable().getType();
             final Class<?> propertyClassImpl;
@@ -112,9 +129,21 @@ public final class CssMetaDataAdapter {
             final List<CssMetaData<? extends Styleable, ?>> metaData = Reflection.reflectStatic(field).forceAccess().getUnsafe();
             metaData.forEach(m -> {
                 if (m.getProperty().equals(prop.property())) {
-                    final StyleableProperty<?> testProperty = Reflection.reflect(propertyClassImpl).findConstructor(CssMetaData.class, Object.class, String.class)
+                    final StyleableProperty<?> testProperty = conRefProp.get()
                             .instantiateUnsafeAndGet(m, obj, prop.localPropertyField());
                     Reflection.reflect(obj).reflectField(prop.localPropertyField()).forceAccess().set(testProperty);
+                    if (bindToProp.get() != null) {
+                        final List<MethodReflection> found = new ArrayList<>();
+                        Reflection.reflect(bindToProp.get()).iterateMethods(mRef -> mRef.getReflectable().getName().equals("bind")
+                                && mRef.getReflectable().getParameterCount() == 1
+                                && mRef.getReflectable().getParameterTypes()[0].equals(ObservableValue.class), found::add);
+                        if (!found.isEmpty()) {
+                            System.out.println("BIND");
+                            System.out.println(found.get(0).getReflectable());
+                            System.out.println(testProperty);
+                            found.get(0).invoke(testProperty);
+                        }
+                    }
                 }
             });
         });

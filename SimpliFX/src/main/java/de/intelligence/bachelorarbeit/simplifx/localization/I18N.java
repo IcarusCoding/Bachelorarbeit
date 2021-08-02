@@ -21,7 +21,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-import org.apache.commons.lang3.ArrayUtils;
+import com.google.common.collect.ObjectArrays;
 
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
@@ -87,7 +87,7 @@ public final class I18N implements II18N {
                         Arrays.stream(params).map(o -> o instanceof ObservableValue ?
                                 ((ObservableValue<?>) o).getValue() : Objects.requireNonNullElse(o, "null")
                                 .toString()).toArray()) : I18N.NOT_FOUND,
-                ArrayUtils.addAll(Arrays.stream(params)
+                ObjectArrays.concat(Arrays.stream(params)
                         .filter(ObservableValue.class::isInstance).map(ObservableValue.class::cast)
                         .toArray(ObservableValue[]::new), this.currentLocale));
     }

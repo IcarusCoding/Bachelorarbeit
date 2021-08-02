@@ -19,4 +19,6 @@ public @interface CssProperty {
 
     Class<? extends StyleConverter<?, ?>> converterClass();
 
+    String bindTo() default "";
+
 }

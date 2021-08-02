@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -97,14 +98,28 @@ public final class SimpliFX {
     private static SharedResources globalResources;
     private static PropertyRegistry globalPropertyRegistry;
     private static Function<Pane, INotificationDialog> defaultNotificationHandler = NotificationDialog::new;
+    private static Consumer<Throwable> exceptionHandler;
     private static boolean launched;
 
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
+        if (SimpliFX.launched) {
+            throw new SimpliFXException("Cannot set the classpath scan policy after the application was launched");
+        }
         SimpliFX.scanPolicy = scanPolicy;
     }
 
     public static void setDefaultNotificationHandler(Function<Pane, INotificationDialog> defaultNotificationHandler) {
+        if (SimpliFX.launched) {
+            throw new SimpliFXException("Cannot set the default notification handler after the application was launched");
+        }
         SimpliFX.defaultNotificationHandler = defaultNotificationHandler;
+    }
+
+    public static void setExceptionHandler(Consumer<Throwable> exceptionHandler) {
+        if (SimpliFX.launched) {
+            throw new SimpliFXException("Cannot set the exception handler after the application was launched");
+        }
+        SimpliFX.exceptionHandler = exceptionHandler;
     }
 
     public static void launch(String... args) {
@@ -264,10 +279,17 @@ public final class SimpliFX {
         try {
             fxLauncherThread.join();
         } catch (InterruptedException ex) {
-            throw new RuntimeException("Unexpected exception thrown: ", ex);
+            final RuntimeException unexpected = new RuntimeException("Unexpected exception thrown: ", ex);
+            if (SimpliFX.exceptionHandler == null) {
+                throw unexpected;
+            }
+            SimpliFX.exceptionHandler.accept(unexpected);
         }
         if (launcherException.get() != null) {
-            throw launcherException.get();
+            if (SimpliFX.exceptionHandler == null) {
+                throw launcherException.get();
+            }
+            SimpliFX.exceptionHandler.accept(launcherException.get());
         }
     }
 

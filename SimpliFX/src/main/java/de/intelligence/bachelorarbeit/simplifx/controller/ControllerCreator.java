@@ -18,6 +18,8 @@ import org.xml.sax.SAXException;
 
 import de.intelligence.bachelorarbeit.reflectionutils.ClassReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
+import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;
+import de.intelligence.bachelorarbeit.simplifx.application.PreloaderEntryPoint;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigValueInjector;
 import de.intelligence.bachelorarbeit.simplifx.config.PropertyRegistry;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
@@ -98,6 +100,9 @@ public final class ControllerCreator {
         }
         if (clazzRef.isNonStaticMember()) {
             throw new InvalidControllerDefinitionException("Controller \"" + clazz.getSimpleName() + "\" must not be a non static member. Maybe add the static modifier?");
+        }
+        if (clazz.isAnnotationPresent(ApplicationEntryPoint.class) || clazz.isAnnotationPresent(PreloaderEntryPoint.class)) {
+            throw new InvalidControllerDefinitionException("An entrypoint for the application or the preloader can not be used as a controller (\"" + clazz.getSimpleName() + "\").");
         }
         final Controller annotation = controllerOpt.get();
         final String fxmlPath = annotation.fxml();
