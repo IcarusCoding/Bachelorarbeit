@@ -6,13 +6,21 @@ import com.google.inject.Module;
 
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 
+/**
+ * An implementation of the {@link DIEnvironment} interface which manages a guice {@link Injector}
+ * for dependency injection.
+ */
 final class GuiceEnvironment implements DIEnvironment {
 
     private final Injector injector;
 
-    GuiceEnvironment(Object obj, Module... modules) {
+    /**
+     * Creates a new instance of this {@link DIEnvironment}.
+     *
+     * @param modules An array of guice {@link Module} instances.
+     */
+    GuiceEnvironment(Module... modules) {
         this.injector = Guice.createInjector(modules);
-        this.inject(obj);
     }
 
     @Override

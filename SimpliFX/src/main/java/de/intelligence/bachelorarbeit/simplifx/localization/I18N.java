@@ -25,6 +25,9 @@ import com.google.common.collect.ObjectArrays;
 
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
+/**
+ * An implementation of the {@link II18N} interface.
+ */
 public final class I18N implements II18N {
 
     private static final String NOT_FOUND = "<key not found>";
@@ -32,6 +35,11 @@ public final class I18N implements II18N {
     private final ReadOnlyObjectWrapper<Locale> currentLocale;
     private final Map<Locale, CompoundResourceBundle> bundles;
 
+    /**
+     * Creates a new {@link I18N} instance with the specified {@link List} of {@link CompoundResourceBundle} instances.
+     *
+     * @param resourceBundles The {@link List} of {@link CompoundResourceBundle} instances.
+     */
     public I18N(List<CompoundResourceBundle> resourceBundles) {
         this.bundles = resourceBundles.stream()
                 .collect(Collectors.toMap(CompoundResourceBundle::getLocale, Function.identity()));

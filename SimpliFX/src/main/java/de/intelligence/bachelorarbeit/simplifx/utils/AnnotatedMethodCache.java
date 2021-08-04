@@ -9,6 +9,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 
+/**
+ * A utility class which caches methods by its annotation and class.
+ *
+ * @author Deniz Groenhoff
+ */
 public final class AnnotatedMethodCache {
 
     private static final ConcurrentHashMap<Class<? extends Annotation>, ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<Method>>> cache;
@@ -17,6 +22,13 @@ public final class AnnotatedMethodCache {
         cache = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Retrieves the methods annotated with the specified annotation class in the provided class.
+     *
+     * @param annotationClazz The class of the annotation.
+     * @param clazz           The class in which the methods should be found.
+     * @return A {@link List} of methods annotated with the specified annotation int the provided class.
+     */
     public static List<Method> getMethodsAnnotatedBy(Class<? extends Annotation> annotationClazz, Class<?> clazz) {
         if (!AnnotatedMethodCache.cache.containsKey(annotationClazz)) {
             AnnotatedMethodCache.cache.put(annotationClazz, new ConcurrentHashMap<>());

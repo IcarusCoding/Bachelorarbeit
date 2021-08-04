@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * A utility class that provides basic conditional operations
+ * A utility class that provides basic conditional operations.
  *
  * @author Deniz Groenhoff
  */

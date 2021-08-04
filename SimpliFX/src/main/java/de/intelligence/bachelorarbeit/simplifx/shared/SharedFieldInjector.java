@@ -17,16 +17,32 @@ import de.intelligence.bachelorarbeit.simplifx.exception.IllegalSharedFieldExcep
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 
+/**
+ * An injector for fields annotated with the {@link Shared} annotation.
+ *
+ * @author Deniz Groenhoff
+ */
 public class SharedFieldInjector {
 
     private static final Pattern KEY_EXTRACTOR = Pattern.compile("\\p{Lu}");
 
     private final IAnnotatedFieldDetector<Shared> sharedDetector;
 
+    /**
+     * Creates a new injector.
+     *
+     * @param instance The instance in which the fields should get injected.
+     * @param more     Other instances in which the fields should get injected.
+     */
     public SharedFieldInjector(Object instance, Object... more) {
         this.sharedDetector = new AnnotatedFieldDetector<>(Shared.class, instance, more);
     }
 
+    /**
+     * Injects the specified {@link SharedResources} into found fields.
+     *
+     * @param resources The {@link SharedResources} which should get injected.
+     */
     public void inject(SharedResources resources) {
         this.sharedDetector.findAllFields((f, a) -> f.forceAccess().get() == null);
         final Map<FieldReflection, Shared> fields = new LinkedHashMap<>();

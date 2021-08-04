@@ -85,6 +85,11 @@ import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Pair;
 
+/**
+ * A class which is responsible for all SimpliFX related operations.
+ *
+ * @author Deniz Groenhoff
+ */
 public final class SimpliFX {
 
     private static final Logger LOG = LogManager.getLogger(SimpliFX.class);
@@ -101,6 +106,11 @@ public final class SimpliFX {
     private static Consumer<Throwable> exceptionHandler;
     private static boolean launched;
 
+    /**
+     * Sets a new policy for class path scanning.
+     *
+     * @param scanPolicy The new policy for class path scanning.
+     */
     public static void setClasspathScanPolicy(ClasspathScanPolicy scanPolicy) {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the classpath scan policy after the application was launched");
@@ -108,6 +118,12 @@ public final class SimpliFX {
         SimpliFX.scanPolicy = scanPolicy;
     }
 
+    /**
+     * Sets the default notification handler for controller group notifications. This will be used for creating the
+     * main controller group and in every created subgroup if no other handler is specified during the creation process.
+     *
+     * @param defaultNotificationHandler The new default notification handler.
+     */
     public static void setDefaultNotificationHandler(Function<Pane, INotificationDialog> defaultNotificationHandler) {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the default notification handler after the application was launched");
@@ -115,6 +131,12 @@ public final class SimpliFX {
         SimpliFX.defaultNotificationHandler = defaultNotificationHandler;
     }
 
+    /**
+     * Sets a handler which will be used if exceptions are thrown during the application creation process or exceptions
+     * which results in an immediate termination of SimpliFX.
+     *
+     * @param exceptionHandler The new exception handler.
+     */
     public static void setExceptionHandler(Consumer<Throwable> exceptionHandler) {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the exception handler after the application was launched");
@@ -122,6 +144,12 @@ public final class SimpliFX {
         SimpliFX.exceptionHandler = exceptionHandler;
     }
 
+    /**
+     * Launches the application with the specified arguments.
+     * The entrypoint will be found by scanning the classpath.
+     *
+     * @param args The arguments which will be used in the application creation process.
+     */
     public static void launch(String... args) {
         final StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
         SimpliFX.callerClass = walker.getCallerClass();
@@ -129,11 +157,74 @@ public final class SimpliFX {
         SimpliFX.launch(SimpliFX.findApplicationClass(), args);
     }
 
+    /**
+     * Launches the application with the specified arguments and a preloader.
+     * The entrypoints for the application and the preloader will be found by scanning the classpath.
+     *
+     * @param args The arguments which will be used in the application creation process.
+     */
     public static void launchWithPreloader(String... args) {
         final StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
         SimpliFX.callerClass = walker.getCallerClass();
         SimpliFX.startDiscovery();
         SimpliFX.launch(SimpliFX.findApplicationClass(), SimpliFX.findPreloaderClass(), args);
+    }
+
+    /**
+     * Launches the application with the specified arguments and the entrypoint class.
+     *
+     * @param appEntrypointClass The entrypoint class.
+     * @param args               The arguments which will be used in the application creation process.
+     */
+    public static void launch(Class<?> appEntrypointClass, String... args) {
+        SimpliFX.checkLaunch();
+        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(appEntrypointClass, ApplicationEntryPoint.class)
+                .forceAccess().instantiate().getReflectable(), null, args);
+    }
+
+    /**
+     * Launches the application with the specified arguments and the entrypoint classes for the application and the preloader.
+     *
+     * @param applicationClass The entrypoint class.
+     * @param preloaderClass   The preloader class.
+     * @param args             The arguments which will be used in the application creation process.
+     */
+    public static void launch(Class<?> applicationClass, Class<?> preloaderClass, String... args) {
+        Conditions.checkCondition(applicationClass != preloaderClass,
+                "Different classes needed for application and preloader entrypoint!");
+        SimpliFX.checkLaunch();
+        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(applicationClass, ApplicationEntryPoint.class)
+                        .forceAccess().instantiate().getReflectable(),
+                SimpliFX.validateEntrypointClass(preloaderClass, PreloaderEntryPoint.class)
+                        .forceAccess().instantiate().getReflectable(), args);
+    }
+
+    /**
+     * Launches the application with the specified arguments and the application entrypoint instance.
+     *
+     * @param applicationListener The instance of the application entrypoint.
+     * @param args                The arguments which will be used in the application creation process.
+     */
+    public static void launch(Object applicationListener, String... args) {
+        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
+        SimpliFX.checkLaunch();
+        SimpliFX.launchImpl(applicationListener, null, args);
+    }
+
+    /**
+     * Launches the application with the specified arguments and the entrypoint for the application and the preloader.
+     *
+     * @param applicationListener The instance of the application entrypoint.
+     * @param preloaderListener   The instance of the preloader entrypoint.
+     * @param args                The arguments which will be used in the application creation process.
+     */
+    public static void launch(Object applicationListener, Object preloaderListener, String... args) {
+        Conditions.checkCondition(applicationListener.getClass() != preloaderListener.getClass(),
+                "Different classes needed for application and preloader entrypoint!");
+        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
+        SimpliFX.validateEntrypointInstance(preloaderListener, PreloaderEntryPoint.class);
+        SimpliFX.checkLaunch();
+        SimpliFX.launchImpl(applicationListener, preloaderListener, args);
     }
 
     private static Class<?> findApplicationClass() {
@@ -166,37 +257,6 @@ public final class SimpliFX {
             return clazzOpt.get();
         }
         throw new IllegalStateException("Could not find preloader class!");
-    }
-
-    public static void launch(Class<?> appEntrypointClass, String... args) {
-        SimpliFX.checkLaunch();
-        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(appEntrypointClass, ApplicationEntryPoint.class)
-                .forceAccess().instantiate().getReflectable(), null, args);
-    }
-
-    public static void launch(Class<?> applicationClass, Class<?> preloaderClass, String... args) {
-        Conditions.checkCondition(applicationClass != preloaderClass,
-                "Different classes needed for application and preloader entrypoint!");
-        SimpliFX.checkLaunch();
-        SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(applicationClass, ApplicationEntryPoint.class)
-                        .forceAccess().instantiate().getReflectable(),
-                SimpliFX.validateEntrypointClass(preloaderClass, PreloaderEntryPoint.class)
-                        .forceAccess().instantiate().getReflectable(), args);
-    }
-
-    public static void launch(Object applicationListener, String... args) {
-        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
-        SimpliFX.checkLaunch();
-        SimpliFX.launchImpl(applicationListener, null, args);
-    }
-
-    public static void launch(Object applicationListener, Object preloaderListener, String... args) {
-        Conditions.checkCondition(applicationListener.getClass() != preloaderListener.getClass(),
-                "Different classes needed for application and preloader entrypoint!");
-        SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
-        SimpliFX.validateEntrypointInstance(preloaderListener, PreloaderEntryPoint.class);
-        SimpliFX.checkLaunch();
-        SimpliFX.launchImpl(applicationListener, preloaderListener, args);
     }
 
     private static void checkLaunch() {
@@ -331,6 +391,7 @@ public final class SimpliFX {
                                 (Class<?>) ((ParameterizedType) factory.getGenericInterfaces()[0])
                                         .getActualTypeArguments()[0]);
                 SimpliFX.appDIEnv = methodRef.invokeUnsafe(applicationListener, annotation);
+                SimpliFX.appDIEnv.inject(applicationListener);
                 break;
             }
         }
