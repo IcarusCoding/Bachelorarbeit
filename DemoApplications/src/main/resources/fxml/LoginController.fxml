@@ -9,7 +9,6 @@
 <?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.validation.RequiredFieldValidator?>
-<?import de.intelligence.bachelorarbeit.demoapplications.TestRectangle?>
 <StackPane xmlns:fx="http://javafx.com/fxml"
            xmlns="http://javafx.com/javafx"
            fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.LoginController"
@@ -17,7 +16,7 @@
     <VBox alignment="CENTER" spacing="30">
         <HBox alignment="CENTER">
             <Label id="title" text="%login.title"/>
-            <TestRectangle/>
+            <!--<TestRectangle/>-->
             <VBox.margin>
                 <Insets bottom="5"/>
             </VBox.margin>
