@@ -120,6 +120,8 @@ import static com.sun.javafx.FXPermissions.MODIFY_FXML_CLASS_LOADER_PERMISSION;
  * For more information, see the
  * <a href="doc-files/introduction_to_fxml.html">Introduction to FXML</a>
  * document.
+ * <p>
+ * This class was copied and is a modified version of the {@link javafx.fxml.FXMLLoader} class.
  *
  * @since JavaFX 2.0
  */

@@ -6,8 +6,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * An {@link IWrapperAnimation} which fades into a new controller on a controller switch.
+ */
 public final class FadeAnimation extends AbstractWrapperAnimation {
 
+    /**
+     * Creates a new {@link FadeAnimation}.
+     *
+     * @param duration The {@link Duration} of the animation.
+     */
     public FadeAnimation(Duration duration) {
         super(duration);
     }

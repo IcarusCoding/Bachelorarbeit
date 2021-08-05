@@ -37,6 +37,8 @@ import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
  * controller. {@link SimpliFXMLLoader} will now automatically call any suitably
  * annotated no-arg <code>initialize()</code> method defined by the controller.
  * It is recommended that the injection approach be used whenever possible.
+ * <p>
+ * This class was copied and is a modified version of the {@link javafx.fxml.Initializable} class.
  *
  * @since JavaFX 2.0
  */

@@ -14,6 +14,9 @@ import de.intelligence.bachelorarbeit.simplifx.events.ProgressEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StateChangeEvent;
 
+/**
+ * The {@link Preloader} implementation which will be used as the JavaFX preloader entrypoint.
+ */
 public final class PreloaderImpl extends Preloader {
 
     private final IEventEmitter emitter;

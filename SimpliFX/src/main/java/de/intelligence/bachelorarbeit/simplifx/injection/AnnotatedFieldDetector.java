@@ -18,12 +18,25 @@ import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
+/**
+ * An implementation of the {@link IAnnotatedFieldDetector} interface which allows the detection and injection
+ * into fields of multiple object instances.
+ *
+ * @param <T> The annotation type.
+ */
 public final class AnnotatedFieldDetector<T extends Annotation> implements IAnnotatedFieldDetector<T> {
 
     private final Class<T> annotation;
     private final List<Object> searchIn;
     private final Map<Object, Map<Field, T[]>> foundFields;
 
+    /**
+     * Creates a new {@link AnnotatedFieldDetector} with the specified annotation and object instances.
+     *
+     * @param annotation The annotation for which fields should get detected.
+     * @param obj        The instance in which these fields should be found.
+     * @param more       More instances in which fields should be found.
+     */
     public AnnotatedFieldDetector(Class<T> annotation, Object obj, Object... more) {
         this.annotation = annotation;
         this.searchIn = new ArrayList<>();
@@ -88,9 +101,9 @@ public final class AnnotatedFieldDetector<T extends Annotation> implements IAnno
     }
 
     @Override
-    public List<Field> getFields() {
+    public Set<Field> getFields() {
         return this.foundFields.values().stream().flatMap(m -> m.keySet().stream())
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
 }

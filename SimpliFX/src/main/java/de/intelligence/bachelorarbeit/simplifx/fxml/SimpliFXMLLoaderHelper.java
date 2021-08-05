@@ -29,6 +29,10 @@ import javafx.fxml.FXMLLoader;
 
 import com.sun.javafx.util.Utils;
 
+/**
+ * A class which provides multiple utility methods for interacting with a {@link SimpliFXMLLoader}.
+ * This class was copied and is a modified version of the {@link com.sun.javafx.fxml.FXMLLoaderHelper} class.
+ */
 public class SimpliFXMLLoaderHelper {
 
     private static FXMLLoaderAccessor fxmlLoaderAccessor;
