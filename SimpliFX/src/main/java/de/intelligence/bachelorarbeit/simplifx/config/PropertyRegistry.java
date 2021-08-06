@@ -1,5 +1,6 @@
 package de.intelligence.bachelorarbeit.simplifx.config;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +20,9 @@ import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigFileExcept
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
 
+/**
+ * A class which combines multiple {@link Properties} instances into a single one.
+ */
 public final class PropertyRegistry {
 
     private static final Logger LOG = LogManager.getLogger(PropertyRegistry.class);
@@ -27,12 +31,49 @@ public final class PropertyRegistry {
     private final ClassLoader sourceLoader;
     private final Properties properties;
 
+    /**
+     * Creates a new {@link PropertyRegistry} instance.
+     *
+     * @param source The {@link Object} from which the {@link ClassLoader} and {@link ProtectionDomain} will be used
+     *               if relative paths are specified in the loading process.
+     */
     public PropertyRegistry(Object source) {
         this.domain = source.getClass().getProtectionDomain();
         this.sourceLoader = source.getClass().getClassLoader();
         this.properties = new Properties();
     }
 
+    private static String[] createPossiblePaths(String base) {
+        if (base.endsWith(Prefix.PROPERTIES_FILE_EXTENSION) || base.endsWith(Prefix.XML_FILE_EXTENSION)) {
+            return new String[]{base};
+        }
+        return new String[]{base, base + Prefix.PROPERTIES_FILE_EXTENSION, base + Prefix.XML_FILE_EXTENSION};
+    }
+
+    private static Properties load(InputStream input) throws IOException {
+        final Properties properties = new Properties();
+        final byte[] bytes = input.readAllBytes();
+        final ByteArrayInputStream bytesXMLIn = new ByteArrayInputStream(bytes);
+        final ByteArrayInputStream bytesPropIn = new ByteArrayInputStream(bytes);
+        try (bytesXMLIn; bytesPropIn) {
+            final DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            final DocumentBuilder builder = df.newDocumentBuilder();
+            builder.setErrorHandler(null);
+            builder.parse(bytesXMLIn);
+            properties.loadFromXML(bytesPropIn);
+        } catch (SAXException | ParserConfigurationException e) {
+            properties.load(bytesPropIn);
+        }
+        return properties;
+    }
+
+    /**
+     * Loads a configuration file from the classpath.
+     *
+     * @param path The path to the configuration file.
+     */
     public void loadFromClasspath(String path) {
         Conditions.checkNull(path, "path must not be null.");
         boolean successful = false;
@@ -45,27 +86,6 @@ public final class PropertyRegistry {
         if (!successful) {
             throw new InvalidConfigFileException("Could not load internal configuration file \"" + path + "\". Path or configuration file format was invalid.");
         }
-    }
-
-    public void loadFromOutside(String path) {
-        Conditions.checkNull(path, "path must not be null.");
-        boolean successful = false;
-        for (String s : this.createPossiblePaths(path)) {
-            if (this.tryLoadFromOutside(s)) {
-                successful = true;
-                break;
-            }
-        }
-        if (!successful) {
-            throw new InvalidConfigFileException("Could not load external configuration file \"" + path + "\". Path or configuration file format was invalid.");
-        }
-    }
-
-    private String[] createPossiblePaths(String base) {
-        if (base.endsWith(Prefix.PROPERTIES_FILE_EXTENSION) || base.endsWith(Prefix.XML_FILE_EXTENSION)) {
-            return new String[]{base};
-        }
-        return new String[]{base, base + Prefix.PROPERTIES_FILE_EXTENSION, base + Prefix.XML_FILE_EXTENSION};
     }
 
     private boolean tryLoadFromOutside(String path) {
@@ -114,26 +134,41 @@ public final class PropertyRegistry {
         this.properties.putAll(properties);
     }
 
-    private Properties load(InputStream input) throws IOException {
-        final Properties properties = new Properties();
-        final byte[] bytes = input.readAllBytes();
-        final ByteArrayInputStream bytesXMLIn = new ByteArrayInputStream(bytes);
-        final ByteArrayInputStream bytesPropIn = new ByteArrayInputStream(bytes);
-        try (bytesXMLIn; bytesPropIn) {
-            final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            builder.setErrorHandler(null);
-            builder.parse(bytesXMLIn);
-            properties.loadFromXML(bytesPropIn);
-        } catch (SAXException | ParserConfigurationException e) {
-            properties.load(bytesPropIn);
+    /**
+     * Loads a configuration file from outside the classpath.
+     *
+     * @param path The path to the configuration file.
+     */
+    public void loadFromOutside(String path) {
+        Conditions.checkNull(path, "path must not be null.");
+        boolean successful = false;
+        for (String s : this.createPossiblePaths(path)) {
+            if (this.tryLoadFromOutside(s)) {
+                successful = true;
+                break;
+            }
         }
-        return properties;
+        if (!successful) {
+            throw new InvalidConfigFileException("Could not load external configuration file \"" + path + "\". Path or configuration file format was invalid.");
+        }
     }
 
+    /**
+     * Retrieves the read-only {@link Properties}.
+     *
+     * @return The read-only {@link Properties}.
+     */
     public Properties getReadOnlyProperties() {
         return new ReadOnlyPropertiesWrapper(this.properties);
     }
 
+    /**
+     * Retrieves the configuration value from the specified key.
+     *
+     * @param key The configuration key for which a value should be found.
+     * @param def The default value if the specified configuration key was not found.
+     * @return The configuration value from the specified key.
+     */
     public String getForKey(String key, String def) {
         return this.properties.getProperty(key, def);
     }

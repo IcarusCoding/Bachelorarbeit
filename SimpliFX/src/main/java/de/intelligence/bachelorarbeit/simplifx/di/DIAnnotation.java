@@ -13,6 +13,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DIAnnotation {
 
+    /**
+     * Retrieves the {@link IDIEnvironmentFactory} class connected to the created {@link Annotation}.
+     *
+     * @return The {@link IDIEnvironmentFactory} class connected to the created {@link Annotation}.
+     */
     Class<? extends IDIEnvironmentFactory<? extends Annotation>> value();
 
 }

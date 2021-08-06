@@ -2,13 +2,20 @@ package de.intelligence.bachelorarbeit.simplifx.controller.provider;
 
 import javafx.util.Callback;
 
-import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 
+/**
+ * A {@link IControllerFactoryProvider} which supports dependency injection.
+ */
 public final class DIControllerFactoryProvider implements IControllerFactoryProvider {
 
     private final DIEnvironment environment;
 
+    /**
+     * Creates a new {@link DIControllerFactoryProvider} with the specified {@link DIEnvironment}.
+     *
+     * @param environment The {@link DIEnvironment} to use for dependency injection.
+     */
     public DIControllerFactoryProvider(DIEnvironment environment) {
         this.environment = environment;
     }
@@ -24,7 +31,7 @@ public final class DIControllerFactoryProvider implements IControllerFactoryProv
 
     @Override
     public Object create(Class<?> clazz) {
-        return Reflection.reflect(clazz).findConstructor().instantiate().getReflectable();
+        return this.environment.get(clazz);
     }
 
 }

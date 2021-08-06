@@ -52,9 +52,7 @@ public final class SharedResources {
      */
     public <T> void create(String name, SharedReference<T> ref) {
         Conditions.checkNull(ref, "reference must not be null!");
-        if (!this.referenceMap.containsKey(name)) {
-            this.referenceMap.put(name, ref);
-        }
+        this.referenceMap.putIfAbsent(name, ref);
     }
 
     /**

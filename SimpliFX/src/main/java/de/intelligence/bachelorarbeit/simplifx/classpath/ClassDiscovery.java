@@ -27,14 +27,16 @@ public final class ClassDiscovery implements IClassDiscovery {
         this.results = new HashMap<>();
     }
 
-    private String convertPackage(String pkg) {
+    private static String convertPackage(String pkg) {
         return pkg.replace('\\', Prefix.FILE_SEPARATOR_C).replace('.', Prefix.FILE_SEPARATOR_C);
     }
 
-    private void findAllClassPathURLs(String path, ClassLoader loader, Set<URL> classPathURLs) {
+    private static void findAllClassPathURLs(String path, ClassLoader loader, Set<URL> classPathURLs) {
         try {
             loader.getResources(path).asIterator().forEachRemaining(classPathURLs::add);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            // ignored
+        }
         if (path.isBlank()) {
             ClassLoader current = loader;
             do {
@@ -47,8 +49,8 @@ public final class ClassDiscovery implements IClassDiscovery {
                         try {
                             classPathURLs.add(new URL(Prefix.JAR_PREFIX + Prefix.FILE_PREFIX + new File(s)
                                     .getAbsolutePath() + Prefix.JAR_SEPARATOR));
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
+                        } catch (MalformedURLException ignored) {
+                            // ignored
                         }
                     });
                 }

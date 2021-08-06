@@ -5,7 +5,7 @@ package de.intelligence.bachelorarbeit.simplifx.utils;
  *
  * @author Deniz Groenhoff
  */
-public class Prefix {
+public final class Prefix {
 
     public static final String FILE_SCHEME = "file";
     public static final String FILE_PREFIX = "file:";

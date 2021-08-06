@@ -92,9 +92,13 @@ public final class I18N implements II18N {
     public StringBinding createObservedBinding(String key, Object... params) {
         return Bindings.createStringBinding(
                 () -> this.containsKey(key) ? MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key),
-                        Arrays.stream(params).map(o -> o instanceof ObservableValue ?
-                                ((ObservableValue<?>) o).getValue() : Objects.requireNonNullElse(o, "null")
-                                .toString()).toArray()) : I18N.NOT_FOUND,
+                        Arrays.stream(params).map(o -> {
+                            if (o instanceof ObservableValue) {
+                                return ((ObservableValue<?>) o).getValue();
+                            }
+                            return Objects.requireNonNullElse(o, "null")
+                                    .toString();
+                        }).toArray()) : I18N.NOT_FOUND,
                 ObjectArrays.concat(Arrays.stream(params)
                         .filter(ObservableValue.class::isInstance).map(ObservableValue.class::cast)
                         .toArray(ObservableValue[]::new), this.currentLocale));

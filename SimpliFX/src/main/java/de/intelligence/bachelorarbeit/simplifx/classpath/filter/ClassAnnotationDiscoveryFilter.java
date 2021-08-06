@@ -27,7 +27,7 @@ public class ClassAnnotationDiscoveryFilter implements IDiscoveryFilter<ClassRea
             throw new ClasspathDiscoveryException("Specified annotation cannot be applied to class types.");
         }
         final Optional<Retention> retentionOpt = Optional.ofNullable(annotation.getAnnotation(Retention.class));
-        if (retentionOpt.isPresent() && !retentionOpt.get().value().equals(RetentionPolicy.RUNTIME)) {
+        if (retentionOpt.isPresent() && retentionOpt.get().value() != RetentionPolicy.RUNTIME) {
             throw new ClasspathDiscoveryException("Specified annotation is not visible at runtime.");
         }
         this.annotation = annotation;

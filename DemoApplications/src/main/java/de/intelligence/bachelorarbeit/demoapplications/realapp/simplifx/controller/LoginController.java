@@ -64,7 +64,8 @@ public final class LoginController {
 
     @FXML
     private void onLogin() {
-        if (this.usernameField.validate() & this.passwordField.validate()) {
+        final boolean pwValidated = this.passwordField.validate();
+        if (this.usernameField.validate() && pwValidated) {
             if (this.loginService.login(this.usernameField.getText(), this.passwordField.getText())) {
                 this.usernameRef.set(this.usernameField.getText());
                 this.ctx.switchController(MainMenuController.class, new FadeAnimation(Duration.millis(250)));

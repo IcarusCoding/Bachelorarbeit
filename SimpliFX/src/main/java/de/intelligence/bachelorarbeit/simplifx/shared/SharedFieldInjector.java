@@ -38,6 +38,26 @@ public class SharedFieldInjector {
         this.sharedDetector = new AnnotatedFieldDetector<>(Shared.class, instance, more);
     }
 
+    private static Class<?> validateGenericParameter(Field field) {
+        final Type genericArg;
+        if (field.getGenericType() instanceof ParameterizedType type) {
+            genericArg = type.getActualTypeArguments()[0];
+            if (genericArg instanceof WildcardType) {
+                throw new IllegalSharedFieldException(field, "Wildcard types are not supported.");
+            }
+            // generic shared resources can be supported but will cause problems at runtime due to type erasure
+            /*if (genericArg instanceof ParameterizedType subParam && subParam.getRawType() instanceof Class<?> c) {
+                return c;
+            }*/
+            if (!(genericArg instanceof Class<?>)) {
+                throw new IllegalSharedFieldException(field, "Generic shared resources are currently not supported.");
+            }
+        } else {
+            throw new IllegalSharedFieldException(field, "Raw use is disallowed.");
+        }
+        return (Class<?>) genericArg;
+    }
+
     /**
      * Injects the specified {@link SharedResources} into found fields.
      *
@@ -68,7 +88,7 @@ public class SharedFieldInjector {
             }
             SharedReference<?> ref = resources.getForName(key);
             if (fieldType.equals(SharedReference.class) || fieldType.isAssignableFrom(ReadOnlyObjectProperty.class)) {
-                final Class<?> clazzType = this.validateGenericParameter(field);
+                final Class<?> clazzType = SharedFieldInjector.validateGenericParameter(field);
                 if (ref != null) {
                     if (!clazzType.equals(ref.getType())) {
                         throw new IllegalSharedFieldException(field, "Shared resource with id \"" + key
@@ -88,26 +108,6 @@ public class SharedFieldInjector {
                 fieldRef.set(ref.asProperty());
             }
         }
-    }
-
-    private Class<?> validateGenericParameter(Field field) {
-        final Type genericArg;
-        if (field.getGenericType() instanceof ParameterizedType type) {
-            genericArg = type.getActualTypeArguments()[0];
-            if (genericArg instanceof WildcardType) {
-                throw new IllegalSharedFieldException(field, "Wildcard types are not supported.");
-            }
-            // generic shared resources can be supported but will cause problems at runtime due to type erasure
-            /*if (genericArg instanceof ParameterizedType subParam && subParam.getRawType() instanceof Class<?> c) {
-                return c;
-            }*/
-            if (!(genericArg instanceof Class<?>)) {
-                throw new IllegalSharedFieldException(field, "Generic shared resources are currently not supported.");
-            }
-        } else {
-            throw new IllegalSharedFieldException(field, "Raw use is disallowed.");
-        }
-        return (Class<?>) genericArg;
     }
 
 }

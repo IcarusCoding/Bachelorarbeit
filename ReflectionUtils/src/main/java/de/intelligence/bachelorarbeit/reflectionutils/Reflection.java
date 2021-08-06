@@ -16,7 +16,7 @@ import sun.misc.Unsafe;
  *
  * @author Deniz Groenhoff
  */
-public class Reflection {
+public final class Reflection {
 
     static final BiPredicate<Class<?>, Class<?>> PRIMITIVE_CHECK = (wantedType, foundType) ->
             wantedType.isPrimitive() && ((Boolean.class.equals(foundType) && boolean.class.equals(wantedType))
@@ -27,6 +27,10 @@ public class Reflection {
                     || (Integer.class.equals(foundType) && int.class.equals(wantedType))
                     || (Long.class.equals(foundType) && long.class.equals(wantedType))
                     || (Short.class.equals(foundType) && short.class.equals(wantedType)));
+
+    private Reflection() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Starts the reflection with a static {@link Field} as the entry point
@@ -173,10 +177,6 @@ public class Reflection {
             }
         }
         return found;
-    }
-
-    private Reflection() {
-        throw new UnsupportedOperationException();
     }
 
 }

@@ -2,7 +2,6 @@ package de.intelligence.bachelorarbeit.simplifx.injection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,8 +38,7 @@ public final class AnnotatedFieldDetector<T extends Annotation> implements IAnno
      */
     public AnnotatedFieldDetector(Class<T> annotation, Object obj, Object... more) {
         this.annotation = annotation;
-        this.searchIn = new ArrayList<>();
-        Arrays.stream(Conditions.concat(more, obj)).filter(Objects::nonNull).forEach(this.searchIn::add);
+        this.searchIn = Arrays.stream(Conditions.concat(more, obj)).filter(Objects::nonNull).collect(Collectors.toList());
         this.foundFields = new HashMap<>();
     }
 

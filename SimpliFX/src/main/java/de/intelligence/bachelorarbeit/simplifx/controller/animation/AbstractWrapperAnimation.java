@@ -15,7 +15,7 @@ public abstract class AbstractWrapperAnimation implements IWrapperAnimation {
 
     protected Duration duration;
 
-    public AbstractWrapperAnimation(Duration duration) {
+    protected AbstractWrapperAnimation(Duration duration) {
         this.duration = duration;
     }
 
@@ -31,7 +31,7 @@ public abstract class AbstractWrapperAnimation implements IWrapperAnimation {
                 new KeyFrame(Duration.ZERO, new KeyValue(factor, 1)),
                 new KeyFrame(duration, new KeyValue(factor, 0, Interpolator.EASE_BOTH)));
         timeline.statusProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.equals(Animation.Status.STOPPED)) {
+            if (newVal == Animation.Status.STOPPED) {
                 onStop.run();
             }
         });

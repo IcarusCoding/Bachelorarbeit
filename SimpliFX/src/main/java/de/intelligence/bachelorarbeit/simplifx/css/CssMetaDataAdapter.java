@@ -32,13 +32,17 @@ public final class CssMetaDataAdapter {
 
     private static final Logger LOG = LogManager.getLogger(CssMetaDataAdapter.class);
 
+    private CssMetaDataAdapter() {
+        throw new UnsupportedOperationException();
+    }
+
     public static void createStaticMetaData(Class<?> clazz, Field field) {
         if (!Reflection.reflect(Node.class).canAccept(clazz)) {
             LOG.warn("Class does not inherit from Node, skipping: {}.", clazz.getSimpleName());
             return;
         }
         final AtomicReference<MethodReflection> methodRef = new AtomicReference<>();
-        Reflection.reflect(clazz).iterateMethods(m -> m.getName().equals("getClassCssMetaData"), m -> {
+        Reflection.reflect(clazz).iterateMethods(m -> "getClassCssMetaData".equals(m.getName()), m -> {
             if (methodRef.get() == null) {
                 methodRef.set(Reflection.reflectStatic(m));
             }
@@ -50,7 +54,7 @@ public final class CssMetaDataAdapter {
         }
         final ParameterizedType parameterizedType = ((ParameterizedType) ((ParameterizedType) fieldRef.getReflectable().getGenericType()).getActualTypeArguments()[0]);
         if (!fieldRef.getReflectable().getType().equals(List.class) && parameterizedType.getRawType() == CssMetaData.class
-                && Arrays.stream(parameterizedType.getActualTypeArguments()).allMatch(t -> t instanceof WildcardType)
+                && Arrays.stream(parameterizedType.getActualTypeArguments()).allMatch(WildcardType.class::isInstance)
                 && ((WildcardType) parameterizedType.getActualTypeArguments()[0]).getUpperBounds()[0] == Styleable.class
                 && ((WildcardType) parameterizedType.getActualTypeArguments()[1]).getUpperBounds()[0] == Object.class) {
             LOG.warn("Invalid field detected (Field type is not List<CssMetaData<? extends Styleable, ?>): {}.", field);
@@ -134,13 +138,10 @@ public final class CssMetaDataAdapter {
                     Reflection.reflect(obj).reflectField(prop.localPropertyField()).forceAccess().set(testProperty);
                     if (bindToProp.get() != null) {
                         final List<MethodReflection> found = new ArrayList<>();
-                        Reflection.reflect(bindToProp.get()).iterateMethods(mRef -> mRef.getReflectable().getName().equals("bind")
+                        Reflection.reflect(bindToProp.get()).iterateMethods(mRef -> "bind".equals(mRef.getReflectable().getName())
                                 && mRef.getReflectable().getParameterCount() == 1
                                 && mRef.getReflectable().getParameterTypes()[0].equals(ObservableValue.class), found::add);
                         if (!found.isEmpty()) {
-                            System.out.println("BIND");
-                            System.out.println(found.get(0).getReflectable());
-                            System.out.println(testProperty);
                             found.get(0).invoke(testProperty);
                         }
                     }

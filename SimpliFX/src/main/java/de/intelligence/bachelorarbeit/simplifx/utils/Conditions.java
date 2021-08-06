@@ -75,6 +75,7 @@ public final class Conditions {
             try {
                 return action.get();
             } catch (Exception ignored) {
+                // ignore
             }
         }
         return null;

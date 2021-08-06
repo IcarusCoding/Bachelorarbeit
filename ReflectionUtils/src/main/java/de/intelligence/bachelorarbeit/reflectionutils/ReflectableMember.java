@@ -55,8 +55,8 @@ abstract class ReflectableMember<T extends Member & AnnotatedElement> extends Re
      *
      * @return The type-inferred accessor
      */
-    public <T> T getAccessorUnsafe() {
-        return (T) this.accessor;
+    public <E> E getAccessorUnsafe() {
+        return (E) this.accessor;
     }
 
     @Override

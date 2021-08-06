@@ -1,5 +1,6 @@
 package de.intelligence.bachelorarbeit.simplifx.css;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.Property;
@@ -58,4 +59,22 @@ public final class CssMetaDataProxy<S extends Styleable, V> extends CssMetaData<
         return (StyleableProperty<V>) property;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CssMetaDataProxy<?, ?> that)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        return styleable.equals(that.styleable) && fieldName.equals(that.fieldName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), styleable, fieldName);
+    }
 }

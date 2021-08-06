@@ -22,6 +22,10 @@ public final class AnnotatedMethodCache {
         cache = new ConcurrentHashMap<>();
     }
 
+    private AnnotatedMethodCache() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Retrieves the methods annotated with the specified annotation class in the provided class.
      *
@@ -30,9 +34,7 @@ public final class AnnotatedMethodCache {
      * @return A {@link List} of methods annotated with the specified annotation int the provided class.
      */
     public static List<Method> getMethodsAnnotatedBy(Class<? extends Annotation> annotationClazz, Class<?> clazz) {
-        if (!AnnotatedMethodCache.cache.containsKey(annotationClazz)) {
-            AnnotatedMethodCache.cache.put(annotationClazz, new ConcurrentHashMap<>());
-        }
+        AnnotatedMethodCache.cache.putIfAbsent(annotationClazz, new ConcurrentHashMap<>());
         final var classMethodMap = AnnotatedMethodCache.cache.get(annotationClazz);
         if (classMethodMap.containsKey(clazz)) {
             return new ArrayList<>(classMethodMap.get(clazz));

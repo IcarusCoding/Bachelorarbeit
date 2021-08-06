@@ -8,8 +8,16 @@ import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * A read-only wrapper for a {@link Properties} instance.
+ */
 public final class ReadOnlyPropertiesWrapper extends Properties {
 
+    /**
+     * Creates a new {@link ReadOnlyPropertiesWrapper} from a {@link Properties} instance.
+     *
+     * @param props The {@link Properties} instance which should get wrapped.
+     */
     public ReadOnlyPropertiesWrapper(Properties props) {
         super.putAll(props);
     }
@@ -98,4 +106,5 @@ public final class ReadOnlyPropertiesWrapper extends Properties {
     public synchronized Object merge(Object key, Object value, BiFunction<? super Object, ? super Object, ?> remappingFunction) {
         throw new UnsupportedOperationException();
     }
+
 }

@@ -27,11 +27,6 @@ import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
 @GuiceInjection(MainModule.class)
 public final class DemoApplication {
 
-    public static void main(String[] args) throws Exception {
-        Reflection.addOpens("java.lang.reflect", "java.base", JFXTextFieldSkin.class.getModule());
-        SimpliFX.launchWithPreloader();
-    }
-
     @ResourceBundle("lang.Messages")
     private II18N ii18N;
 
@@ -40,6 +35,11 @@ public final class DemoApplication {
 
     @Shared
     private SharedReference<StringProperty> titleRef;
+
+    public static void main(String[] args) throws Exception {
+        Reflection.addOpens("java.lang.reflect", "java.base", JFXTextFieldSkin.class.getModule());
+        SimpliFX.launchWithPreloader();
+    }
 
     @EventHandler
     private void onInit(InitEvent event) {
