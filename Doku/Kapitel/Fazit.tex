@@ -4,8 +4,47 @@ In dieser Arbeit wurde eine auf Java Annotationen basierende Bibliothek zur Simp
 
 \section{Zusammenfassung}
 \label{zusammenfassung}
+Gemäß der in der Einleitung beschriebenen Zielsetzung wurde eine Bibliothek entwickelt, welche das Arbeiten und die Entwicklung von Applikationen mit JavaFX in einigen Kernkonzepten vereinfacht (siehe \autoref{zielsetzung}). Besonders die Sprachunterstützung und die dafür benötigte dynamische Übersetzung durch einen neuen \texttt{FXMLLoader} sowie eine Erweiterung der Funktionen für eine Erstellung und Verwaltung von Controllern sind ein fundamentaler Bestandteil der Bibliothek. Des Weiteren können Konfigurationsdateien und Sprachdateien mit Leichtigkeit durch Annotationsverwendung geladen und nach Initialisierung der Anwendung genutzt werden. Außerdem wurden Schnittstellen hinzugefügt, welche die Interaktion zu komplexen Systemen wie der Java Reflection API vereinfachen und effektiv die Fehleranfälligkeit dieser durch eine zentralisierte Fehlerbehandlung reduzieren. Insgesamt wurden im Rahmen der Anforderungsanalyse (siehe \autoref{anforderungsanalyse}) \thereq{} Anforderungen an die Bibliothek gestellt. Diese setzen sich aus \thereqFunAmount{} fundamentalen und \thereqOptAmount{} optionalen Anforderungen zusammen, von welchen jeweils \thereqFunCompleted{} bzw. \thereqOptCompleted{} erfüllt worden sind. Daraus resultiert eine Erfüllquote von \CalculatePercentage{\thereqFunCompleted}{\thereqFunAmount} der fundamentalen Anforderungen und eine von \CalculatePercentage{\thereqOptCompleted}{\thereqOptAmount} bei den optionalen Anforderungen. Zusammenfassend wurden demnach \CalculatePercentage{\thereqTotalCompleted}{\thereq} aller Anforderungen erfüllt. In \autoref{fig:completeness_requirements} sind diese Quoten in Form eines Balkendiagramms grafisch dargestellt.
+\begin{figure}[H]
+	\centering
+	\definecolor{complete}{HTML}{ABDDA4}
+	\definecolor{incomplete}{HTML}{D7191C}
+	\begin{tikzpicture}
+		\begin{axis}[xbar stacked, legend style={%
+				legend columns=2, at={(xticklabel cs:0.5)}, anchor=north,draw=none
+			}, ytick=data, axis y line*=none, axis x line*=bottom, xmin=0, xmax=\thereq+2, width=0.8\textwidth, bar width=6mm, xlabel={Anzahl}, yticklabels={Gesamt, Optional, Fundamental}, area legend, y=8mm, enlarge y limits={abs=0.625}]
+			\addplot[fill=complete] coordinates {(\thereqTotalCompleted, 0) (\thereqOptCompleted,1) (\thereqFunCompleted,2)};
+			\addplot[fill=incomplete] coordinates {(\thereq-\thereqTotalCompleted, 0) (\thereqOptAmount-\thereqOptCompleted,1) (\thereqFunAmount-\thereqFunCompleted,2)};
+			\legend{Erfüllt, Nicht erfüllt}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Diagramm -- Erfüllungsquote aller Anforderungen.}
+	\label{fig:completeness_requirements}
+\end{figure}
 
-\add{Zusammenfassung}
+\ExplSyntaxOn
+
+\NewDocumentCommand{\Foreach}{ m O{,} m}
+ {
+  \__foreach_main:nn { #1 } { #2 } { #3 }
+ }
+
+\seq_new:N \l__foreach_arg_seq
+\clist_new:N \l__foreach_braced_clist
+
+\cs_new_protected:Npn \__foreach_main:nn #1 #2 #3
+ {
+  \seq_set_split:Nnn \l__foreach_arg_seq { #2 } { #3 }
+  \clist_clear:N \l__foreach_braced_clist
+  \seq_map_inline:Nn \l__foreach_arg_seq
+   {
+    \clist_put_right:Nn \l__foreach_braced_clist { { ##1 } }
+   }
+  \foreach #1 in~\l__foreach_braced_clist
+ }
+\ExplSyntaxOff
+\newcounter{test}{\fullreqs}
+\Foreach{\x}[|]{\fullreqs}{[\x]}
 
 \section{Ausblick und mögliche Erweiterungen}
 \label{ausblick_und_mögliche_erweiterungen}
