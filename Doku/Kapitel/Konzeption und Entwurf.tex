@@ -110,13 +110,13 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 \newcounter{reqOptAmount}
 \newcommand*{\reqautorefname}{Anforderung}
 
-\xdef\fullreqs{}
+\edef\fullreqs{}
 
 \NewDocumentEnvironment{freq}{m o d()}{%
 	\def\realreq{\number\numexpr\value{req}+1\relax}
 	\subsubsection*{\IfNoValueTF{#2}{[FA--\ifnum\realreq<10 0\fi\realreq] #1}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #1}}%
 	\refstepcounter{req}%
-	\global\appto\fullreqs{freq,\thereq,#1,#2,#3|}
+	\global\eappto\fullreqs{\thereq,freq,#1,#2,#3;}
 	\label{freq\thereq}%
 	\IfNoValueTF{#2}{\refstepcounter{reqFunAmount}}{\refstepcounter{reqOptAmount}}%
 	\IfNoValueTF{#3}{}{\refstepcounter{reqTotalCompleted}\IfNoValueTF{#2}{\refstepcounter{reqFunCompleted}}{\refstepcounter{reqOptCompleted}}}
@@ -126,7 +126,7 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 	\def\realreq{\number\numexpr\value{req}+1\relax}
 	\subsubsection*{\IfNoValueTF{#2}{[NFA--\ifnum\realreq<10 0\fi\realreq] #1}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #1}}%
 	\refstepcounter{req}%
-	\global\appto\fullreqs{nreq,\thereq,#1,#2,#3|}
+	\global\eappto\fullreqs{\thereq,nreq,#1,#2,#3;}
 	\label{nreq\thereq}
 	\IfNoValueTF{#2}{\refstepcounter{reqFunAmount}}{\refstepcounter{reqOptAmount}}%
 	\IfNoValueTF{#3}{}{\refstepcounter{reqTotalCompleted}\IfNoValueTF{#2}{\refstepcounter{reqFunCompleted}}{\refstepcounter{reqOptCompleted}}}
