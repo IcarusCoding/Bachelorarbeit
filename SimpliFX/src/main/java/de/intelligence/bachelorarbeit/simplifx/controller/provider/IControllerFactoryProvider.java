@@ -14,6 +14,20 @@ public interface IControllerFactoryProvider {
      */
     Callback<Class<?>, Object> provide();
 
+    /**
+     * Creates a new instance from the specified class.
+     *
+     * @param clazz The class from which should be instantiated.
+     * @return The created instance.
+     */
     Object create(Class<?> clazz);
+
+    /**
+     * Processes the created instance.
+     *
+     * @param instance The instance which should get processed.
+     */
+    default void handle(Object instance) {
+    }
 
 }

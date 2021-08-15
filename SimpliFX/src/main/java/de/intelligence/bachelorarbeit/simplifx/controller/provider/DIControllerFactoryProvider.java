@@ -24,7 +24,7 @@ public final class DIControllerFactoryProvider implements IControllerFactoryProv
     public Callback<Class<?>, Object> provide() {
         return clazz -> {
             final Object instance = this.create(clazz);
-            this.environment.inject(instance);
+            this.handle(instance);
             return instance;
         };
     }
@@ -32,6 +32,11 @@ public final class DIControllerFactoryProvider implements IControllerFactoryProv
     @Override
     public Object create(Class<?> clazz) {
         return this.environment.get(clazz);
+    }
+
+    @Override
+    public void handle(Object instance) {
+        this.environment.inject(instance);
     }
 
 }

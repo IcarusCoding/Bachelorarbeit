@@ -14,7 +14,6 @@ import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint
 import de.intelligence.bachelorarbeit.simplifx.application.StageConfig;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigSource;
 import de.intelligence.bachelorarbeit.simplifx.event.EventHandler;
-import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.guice.GuiceInjection;
 import de.intelligence.bachelorarbeit.simplifx.localization.II18N;
@@ -38,18 +37,8 @@ public final class DemoApplication {
 
     public static void main(String[] args) throws Exception {
         Reflection.addOpens("java.lang.reflect", "java.base", JFXTextFieldSkin.class.getModule());
+        //SimpliFX.enableExperimentalFeatures();
         SimpliFX.launchWithPreloader();
-    }
-
-    @EventHandler
-    private void onInit(InitEvent event) {
-        // throw new RuntimeException("TEST EXCEPTION");
-        //  event.getNotificationAccess().notifyPreloader(new Preloader.ErrorNotification(null, "TEST", null));
-       /* try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @EventHandler

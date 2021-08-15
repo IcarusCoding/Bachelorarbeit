@@ -68,12 +68,15 @@ import de.intelligence.bachelorarbeit.simplifx.controller.INotificationDialog;
 import de.intelligence.bachelorarbeit.simplifx.controller.NotificationDialog;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.DIControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.controller.provider.FXMLControllerFactoryProvider;
+import de.intelligence.bachelorarbeit.simplifx.controller.provider.IControllerFactoryProvider;
 import de.intelligence.bachelorarbeit.simplifx.di.DIAnnotation;
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 import de.intelligence.bachelorarbeit.simplifx.di.IDIEnvironmentFactory;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.exception.ApplicationConstructionException;
 import de.intelligence.bachelorarbeit.simplifx.exception.SimpliFXException;
+import de.intelligence.bachelorarbeit.simplifx.experimental.SubclassControllerFactoryProvider;
+import de.intelligence.bachelorarbeit.simplifx.experimental.SubclassingClassLoader;
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.localization.CompoundResourceBundle;
@@ -105,10 +108,18 @@ public final class SimpliFX {
     private static PropertyRegistry globalPropertyRegistry;
     private static Function<Pane, INotificationDialog> defaultNotificationHandler = NotificationDialog::new;
     private static Consumer<Throwable> exceptionHandler;
+    private static boolean experimentalEnabled;
     private static boolean launched;
 
     private SimpliFX() {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Enables experimental features.
+     */
+    public static void enableExperimentalFeatures() {
+        SimpliFX.experimentalEnabled = true;
     }
 
     /**
@@ -613,9 +624,12 @@ public final class SimpliFX {
                         this.errored = true;
                     }
                 }
+                IControllerFactoryProvider provider = SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv);
+                if (SimpliFX.experimentalEnabled) {
+                    provider = new SubclassControllerFactoryProvider(new SubclassingClassLoader(applicationListener.getClass().getClassLoader()), provider);
+                }
                 final IControllerGroup mainGroup = new ControllerGroupImpl("main", applicationListener.getClass().getAnnotation(ApplicationEntryPoint.class).value(),
-                        SimpliFX.appDIEnv == null ? new FXMLControllerFactoryProvider() : new DIControllerFactoryProvider(SimpliFX.appDIEnv),
-                        SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry,
+                        provider, SimpliFX.globalI18N, SimpliFX.globalResources, SimpliFX.globalPropertyRegistry,
                         SimpliFX.defaultNotificationHandler, null, null);
                 if (!this.errored && currAppState.get() != LaunchState.EXIT) {
                     this.doNotifyStateChange(Preloader.StateChangeNotification.Type.BEFORE_START);
