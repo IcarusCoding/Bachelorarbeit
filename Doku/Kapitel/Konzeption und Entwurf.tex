@@ -333,7 +333,7 @@ System.out.println(f.get()); // 42
 \end{figure}
 \subsubsection{Schnittstelle: Klassenpfad}
 \label{classpath_interface}
-Damit die Automatisierungsmaßnahmen für \autoref{freq1} zum Finden von speziell annotierten Elementen möglich sind, muss eine Art von Klassenpfad-Scanner implementiert werden. Dabei werden alle Klassen, welche in den durch \texttt{Classloader} Instanzen bereitgestellten Klassenpfaden gefunden werden, nach den jeweiligen Annotationen gefiltert (siehe \autoref{fig:classpath_scanprocess}). Das Finden aller Klassen im Klassenpfad muss sowohl für normale Dateisysteme als auch für Applikationen, welche in Java Archiven gepackt worden sind, möglich sein. Um Klassen auf beispielsweise Annotationen zu filtern darf, aufgrund von möglichen Sicherheitsrisiken und Performanceproblemen, kein \texttt{Class} Objekt mittels \texttt{Class\#forName} erstellt werden.\add{sonarlint} Dadurch soll verhindert werden, dass eventuelle \texttt{static}-Blöcke ausgeführt werden. Das Scannen einer Klasse, ohne den \texttt{static}-Block auszuführen, kann durch die ASM Bibliothek\footref{ft:asm}, mithilfe des Besucher Entwurfsmusters erfolgen. Außerdem muss der Scanprozess eine gewisse Konfigurierbarkeit aufweisen, da manuell \texttt{Classloader} Instanzen zum Scanprozess hinzugefügt werden sollen und um eine optimale Leistung zu gewährleisten, soll ein initialer Paketname oder Teilstring eines Paketes angegeben werden können, damit nicht benötigte Klassen, schon im Scanprozess ignoriert werden. Ergebnisse des Scans müssen in einem Cache zwischengespeichert werden, damit nicht jeder Filtervorgang den Klassenpfad erneut scannen muss und somit unnötigerweise einen Performance-Hotspot kreiert.
+Damit die Automatisierungsmaßnahmen für \autoref{freq1} zum Finden von speziell annotierten Elementen möglich sind, muss eine Art von Klassenpfad-Scanner implementiert werden. Dabei werden alle Klassen, welche in den durch \texttt{Classloader} Instanzen bereitgestellten Klassenpfaden gefunden werden, nach den jeweiligen Annotationen gefiltert (siehe \autoref{fig:classpath_scanprocess}). Das Finden aller Klassen im Klassenpfad muss sowohl für normale Dateisysteme als auch für Applikationen, welche in Java Archiven gepackt worden sind, möglich sein. Um Klassen auf beispielsweise Annotationen zu filtern darf, aufgrund von möglichen Sicherheitsrisiken und Performanceproblemen, kein \texttt{Class} Objekt mittels \texttt{Class\#forName} erstellt werden. Dadurch soll verhindert werden, dass eventuelle \texttt{static}-Blöcke ausgeführt werden. Das Scannen einer Klasse, ohne den \texttt{static}-Block auszuführen, kann durch die ASM Bibliothek\footref{ft:asm}, mithilfe des Besucher Entwurfsmusters erfolgen. Außerdem muss der Scanprozess eine gewisse Konfigurierbarkeit aufweisen, da manuell \texttt{Classloader} Instanzen zum Scanprozess hinzugefügt werden sollen und um eine optimale Leistung zu gewährleisten, soll ein initialer Paketname oder Teilstring eines Paketes angegeben werden können, damit nicht benötigte Klassen, schon im Scanprozess ignoriert werden. Ergebnisse des Scans müssen in einem Cache zwischengespeichert werden, damit nicht jeder Filtervorgang den Klassenpfad erneut scannen muss und somit unnötigerweise einen Performance-Hotspot kreiert.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{Abbildungen/Klassenpfad Scanprozess.png}
@@ -380,50 +380,49 @@ Nach dem Finden und der vollständigen Konstruktion der Einstiegspunkte wird das
 \label{annotations}
 Im Folgenden werden alle benötigten Annotationen mit ihren jeweiligen Parametern definiert und auf die zu implementierende Funktionalität sowie mögliche Restriktionen eingegangen. Dabei wird explizit angegeben, welche Parameter keinen \texttt{default} Wert besitzen und aufgrund dessen vom Entwickler manuell angegeben werden müssen.
 \subsubsection{Annotation: @ApplicationEntryPoint}
-Soll eine Anwendung mit \texttt{SimpliFX} verwendet werden, so muss eine Klasse existieren, welche als Einstiegspunkt fungieren soll und die \texttt{@ApplicationEntryPoint} Annotation aufweisen. Dieser kann ein einziger Parameter übergeben werden, welcher notwendig ist und die Klasse des Hauptcontrollers darstellen soll.
+Soll eine Anwendung mit \texttt{SimpliFX} verwendet werden, so muss eine Klasse existieren, welche als Einstiegspunkt fungieren soll und die \texttt{@ApplicationEntryPoint} Annotation aufweist. Dieser kann ein einziger Parameter übergeben werden, welcher notwendig ist und die Klasse des Hauptcontrollers darstellen soll (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Annotation: @PreloaderEntryPoint}
 Die \texttt{@PreloaderEntryPoint} Annotation besitzt ähnliche Funktionalitäten wie die \texttt{@ApplicationEntryPoint} Annotation, nur das kein Parameter angegeben werden kann und nicht der Anwendungseinstiegspunkt definiert wird, sondern der Einstiegspunkt für einen Preloader. Dieser ist optional und ist für ein Starten der Applikation nicht notwendig.
 \subsubsection{Annotation: @ConfigSource}
-Mit der Java Properties-API kompatible Konfigurationsdateien können durch das Nutzen der \texttt{@ConfigSource} Annotation automatisch geladen und dem annotierten Properties-Feld zugewiesen werden. Die Annotation hat einen optionalen Parameter, welcher den Namen der Konfigurationsdatei bzw. den Pfad zu dieser enthält. Ist kein Pfad angegeben, so wird, je nach Klassenpfadscan-Einstellung, der Klassenpfad nach einer Datei mit einem Namen, welcher dem des annotierten Feldes entspricht, durchsucht. Jedes Element aus einer Konfigurationsdatei, welche auf diesem Wege geladen worden ist, kann durch die \texttt{@ConfigValue} Annotation verwendet werden.
+Mit der Java Properties-API kompatible Konfigurationsdateien können durch das Nutzen der \texttt{@ConfigSource} Annotation automatisch geladen und annotierten Properties-Feldern zugewiesen werden. Die Annotation hat einen optionalen Parameter, welcher den Namen der Konfigurationsdatei bzw. den Pfad zu dieser enthält. Der Pfad kann hierbei relativ oder absolut sein. Außerdem kann angegeben werden, ob die Konfigurationsdatei im Klassenpfad oder außerhalb davon zu finden ist. Jedes Element aus einer Konfigurationsdatei, welche auf diesem Wege geladen worden ist, kann durch die \texttt{@ConfigValue} Annotation verwendet werden (siehe \autoref{lst:fields_demo}).
 \subsubsection{Annotation: @ConfigValue}
-Konfigurierbare Elemente können mit \texttt{@ConfigValue} annotiert werden. Der Konfigurationsschlüssel muss in Form eines erforderlichen Parameters an die Annotation übergeben werden. Außerdem ist es möglich, einen optionalen Standardwert festzulegen, welcher dem jeweiligen annotierten Feld zugewiesen wird, wenn der angegebene Konfigurationsschlüssel in keiner Konfigurationsdatei gefunden werden kann.
+Konfigurierbare Elemente können mit \texttt{@ConfigValue} annotiert werden. Der Konfigurationsschlüssel muss in Form eines erforderlichen Parameters an die Annotation übergeben werden. Außerdem ist es möglich, einen optionalen Standardwert festzulegen, welcher dem jeweiligen annotierten Feld zugewiesen wird, wenn der angegebene Konfigurationsschlüssel in keiner Konfigurationsdatei gefunden werden kann (siehe \autoref{lst:sidebar_controller_localize}).
 \subsubsection{Annotation: @PostConstruct}
-Hat \texttt{SimpliFX} den Erstellungs- bzw. Einrichtungsprozess eines Objektes vollendet, so soll die jeweilige Instanz davon in Kenntnis gesetzt werden. Dazu werden Methoden, welche die \texttt{@PostConstruct} Annotation aufweisen, automatisch aufgerufen. Optional kann ein Prioritätsparameter angegeben werden, welcher die Aufrufreihenfolge, wenn mehrere solcher Methoden existieren, bestimmt. Die Priorität wird dabei als Ganzzahl repräsentiert und Methoden werden in aufsteigender Reihenfolge dieser aufgerufen.
+Hat \texttt{SimpliFX} den Erstellungs- bzw. Einrichtungsprozess eines Objektes vollendet, so soll die jeweilige Instanz davon in Kenntnis gesetzt werden. Dazu werden Methoden, welche die \texttt{@PostConstruct} Annotation aufweisen, automatisch aufgerufen. Optional kann ein Prioritätsparameter angegeben werden, welcher die Aufrufreihenfolge, bei der Existenz mehrerer solcher Methoden, bestimmt. Die Priorität wird dabei als Ganzzahl repräsentiert und Methoden werden in aufsteigender Reihenfolge aufgerufen (siehe \autoref{lst:titlebar_controller_content}).
 \subsubsection{Annotation: @Controller}
-Ein \texttt{SimpliFX} kompatibler Controller muss die \texttt{@Controller} Annotation aufweisen und dabei mindestens den FXML Parameter gesetzt haben. Der FXML Parameter gibt den Pfad zur FXML Datei an, welcher für die Konstruktion des Controllers benötigt wird. Analog dazu kann optional eine \ac{css} Datei angegeben werden. Desweiteren ist die Angabe einer Controllergruppe möglich, um verschiedene Controller in Gruppen zu unterteilen.
+Ein \texttt{SimpliFX} kompatibler Controller muss die \texttt{@Controller} Annotation aufweisen und dabei mindestens den FXML Parameter gesetzt haben. Der FXML Parameter gibt den Pfad zur FXML Datei an, welcher für die Konstruktion des Controllers benötigt wird. Analog dazu kann optional eine \ac{css} Datei angegeben werden (siehe \autoref{lst:main_controller_demo}).
 \subsubsection{Annotation: @EventHandler}
-Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Eventinformationen aufgerufen werden sollen, können mit der \texttt{@EventHandler} Annotation annotiert werden. Diese akzeptiert einen optionalen Prioritätsparameter, der für die Aufrufreihenfolge gleichartiger Methoden verantwortlich ist. Jede durch JavaFX ermöglichte Methode zum Abfangen von Events (\texttt{onAction}, \texttt{onClick}, ...), welche normalerweise mit \texttt{@FXML} annotiert wird, kann ebenfalls mit \texttt{@EventHandler} annotiert werden.
+Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Eventinformationen aufgerufen werden sollen, können mit der \texttt{@EventHandler} Annotation annotiert werden. Diese akzeptiert einen optionalen Prioritätsparameter, der für die Aufrufreihenfolge gleichartiger Methoden verantwortlich ist. Annotierte Methoden werden automatisch erkannt und aufgerufen, sofern diese in einem Einstiegspunkt deklariert worden sind. Die Verwendung des Event-Systems kann ebenfalls manuell durch den Entwickler außerhalb von Controllern und Einstiegspunkten verwendet werden. Dazu muss dieser die jeweiligen Klassen zur Eventbehandlung in einem \texttt{IEventEmitter} registrieren (siehe \autoref{lst:event_method_demo}).
 \subsubsection{Annotation: @ResourceBundle}
-Die Registrierung von \texttt{ResourceBundle}s aus dem Klassenpfad erfolgt durch die \texttt{@ResourceBundle} Annotation, welche als notwendigen Parameter den Basisnamen bzw. den relativen Pfad ausgehend vom \texttt{resources} Verzeichnis akzeptiert. Nur Felder, die \texttt{II18N} oder eine Implementierung dieser Schnittstelle als Typen aufweisen, können mit \texttt{@ResourceBundle} annotiert werden.
+Die Registrierung von \texttt{ResourceBundle}s aus dem Klassenpfad erfolgt durch die \texttt{@ResourceBundle} Annotation, welche als notwendigen Parameter den Basisnamen bzw. den relativen Pfad ausgehend vom \texttt{resources} Verzeichnis akzeptiert. Nur Felder, die \texttt{II18N} oder eine Implementierung dieser Schnittstelle als Typen aufweisen, können mit \texttt{@ResourceBundle} annotiert werden (siehe \autoref{lst:fields_demo}).
 \subsubsection{Annotation: @LocalizeValue}
-Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Komponenten handeln, welche eine Form von übersetzbarem Text darstellen können. Dazu gehören beispielsweise die \texttt{Button} und die \texttt{Label} Klasse. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden.
+Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Properties handeln, welche den jeweiligen Parametertypen darstellen können. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Für die automatische Verbindung der Property und der jeweiligen JavaFX-Komponente, muss die FX-Id dieser als Annotationsparameter angegeben wird. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden (siehe \autoref{lst:sidebar_controller_localize}).
 \subsubsection{Annotation: @CssProperty}
 Felder, welche einen \texttt{Collection}-Typen aufweisen, können mit der \texttt{CssProperty} Annotation annotiert werden. Dadurch wird automatisch eine neue \texttt{CssMetaData} Instanz erstellt und der Liste hinzugefügt. Der Entwickler muss den Namen der neuen \ac{css} Property und die Konvertierungsklasse als Parameter angeben. Dazu ist es möglich, ein Feld anzugeben, welches an den konvertierten Wert der \ac{css} Property gebunden wird und somit in der jeweiligen Klasseninstanz verfügbar ist. Die Annotation ist \texttt{Repeatable} und kann mehrmals an einem Feld angebracht werden.
 \subsubsection{Annotation: @DIAnnotation}
-Die \texttt{@DIAnnotation} Annotation ist eine Meta-Annotation, kann also nur an anderen Definitionen von Annotationen angebracht werden. Sie ist nicht für den Benutzer der Bibliothek bestimmt, sondern stellt anderen Annotationen wichtige Informationen zur Konstruktion von Komponenten zur Abhängigkeitsinjektion bereit. Es existieren drei Annotationen, welche jeweils für die Kompatibilität mit Spring, Guice und Dagger verantwortlich sind.
+Die \texttt{@DIAnnotation} Annotation ist eine Meta-Annotation, kann also nur an anderen Definitionen von Annotationen angebracht werden. Sie ist nicht für den Benutzer der Bibliothek bestimmt, sondern stellt anderen Annotationen wichtige Informationen zur Konstruktion von Komponenten zur Abhängigkeitsinjektion bereit. Es existieren drei Annotationen, welche jeweils für die Kompatibilität mit Spring, Guice und Dagger verantwortlich sind (siehe \autoref{appendix:add_new_di_library}).
 \subsubsection{Annotation: @SpringInjection}
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Spring und muss am Einstiegspunkt der Applikation angebracht sein. Konfigurationsklassen von Spring können als Parameter in Form eines Arrays übergeben werden.
 \subsubsection{Annotation: @GuiceInjection}
-Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Guice und muss am Einstiegspunkt der Applikation angebracht sein. Guice-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
+Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Guice und muss am Einstiegspunkt der Applikation angebracht sein. Guice-Modulklassen können als Parameter in Form eines Arrays übergeben werden (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Annotation: @Dagger1Injection}
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Dagger der Version 1 und muss am Einstiegspunkt der Applikation angebracht werden. Dagger-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
 \subsubsection{Annotation: @Setup}
-Die \texttt{@Setup} Annotation ist ausschließlich im Rahmen des Controller-Systems nutzbar und kann nur an Methoden angebracht werden. Hat \texttt{SimpliFX} einen Controller fertig initialisiert (Abhängigkeiten, Ressourcen, ...), so werden alle Setup-Methoden aufgerufen. In diesen Methoden kann der Entwickler neue Controller vom System initialisieren lassen und deren Wurzel-Node dann beispielsweise in anderen JavaFX-Komponenten integrieren.
+Die \texttt{@Setup} Annotation ist ausschließlich im Rahmen des Controller-Systems nutzbar und kann nur an Methoden angebracht werden. Hat \texttt{SimpliFX} einen Controller fertig initialisiert (Abhängigkeiten, Ressourcen, ...), so werden alle Setup-Methoden aufgerufen. In diesen Methoden kann der Entwickler neue Controller vom System initialisieren lassen und deren Wurzel-Node dann beispielsweise in anderen JavaFX-Komponenten integrieren (siehe \autoref{lst:main_controller_setup}).
 \subsubsection{Annotation: @OnShow und @OnHide}
-Methoden eines Controllers, welche mit \texttt{@OnShow} annotiert wurden, werden aufgerufen, wenn ein Controller im Szenengraphen enthalten ist und somit aktiv gerendert wird. Analog dazu werden \texttt{@OnHide} Methoden aufgerufen, wenn der Controller gewechselt wird und somit nicht mehr angezeigt wird.
+Methoden eines Controllers, welche mit \texttt{@OnShow} annotiert wurden, werden aufgerufen, wenn ein Controller im Szenengraphen enthalten ist und somit aktiv gerendert wird. Eine Priorisierung der Aufrufreihenfolge ist wie bei anderen Lebenszyklusbehandlungsannotationen ebenfalls möglich. Analog dazu werden \texttt{@OnHide} Methoden aufgerufen, wenn der Controller gewechselt wird und somit nicht mehr angezeigt wird (siehe \autoref{lst:login_controller_visibility_methods}).
 \subsubsection{Annotation: @OnDestroy}
 \texttt{@OnDestroy} Methoden werden aufgerufen, sobald ein Controller nicht länger benötigt wird und alle damit verbundenen Ressourcen gelöscht werden können.
 \subsubsection{Annotation: @EventEmitter und @EventReceiver}
 Die \texttt{@EventEmitter} Annotation verbindet das Auftreten von JavaFX-Events mit dem Aufruf von Methoden. Dabei werden Felder als EventEmitter deklariert und Methoden als EventReceiver. Ein notwendiger Parameter beider Annotationen ist ein gemeinsamer Identifikator, welcher die Beziehung zwischen Methode und Feld ermöglicht. Methoden müssen als Parameter die jeweilige JavaFX-Event Klasse als Parameter aufweisen.
 \subsubsection{Annotation: @FXThread}
-Methoden, welche mit \texttt{@FXThread} annotiert wurden, sollen bei Aufruf von durch \texttt{SimpliFX} verwaltete Objekte, auf dem Java Application Thread ausgeführt werden.
+Methoden, welche mit \texttt{@FXThread} annotiert wurden, sollen bei Aufruf von durch \texttt{SimpliFX} verwaltete Objekte, auf dem Java Application Thread ausgeführt werden. Aufgrund des dynamischen Ladens der Klasse zur Laufzeit durch einen eigenen \texttt{ClassLoader} und der damit einhergehenden Bytecode-Manipulation, handelt es sich um eine experimentelle Funktion, welche speziell vor Anwendungsstart aktiviert werden muss.
 \subsubsection{Annotation: @Shared}
-Objekte und Referenzen auf Objekte, welche geteilte Ressourcen darstellen sollen und somit beispielsweise zwischen Controllern geteilt werden sollen, können mit \texttt{@Shared} annotiert werden. Bei einer eventuellen Veränderung der Werte von geteilten Ressourcen, müssen offensichtlich alle Vorkommnisse dieser Ressource aktualisiert werden. Aufgrund dieser Eigenschaft können nur von \texttt{SimpliFX} bereitgestellte Klassen (z.B. eine SharedResource oder SharedReference Klasse), sowie aktualisierbare JavaFX Properties eine geteilte Ressource darstellen und somit mit \texttt{@Shared} als solche deklariert werden. Geteilte Ressourcen sollen anhand eines \texttt{String} Wertes eindeutig identifizierbar sein, welcher optional per Parameter an die Annotation weitergegeben werden.
+Objekte und Referenzen auf Objekte, welche geteilte Ressourcen darstellen sollen und somit beispielsweise zwischen Controllern geteilt werden sollen, können mit \texttt{@Shared} annotiert werden. Bei einer eventuellen Veränderung der Werte von geteilten Ressourcen, müssen offensichtlich alle Vorkommnisse dieser Ressource aktualisiert werden. Aufgrund dieser Eigenschaft können nur von \texttt{SimpliFX} bereitgestellte Klassen (z.B. eine SharedResource oder SharedReference Klasse), sowie read-only JavaFX \texttt{ObjectProperty} Felder eine geteilte Ressource darstellen und somit mit \texttt{@Shared} als solche deklariert werden. Geteilte Ressourcen sollen anhand eines \texttt{String} Wertes eindeutig identifizierbar sein, welcher optional per Parameter an die Annotation weitergegeben werden (siehe \autoref{lst:login_controller_fields}).
 \subsubsection{Annotation: @StageConfig}
-Die \texttt{@StageConfig} Annotation muss, bei Nutzung, den \texttt{SimpliFX} Einstiegspunkt annotieren und kann die JavaFX Hauptstage automatisch vorkonfigurieren. Mithilfe der Annotationsparameter kann der Titel, der \texttt{StageStyle}, das Vordergrund- und Skalierungsverhalten und das Symbol der Stage modifiziert werden. Außerdem kann der optionale \texttt{autoShow} Parameter angegeben werden, welcher kontrolliert, ob \texttt{SimpliFX} die \texttt{Stage} Instanz automatisch nach Erstellung mittels \texttt{Stage\#show} anzeigt. Ein \texttt{EventHandler}, welcher das \texttt{StartEvent} der JavaFX Applikation verarbeitet, muss somit nicht definiert werden.
+Die \texttt{@StageConfig} Annotation muss, bei Nutzung, den \texttt{SimpliFX} Einstiegspunkt annotieren und kann die JavaFX Hauptstage automatisch vorkonfigurieren. Mithilfe der Annotationsparameter kann der Titel, der \texttt{StageStyle}, das Vordergrund- und Skalierungsverhalten und das Symbol der Stage modifiziert werden. Außerdem kann der optionale \texttt{autoShow} Parameter angegeben werden, welcher kontrolliert, ob \texttt{SimpliFX} die \texttt{Stage} Instanz automatisch nach Erstellung mittels \texttt{Stage\#show} anzeigt. Ein \texttt{EventHandler}, welcher das \texttt{StartEvent} der JavaFX Applikation verarbeitet, muss somit nicht definiert werden (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Übersicht und Zusammenfassung}
 In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglichen Typ- oder Elementrestriktionen, Parametern und den zugrundeliegende funktionalen Anforderungen aufgelistet.
-\add{the javafx menu base class to eventemitter restrictions}
 \renewcommand*{\arraystretch}{1.3}
 \begin{longtable}[H]{|p{0.16\textwidth}|p{0.04\textwidth}|p{0.35\textwidth}|p{0.30\textwidth}|}
 	%\begin{tabular}{|p{0.16\textwidth}|p{0.04\textwidth}|p{0.35\textwidth}|p{0.30\textwidth}|}
@@ -505,8 +504,9 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		LocalizeValue & \ref{freq3} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Feldname
+				\item FX-Id
 				\item Parameterindex
+				\item Feldname der JavaFX Komponente
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -544,12 +544,13 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item \ac{css} Property
 				\item Konvertierungsklasse
-				\item JavaFX-Property Feld
+				\item Lokales JavaFX-Property Feld
+				\item Java-FX Property für das Binding
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Collection-Felder
+				\item Nur List-Felder
 			\end{itemize}
 		\end{minipage} \\
 		\hline
@@ -558,7 +559,6 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item FXML Pfad
 				\item \ac{css} Pfad
-				\item Controllergruppe
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -611,7 +611,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Property-Felder
+				\item \texttt{SharedResources}-, \texttt{SharedReference}-, \texttt{ObjectProperty}-Felder
 			\end{itemize}
 		\end{minipage} \\
 		\hline
@@ -619,6 +619,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Pfad oder Name der Datei
+				\item Klassenpfadquelle
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -667,7 +668,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		FXThread & \ref{freq21} & -- & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Methoden
+				\item Nur Methoden in Controllern
 			\end{itemize}
 		\end{minipage} \\
 		\hline
