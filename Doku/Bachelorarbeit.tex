@@ -22,7 +22,7 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{adjustbox}
-\usepackage{refcheck}
+%\usepackage{refcheck} %DEBUG ONLY
 \usepackage[normalem]{ulem}
 \usepackage{caption}
 \usepackage{etoolbox}
@@ -216,6 +216,24 @@
 	\or Dezember% 12
 	\fi}
 
+\newcommand{\NUMBERFORMAT}[1]{%
+	\ifcase#1
+	\or eine% 1
+	\or zwei% 2
+	\or drei% 3
+	\or vier% 4
+	\or fünf% 5
+	\or sechs% 6
+	\or sieben% 7
+	\or acht% 8
+	\or neun% 9
+	\or zehn% 10
+	\or elf% 11
+	\or zwölf% 12
+	\else #1%
+	\fi}
+
+
 \newcommand{\csharpbold}{$\mathbf{C^\text{\#}}$}
 \newcommand{\csharp}{$C^\text{\#}$}
 
@@ -242,12 +260,12 @@
 
 
 % Zusammenfassung erstellen
-\begin{abstract}
-	\input{Sonstiges/Abstract.tex}
-\end{abstract}
-\begin{abstract}
-	\input{Sonstiges/Zusammenfassung.tex}
-\end{abstract}
+%\begin{abstract}
+%	\input{Sonstiges/Abstract.tex}
+%\end{abstract}
+%\begin{abstract}
+%	\input{Sonstiges/Zusammenfassung.tex}
+%\end{abstract}
 	
 % Inhaltsverzeichnis erstellen
 \tableofcontents
@@ -284,7 +302,6 @@
 \nocite{*}
 \bibliographystyle{geralpha}
 \bibliography{Bibliographie/Bibliographie}
-\add{Check unused sources}
 \listoftodos[Notes]
 
 % Index ausgeben

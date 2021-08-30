@@ -1,7 +1,7 @@
 \chapter{Hinzufügen einer Bibliothek für die Abhängigkeitsinjektion}
 \label{appendix:add_new_di_library}
 \begin{figure}[H]
-	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Umgebung., captionpos=b, nolol]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Umgebung, captionpos=b, nolol]
 public class TestEnvironment implements DIEnvironment {
 	public TestEnvironment(Object obj, Class<?>[] modules) {
 		// Initialisiere Bibliothek
@@ -20,7 +20,7 @@ public class TestEnvironment implements DIEnvironment {
 	\end{lstlisting}
 \end{figure}
 \begin{figure}[H]
-	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Umgebung., captionpos=b, nolol]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Factory, captionpos=b, nolol]
 public class TestEnvironmentFactory implements 
 		IDIEnvironmentFactory<TestInjection> {
 	#@Override
@@ -32,7 +32,7 @@ public class TestEnvironmentFactory implements
 	\end{lstlisting}
 \end{figure}
 \begin{figure}[H]
-	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Annotation., captionpos=b, nolol]
+	\begin{lstlisting}[caption=Beispiel -- Erstellen einer neuen Annotation, captionpos=b, nolol]
 #@Target(ElementType.TYPE)
 #@Retention(RetentionPolicy.RUNTIME)
 #@DIAnnotation(TestEnvironmentFactory.class)
