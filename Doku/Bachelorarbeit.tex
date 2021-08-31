@@ -22,7 +22,7 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{adjustbox}
-\usepackage{refcheck}
+%\usepackage{refcheck} %DEBUG ONLY
 \usepackage[normalem]{ulem}
 \usepackage{caption}
 \usepackage{etoolbox}
@@ -32,6 +32,15 @@
 \usepackage{longtable}
 \usepackage{forest}
 \usepackage{awesomebox}
+\usepackage{xparse}
+\usepackage{calc}
+\usepackage{pgfplots}
+\usepackage{ifthen}
+\usepackage{pifont}
+\usepackage{xstring}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
 
 \makeatletter
 \def\errorunderline{\bgroup \markoverwith{\lower3.5\p@\hbox{\sixly \textcolor{red}{\char58}}}\ULon}
@@ -207,6 +216,24 @@
 	\or Dezember% 12
 	\fi}
 
+\newcommand{\NUMBERFORMAT}[1]{%
+	\ifcase#1
+	\or eine% 1
+	\or zwei% 2
+	\or drei% 3
+	\or vier% 4
+	\or fünf% 5
+	\or sechs% 6
+	\or sieben% 7
+	\or acht% 8
+	\or neun% 9
+	\or zehn% 10
+	\or elf% 11
+	\or zwölf% 12
+	\else #1%
+	\fi}
+
+
 \newcommand{\csharpbold}{$\mathbf{C^\text{\#}}$}
 \newcommand{\csharp}{$C^\text{\#}$}
 
@@ -233,12 +260,12 @@
 
 
 % Zusammenfassung erstellen
-\begin{abstract}
-	\input{Sonstiges/Abstract.tex}
-\end{abstract}
-\begin{abstract}
-	\input{Sonstiges/Zusammenfassung.tex}
-\end{abstract}
+%\begin{abstract}
+%	\input{Sonstiges/Abstract.tex}
+%\end{abstract}
+%\begin{abstract}
+%	\input{Sonstiges/Zusammenfassung.tex}
+%\end{abstract}
 	
 % Inhaltsverzeichnis erstellen
 \tableofcontents
@@ -255,7 +282,7 @@
 \begin{appendix}
 	\input{Anhang/Controllerbasierte JavaFX Anwendung.tex}
 	\input{Anhang/Hinzufuegen einer neuen Bibliothek für die Abhaengigkeitsinjektion.tex}
-	\input{Anhang/Implementierung und Beziehungen des Controller-Systems.tex}
+	\input{Anhang/Schnittstellen und Beziehungen des Controller-Systems.tex}
 	\input{Anhang/Demo Anwendung.tex}
 \end{appendix}
 
@@ -275,11 +302,7 @@
 \nocite{*}
 \bibliographystyle{geralpha}
 \bibliography{Bibliographie/Bibliographie}
-\add{Switch to newest JLS}
-\add{Check unused sources}
-\add{crossref for @InBook to get valid booktitle}
-\add{fix inconsistencies with author names}
-\listoftodos[Notes]
+%\listoftodos[Notes]
 
 % Index ausgeben
 \cleardoublepage

@@ -7,10 +7,10 @@ Auf die Anforderungserhebung folgt die Konzeption des benötigten Systems und de
 \section{Identifikation von Problemen und komplexen Strukturen in der JavaFX Entwicklung}
 \sectionmark{Identifikation von Problemen}
 \label{problemanalyse}
-Im Folgenden werden generelle Probleme bei der Entwicklung von JavaFX Anwendungen identifiziert. Dazu gehören Mechanismen welche aufgrund ihrer Komplexität nicht für Anfänger geeignet sind oder von erfahrenen Entwicklern häufig genutzt und somit möglicherweise vereinfacht werden können. Obwohl dabei Annotationen als Basis für eine Vereinfachung dienen, wird auch das Erstellen von zusätzlichen Klassen oder dem Entwickeln von Erweiterungen für existierenden JavaFX Konzepte als Alternative für diese Zielerreichung in Betracht gezogen. Die Lösungen der gefundenen Probleme werden in einer Anforderungsanalyse durch funktionale und nichtfunktionale Anforderungen in \autoref{anforderungsanalyse} gelöst.
+Im Folgenden werden generelle Probleme bei der Entwicklung von JavaFX Anwendungen identifiziert. Dazu gehören Mechanismen, welche aufgrund ihrer Komplexität nicht für Anfänger geeignet sind oder von erfahrenen Entwicklern häufig genutzt und somit möglicherweise vereinfacht werden können. Obwohl dabei Annotationen als Basis für eine Vereinfachung dienen, wird auch das Erstellen von zusätzlichen Klassen oder das Entwickeln von Erweiterungen für existierenden JavaFX Konzepte als Alternative für diese Zielerreichung in Betracht gezogen. Die Lösungen der gefundenen Probleme werden in einer Anforderungsanalyse durch funktionale und nichtfunktionale Anforderungen in \autoref{anforderungsanalyse} gelöst.
 \subsection{Internationalisierung und Lokalisierung}
-In der Informatik, speziell in der Softwareentwicklung, ist die Internationalisierung ein wichtiger Bestandteil einen Softwareproduktes, bei welchen die Entwickler die Software so gestalten, dass diese ohne viel Aufwand für andere internationale Märkte mit anderen Kulturen und Sprachen verfügbar gemacht werden kann \cite{Reineke2005}. Dabei wird beispielsweise eine einfache Schnittstelle für das Verwenden von verschiedenen Sprachen entwickelt, welche das Übersetzen von vorhandenen Textfeldern und anderen textbasierte Elementen in grafischen Benutzeroberflächen, Konfigurationsdateien oder Konsolenausgaben ermöglicht. Die Schnittstelle wird dabei so entwickelt, dass ohne eine Änderung des Quelltextes, neue Sprachen hinzugefügt werden können. Die Lokalisierung beschreibt dann unter Anderem die Übersetzung von den eben genannten Elementen.\\
-Dieses Konzept kann durch die von Java bereitgestellte \texttt{ResourceBundle} Klasse realisiert werden \cite{Deitsch2001}. Bei der Verwendung eines solchen \texttt{ResourceBundle}s wird jedem zu übersetzenden Element ein Schlüssel zugeordnet und nach Konvention, in einer \texttt{.properties} Datei gespeichert. Wenn eine neue Sprache im Laufe des Lokalisierungsprozesses hinzugefügt werden soll, so muss jeweils eine neue \texttt{.properties} Datei angelegt werden. JavaFX ermöglicht das manuelle Spezifizieren einer vordefinierten \texttt{ResourceBundle} Instanz bei dem Laden einer FXML Datei durch einen \texttt{FXMLLoader}.
+In der Informatik, speziell in der Softwareentwicklung, ist die Internationalisierung ein wichtiger Bestandteil eines Softwareproduktes, bei welchem die Entwickler die Software so gestalten, dass diese ohne viel Aufwand für andere internationale Märkte mit anderen Kulturen und Sprachen verfügbar gemacht werden kann \cite{Reineke2005}. Dabei wird beispielsweise eine einfache Schnittstelle für das Verwenden von verschiedenen Sprachen entwickelt, welche das Übersetzen von vorhandenen Textfeldern und anderen textbasierten Elementen in grafischen Benutzeroberflächen, Konfigurationsdateien oder Konsolenausgaben ermöglicht. Die Schnittstelle wird dabei so entwickelt, dass ohne eine Änderung des Quelltextes neue Sprachen hinzugefügt werden können. Die Lokalisierung beschreibt dann unter anderem die Übersetzung von den eben genannten Elementen.\\
+Dieses Konzept kann durch die von Java bereitgestellte \texttt{ResourceBundle} Klasse realisiert werden \cite{Deitsch2001}. Bei der Verwendung eines solchen \texttt{ResourceBundle}s wird jedem zu übersetzenden Element ein Schlüssel zugeordnet und nach Konvention in einer \texttt{.properties} Datei gespeichert. Wenn eine neue Sprache im Laufe des Lokalisierungsprozesses hinzugefügt werden soll, so muss jeweils eine neue \texttt{.properties} Datei angelegt werden. JavaFX ermöglicht das manuelle Spezifizieren einer vordefinierten \texttt{ResourceBundle} Instanz bei dem Laden einer FXML Datei durch einen \texttt{FXMLLoader}.
 In der zu ladenden FXML Datei müssen hartcodierte Textelemente durch den jeweiligen Schlüssel aus der \texttt{.properties} Datei, wie in \autoref{lst:fxmlkey} gezeigt, ersetzt werden.
 \begin{figure}[H]
 	\noindent
@@ -26,15 +26,15 @@ login.user = Benutzername
 <Label text="%login.username"/>
 		\end{lstlisting}
 	\end{adjustbox}
-	\captionof{lstlisting}{Nutzung des Schlüssels in einer FXML Datei.}
+	\captionof{lstlisting}{Nutzung des Schlüssels in einer FXML Datei}
 	\label{lst:fxmlkey}
 \end{figure}
-\noindent Das Problem bei dieser Art der Übersetzung ist, dass eine Änderung der Sprache zur Laufzeit des Programms nicht dynamisch möglich ist. Die FXML Datei bzw. der dazugehörige Controller muss nach einer Sprachänderung durch beispielsweise eine Schaltfläche oder ein Dropdown-Menü durch einen FXML-Loader neu geladen werden, damit eventuelle Änderungen übernommen werden können. Das dynamische Ändern der Sprache zur Laufzeit ist nur mit einem Modifizierung des Ladeprozesses von FXML Dateien durch eine eigene Version des \texttt{FXMLLoader}s oder durch eine vom \texttt{FXMLLoader} unabhängige Implementierung durch Properties und Bindings möglich. Die erste Variante sorgt für ein automatisches Binden der nötigen Properties und die Letztere für ein manuelles Binden wenn nötig, weshalb eine Fusion beider Möglichkeiten in eine hohe Anpassbarkeit des Systems resultiert. Außerdem ist es auf diese Weise möglich, verschiedene Bindings zu aktualisieren, falls ein bestimmtes Event auftritt, welches eine Änderung des übersetzten Textes hervorruft. Parameterisierte Schlüssel aus der \texttt{.properties} Datei können somit automatisch an die parameterverändernden Events gebunden werden.
+\noindent Das Problem bei dieser Art der Übersetzung ist, dass eine Änderung der Sprache zur Laufzeit des Programms nicht dynamisch möglich ist. Die FXML Datei bzw. der dazugehörige Controller muss nach einer Sprachänderung durch beispielsweise eine Schaltfläche oder ein Dropdown-Menü durch einen FXML-Loader neu geladen werden, damit eventuelle Änderungen übernommen werden können. Das dynamische Ändern der Sprache zur Laufzeit ist nur mit einer Modifizierung des Ladeprozesses von FXML Dateien durch eine eigene Version des \texttt{FXMLLoader}s oder durch eine vom \texttt{FXMLLoader} unabhängige Implementierung mit Properties und Bindings möglich. Die erste Variante sorgt für ein automatisches Binden der nötigen Properties und die Letztere für ein manuelles Binden wenn nötig, weshalb eine Fusion beider Möglichkeiten in eine hohe Anpassbarkeit des Systems resultiert. Außerdem ist es auf diese Weise möglich, verschiedene Bindings zu aktualisieren, falls ein bestimmtes Event auftritt, welches eine Änderung des übersetzten Textes hervorruft. Parametrisierte Schlüssel aus der \texttt{.properties} Datei können somit automatisch an die parameterverändernden Events gebunden werden.
 \subsection{Abhängigkeitsinjektion für Controller}
-Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit des Programms bestimmt und zur Verfügung gestellt. Meist konfiguriert der Entwickler mithilfe einer externen Bibliothek die Bereitstellung der Abhängigkeiten in einer Konfigurationsdatei oder Konfigurationsklasse. Bei dem Nutzen einer Art von Abhängigkeitsinjektion ist die eigentliche Implementierung der Abhängigkeiten durch die abhängigen Objekte nicht bekannt. Diese kennen nur die Schnittstellen, weshalb ein Auswechseln der Schnittstellenimplementierung durch eine Änderung der jeweiligen Konfigurationsdatei/Konfigurationsklasse möglich ist. Durch diese explizite Trennung von Schnittstelle und Implementierung ist eine lose Kopplung der Komponenten gewährleistet, was wiederum zu einer hohen Flexibilität und zu einer hohen Wartbarkeit sowie Testbarkeit führt. Eine Injektion ist dabei durch Felder (Feldinjektion), Konstruktoren (Konstruktorinjektion) oder Setter (Setterinjektion) möglich. Die Funktionalität einer Injektion von Abhängigkeiten in einen Controller ist nicht direkt in JavaFX enthalten, kann aber durch das Verwenden von zum Beispiel Afterburner.fx\footref{ft:afterburner} hinzugefügt werden. Eine Unterstützung von etablierten externen Bibliotheken zur Realisierung des Abhängigkeitsinjektionsmusters wie Spring\footnote{Spring: \url{https://spring.io}}, Dagger\footnote{Dagger: \url{https://square.github.io/dagger/}} oder Guice\footnote{\label{ft:guice}Guice: \url{https://github.com/google/guice}} ist dadurch jedoch nicht gegeben. Aufgrund der Tatsache, dass alle drei genannten Bibliotheken mit der \texttt{jakarta.inject.Inject} bzw. \texttt{javax.inject.Inject} Annotation, eine grundlegende Abhängigkeitsinjektion bereitstellen, kann ebendiese Annotation für eine Injektion innerhalb von Controllern verwendet werden. Ein Beispiel eines Controllers mit verschiedenen injizierten Diensten ist in \autoref{lst:controllerinjection} zu erkennen.
+Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit des Programms bestimmt und zur Verfügung gestellt. Meist konfiguriert der Entwickler mithilfe einer externen Bibliothek die Bereitstellung der Abhängigkeiten in einer Konfigurationsdatei oder Konfigurationsklasse. Bei dem Nutzen einer Art von Abhängigkeitsinjektion ist die eigentliche Implementierung der Abhängigkeiten durch die Objekte nicht bekannt. Diese kennen nur die Schnittstellen, weshalb ein Auswechseln der Schnittstellenimplementierung durch eine Änderung der jeweiligen Konfigurationsdatei/Konfigurationsklasse möglich ist. Durch diese explizite Trennung von Schnittstelle und Implementierung ist eine lose Kopplung der Komponenten gewährleistet, was wiederum zu einer hohen Flexibilität und zu einer hohen Wartbarkeit sowie Testbarkeit führt. Eine Injektion ist dabei durch Felder (Feldinjektion), Konstruktoren (Konstruktorinjektion) oder Setter (Setterinjektion) möglich. Die Funktionalität einer Injektion von Abhängigkeiten in einen Controller ist nicht direkt in JavaFX enthalten, kann aber durch das Verwenden von zum Beispiel Afterburner.fx\footref{ft:afterburner} hinzugefügt werden. Eine Unterstützung von etablierten externen Bibliotheken zur Realisierung des Abhängigkeitsinjektionsmusters wie Spring\footnote{Spring: \url{https://spring.io}}, Dagger\footnote{Dagger: \url{https://square.github.io/dagger/}} oder Guice\footnote{\label{ft:guice}Guice: \url{https://github.com/google/guice}} ist dadurch jedoch nicht gegeben. Aufgrund der Tatsache, dass alle drei genannten Bibliotheken mit der \texttt{jakarta.inject.Inject} bzw. \texttt{javax.inject.Inject} Annotation eine grundlegende Abhängigkeitsinjektion bereitstellen, kann ebendiese Annotation für eine Injektion innerhalb von Controllern verwendet werden. Ein Beispiel eines Controllers mit verschiedenen injizierten Diensten ist in \autoref{lst:controllerinjection} zu erkennen.
 \begin{figure}[H]
 	\centering
-	\begin{lstlisting}[caption=Beispiel -- Controller mit injizierten Diensten., captionpos=b, label=lst:controllerinjection]
+	\begin{lstlisting}[caption=Beispiel -- Controller mit injizierten Diensten, captionpos=b, label=lst:controllerinjection]
 	public class TestController {
 	
 		#@Inject
@@ -46,15 +46,14 @@ Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit
 	}
 	\end{lstlisting}
 \end{figure}
-\noindent Die Implementierungen sollen durch den Entwickler in der jeweiligen Konfigurationsdatei/Konfigurationsklasse den Schnittstellen zugeordnet werden können.
 \subsection{CSS Metadatengeneration}
 Ein wichtiger Bestandteil von JavaFX ist die Möglichkeit, das Aussehen und den Stil von einzelnen Komponenten wie Schaltflächen und Containerelementen durch die Verwendung von \ac{css} zu modifizieren. Werden eigene Komponenten erstellt oder bestehende Komponenten erweitert, so erlaubt JavaFX das Hinzufügen von eigenen \ac{css} Properties zu den jeweiligen Komponenten mithilfe von neuen Instanzen der \texttt{CssMetaData} Klasse. Für jede neue \ac{css} Property muss dabei eine neue \texttt{CssMetaData} Instanz erstellt werden, weshalb das Hinzufügen von vielen solcher Instanzen ein repetitiver Prozess mit vielen Boilerplate Quelltextfragmenten ist, welcher durchaus vereinfacht werden kann.
 \subsection{JavaFX Einstiegspunkt und Preloader}
-Damit eine JavaFX Applikation gestartet werden kann muss, wie in \autoref{javafx} beschrieben, 
-eine Klasse existieren, welche von der \texttt{Application} Klasse erbt. Müssen bestimmte performanceintensive Aufgaben wie das Laden von Sound-/Video- oder Bilddateien vor dem Start der eigentlichen Anwendungen ausgeführt werden, so kann dies in einer Klasse, welche von der \texttt{Preloader} Klasse erben muss, realisiert werden. Der \texttt{Preloader} ist dabei eine spezialisierte Form der \texttt{Application}, welche es dem Entwickler ermöglicht, Ressourcen zu laden und durch eventbasierte Statusaktualisierungen, dem Nutzer mitzuteilen. Damit ein \texttt{Preloader} mit einer standardmäßigen JavaFX Anwendung verbunden werden kann, muss statt \texttt{Platform\#launch}, die interne \texttt{PlatformImpl\#launchApplication} Methode genutzt werden. Entwickler sollen das Nutzen von internen Klassen und Methoden weitgehend vermeiden, da Implementierungen und Funktionen dieser sich ständig ändern können. Das Verwalten der Aufgaben, welche vor dem Anwendungsstart durchgeführt werden müssen, soll vereinfacht werden, wobei insbesondere die vorhandenen Statusaktualisierungen erweitert werden sollen. Auch die Initialisierung einer Applikationsklasse bzw. der benötigten \texttt{Stage} läuft in den meisten Fällen gleich ab und soll bei Bedarf vom Entwickler zu einem großen Teil automatisiert werden können.
+Damit eine JavaFX Applikation gestartet werden kann, muss, wie in \autoref{javafx} beschrieben, 
+eine Klasse existieren, welche von der \texttt{Application} Klasse erbt. Müssen bestimmte performanceintensive Aufgaben wie das Laden von Sound-, Video- oder Bilddateien vor dem Start der eigentlichen Anwendungen ausgeführt werden, so kann dies in einer Klasse, welche von der \texttt{Preloader} Klasse erben muss, realisiert werden. Der \texttt{Preloader} ist dabei eine spezialisierte Form der \texttt{Application}, welche es dem Entwickler ermöglicht, Ressourcen zu laden und dies dem Nutzer durch eventbasierte Statusaktualisierungen mitzuteilen. Damit ein \texttt{Preloader} mit einer standardmäßigen JavaFX Anwendung verbunden werden kann, muss statt \texttt{Platform\#launch} die interne \texttt{PlatformImpl\#launchApplication} Methode genutzt werden. Entwickler sollen das Nutzen von internen Klassen und Methoden weitgehend vermeiden, da sich Implementierungen und Funktionen dieser ständig ändern können. Das Verwalten der Aufgaben, welche vor dem Anwendungsstart durchgeführt werden müssen, soll vereinfacht werden, wobei insbesondere die vorhandenen Statusaktualisierungen erweitert werden sollen. Auch die Initialisierung einer Applikationsklasse bzw. der benötigten \texttt{Stage} läuft in den meisten Fällen gleich ab und soll bei Bedarf vom Entwickler zu einem großen Teil automatisiert werden können.
 \subsection{Controller Lebenszyklus}
 \label{controller_lebenszyklus}
-Der Lebenszyklus von JavaFX Controllern ist in der aktuellen Ausführung für komplexe Systeme mit vielen Controllern ungeeignet, da dieser nur aus zwei Phasen besteht. Zuerst wird die Controllerklasse instanziiert und darauf folgt die Initialisierung der \texttt{@FXML} Felder und der Methodenaufruf einer vom Entwickler bereitgestellten \texttt{initialize} Methode. Damit mit fertig initialisierten \texttt{@FXML} Feldern gearbeitet werden kann, muss der dafür benötigte Quelltext immer in der \texttt{initialize} Methode definiert werden. Ein Beispiel für den Ablauf einer Controllerinstanziierung durch den \texttt{FXMLLoader} ist in \autoref{lst:controllerinstantiation} abgebildet. Der rudimentäre Lebenszyklus unterstützt dabei keine Methoden, welche beispielsweise bei einem Entfernen des Wurzelelements eines Controllers aus dem Szenengraphen ausgeführt wird um eventuell offene Ressourcen zu schließen und somit effektiv Ressourcenlecks zu verhindern. Ein vollständiger Lebenszyklus wie bei Activities in Android\footnote{\url{https://developer.android.com/guide/components/activities/activity-lifecycle}},ist praktisch nicht vorhanden.
+Der Lebenszyklus von JavaFX Controllern ist in der aktuellen Ausführung für komplexe Systeme mit vielen Controllern ungeeignet, da dieser nur aus zwei Phasen besteht. Zuerst wird die Controllerklasse instanziiert und darauf folgt die Initialisierung der \texttt{@FXML} Felder und der Methodenaufruf einer vom Entwickler bereitgestellten \texttt{initialize} Methode. Damit mit fertig initialisierten \texttt{@FXML} Feldern gearbeitet werden kann, muss der dafür benötigte Quelltext immer in der \texttt{initialize} Methode definiert werden. Ein Beispiel für den Ablauf einer Controllerinstanziierung durch den \texttt{FXMLLoader} ist in \autoref{lst:controllerinstantiation} abgebildet. Der rudimentäre Lebenszyklus unterstützt dabei keine Methoden, welche beispielsweise bei einem Entfernen des Wurzelelements eines Controllers aus dem Szenengraphen ausgeführt wird, um eventuell offene Ressourcen zu schließen und somit effektiv Ressourcenlecks zu verhindern. Ein vollständiger Lebenszyklus wie bei Activities in Android\footnote{\url{https://developer.android.com/guide/components/activities/activity-lifecycle}},ist praktisch nicht vorhanden.
 \begin{figure}[H]
 	\centering
 	\begin{lstlisting}[caption=Beispiel -- Instanziierungsablauf., captionpos=b, label=lst:controllerinstantiation]
@@ -78,9 +77,7 @@ public class TestController {
 	\end{lstlisting}
 \end{figure}
 \subsection{Konfigurationsdateien}
-Eine persistente Speicherung von Anwendungskonfigurationen wie beispielsweise Logindaten oder Informationen für Serververbindungen ist wichtig für eine optimale Benutzerfreundlichkeit. Das Speichern von konfigurierbaren Einstellungen kann mit der Java Preferences API oder mit externen Bibliotheken wie GSON, für auf \ac{json} basierte Konfigurationsdateien oder \ac{jaxb}, für auf \ac{xml} basierte Dateien durchgeführt werden. Der Prozess des manuellen Erstellens einer Konfigurationsdatei und dem anschließenden Auslesen bzw. Modifizierung zur Laufzeit ist ein repetitiver Vorgang, welcher durch das Nutzen von Annotationen teilweise automatisiert werden kann.
-\subsection{Zustandsserialisierung von grafischen Oberflächen}
-Das Speichern des aktuellen Zustands einer grafischen Oberfläche mit den jeweiligen Elementen ist aktuell mit dem Funktionsumfang von JavaFX nicht ohne Weiteres umsetzbar. Der Zustand einer Anwendung setzt sich aus den aktuellen Konfiguration von interaktiven Elementen im Szenengraphen zusammen. Beispielsweise ist die Position eines Schiebereglers oder der aktuell ausgewählte Tab einer \texttt{TabPane} nicht insoweit serialisierbar, dass dieser Zustand beim Applikationsende gespeichert und bei einem erneuten Applikationsstart wiederhergestellt werden kann.
+Eine persistente Speicherung von Anwendungskonfigurationen wie beispielsweise Logindaten oder Informationen für Serververbindungen ist wichtig für eine optimale Benutzerfreundlichkeit. Das Speichern von konfigurierbaren Einstellungen kann mit der Java Preferences API oder mit externen Bibliotheken wie GSON\footnote{GSON: \url{https://github.com/google/gson}} für auf \ac{json} basierte Konfigurationsdateien oder \ac{jaxb}, für auf \ac{xml} basierte Dateien durchgeführt werden. Der Prozess des manuellen Erstellens einer Konfigurationsdatei und dem anschließenden Auslesen bzw. Modifizierung zur Laufzeit ist ein repetitiver Vorgang, welcher durch das Nutzen von Annotationen teilweise automatisiert werden kann.
 \section{Anforderungsanalyse}
 \label{anforderungsanalyse}
 In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfachungen aus \autoref{problemanalyse} in Form von funktionalen und nichtfunktionalen Anforderungen formuliert. Dabei werden die Anforderungen in zwei Klassen unterteilt:
@@ -96,21 +93,40 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 %	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --\label{freq\arabic{fcounter}}}}%
 %}
 
+\newcounter{z}
+\newcommand{\CalculatePercentage}[2]{%
+\setcounter{z}{#1 * 100 / #2}%
+\arabic{z} Prozent%
+}%
+
 \newcounter{req}
+\newcounter{reqTotalCompleted}
+\newcounter{reqFunCompleted}
+\newcounter{reqOptCompleted}
+\newcounter{reqFunAmount}
+\newcounter{reqOptAmount}
 \newcommand*{\reqautorefname}{Anforderung}
 
-\newenvironment{freq}[2][]{%
+\edef\fullreqs{}
+
+\NewDocumentEnvironment{freq}{m o d()}{%
 	\def\realreq{\number\numexpr\value{req}+1\relax}
-	\subsubsection*{\ifblank{#1}{[FA--\ifnum\realreq<10 0\fi\realreq] #2}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #2}}%
+	\subsubsection*{\IfNoValueTF{#2}{[FA--\ifnum\realreq<10 0\fi\realreq] #1}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #1}}%
 	\refstepcounter{req}%
-	\label{freq\thereq}
+	\global\eappto\fullreqs{\thereq,freq,#1,#2,#3;}
+	\label{freq\thereq}%
+	\IfNoValueTF{#2}{\refstepcounter{reqFunAmount}}{\refstepcounter{reqOptAmount}}%
+	\IfNoValueTF{#3}{}{\refstepcounter{reqTotalCompleted}\IfNoValueTF{#2}{\refstepcounter{reqFunCompleted}}{\refstepcounter{reqOptCompleted}}}
 }{%
 }
-\newenvironment{nreq}[2][]{%
+\NewDocumentEnvironment{nreq}{m o d()}{%
 	\def\realreq{\number\numexpr\value{req}+1\relax}
-	\subsubsection*{\ifblank{#1}{[NFA--\ifnum\realreq<10 0\fi\realreq] #2}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #2}}%
+	\subsubsection*{\IfNoValueTF{#2}{[NFA--\ifnum\realreq<10 0\fi\realreq] #1}{(FA--\ifnum\realreq<10 0\fi\realreq) Optional -- #1}}%
 	\refstepcounter{req}%
+	\global\eappto\fullreqs{\thereq,nreq,#1,#2,#3;}
 	\label{nreq\thereq}
+	\IfNoValueTF{#2}{\refstepcounter{reqFunAmount}}{\refstepcounter{reqOptAmount}}%
+	\IfNoValueTF{#3}{}{\refstepcounter{reqTotalCompleted}\IfNoValueTF{#2}{\refstepcounter{reqFunCompleted}}{\refstepcounter{reqOptCompleted}}}
 }{%
 }
 
@@ -118,26 +134,26 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 \label{anforderungsanalyse_funktional}
 
 Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben alle gewünschten Funktionen des Endproduktes.
-\begin{freq}{Ermitteln und Konfiguration des JavaFX-Einstiegspunktes}
-	Der Erstellen einer Applikationsklasse sowie eines optionalen Preloaders soll automatisch stattfinden, da der Erstellungsprozess von auf JavaFX basierten Anwendungen in den meisten Fällen ähnlich oder identisch ist. Das Definieren dieser Elemente soll mithilfe von Annotationen geschehen und durch das Absuchen des Klassenpfades durch die entwickelte Bibliothek gefunden werden. Alternativ soll der Entwickler die Möglichkeit haben, den Einstiegspunkt sowie den Preloader explizit zu spezifizieren, falls eine automatische Identifikation nicht erwünscht oder benötigt ist. Die vordefinierten Einstiegspunkte sollen eine Standardkonfiguration der Applikation und der zugrunde liegenden \texttt{Stage} Instanz bereitstellen, welche durch den Entwickler bei Bedarf auch manuell überschrieben werden kann. Dieses Überschreiben soll durch die Nutzung von Annotationen erfolgen. Die Standardkonfiguration umfasst grundsätzliche Applikationseigenschaften wie den Titel, die Fenstergröße oder Designelemente wie den \texttt{StageStyle} und die benötigten Titelleistenschaltflächen.
+\begin{freq}{Ermitteln und Konfiguration des JavaFX-Einstiegspunktes}(c)
+	Der Erstellen einer Applikationsklasse sowie eines optionalen Preloaders soll automatisch stattfinden, da der Erstellungsprozess von auf JavaFX basierten Anwendungen in den meisten Fällen ähnlich oder identisch ist. Das Definieren dieser Elemente soll mithilfe von Annotationen geschehen und durch das Absuchen des Klassenpfades durch die entwickelte Bibliothek gefunden werden. Alternativ soll der Entwickler die Möglichkeit haben, den Einstiegspunkt sowie den Preloader explizit zu spezifizieren, falls eine automatische Identifikation nicht erwünscht oder benötigt ist. Die vordefinierten Einstiegspunkte sollen eine Standardkonfiguration der Applikation und der zugrundeli
+egenden \texttt{Stage} Instanz bereitstellen, welche durch den Entwickler bei Bedarf auch manuell überschrieben werden kann. Dieses Überschreiben soll durch die Nutzung von Annotationen erfolgen. Die Standardkonfiguration umfasst grundsätzliche Applikationseigenschaften wie den Titel, die Fenstergröße oder Designelemente wie den \texttt{StageStyle} und die benötigten Titelleistenschaltflächen.
 \end{freq}
-\begin{freq}{Eventbasierte Verwaltung des Applikationslebenszyklus}
-	Die Verwaltung des Applikationslebenszyklus soll mithilfe von Annotationen im Einstiegspunkt geschehen. Der Applikationslebenszyklus bezeichnet hier die vererbbaren \texttt{Application\#init}, \texttt{Application\#start} und \texttt{Application\#stop} Methoden. Die Erstellung der Applikationsklasse soll wie in \autoref{freq1} beschrieben, durch die zu entwickelnde Bibliothek übernommen werden, weshalb die Aufrufe der eben genannten Methoden durch ein Event-System an den vom Entwickler spezifizierten Einstiegspunkt delegiert werden sollen. Beispielsweise wird statt der Überschreibung der \texttt{Application\#start} Methode, eine Methode im Einstiegspunkt definiert, welche ein \texttt{StartEvent} als Parameter erhält und eine spezielle Annotation aufweist. Methoden für einen optionalen Preloader, sollen analog dazu definiert werden können.
+\begin{freq}{Eventbasierte Verwaltung des Applikationslebenszyklus}(c)
+	Die Verwaltung des Applikationslebenszyklus soll mithilfe von Annotationen im Einstiegspunkt geschehen. Der Applikationslebenszyklus bezeichnet hier die vererbbaren \texttt{Application\#init}, \texttt{Application\#start} und \texttt{Application\#stop} Methoden. Die Erstellung der Applikationsklasse soll, wie in \autoref{freq1} beschrieben, durch die zu entwickelnde Bibliothek übernommen werden, weshalb die Aufrufe der eben genannten Methoden durch ein Event-System an den vom Entwickler spezifizierten Einstiegspunkt delegiert werden sollen. Beispielsweise wird statt der Überschreibung der \texttt{Application\#start} Methode, eine Methode im Einstiegspunkt definiert, welche ein \texttt{StartEvent} als Parameter erhält und eine spezielle Annotation aufweist. Methoden für einen optionalen Preloader sollen analog dazu definiert werden können.
 \end{freq}
-\begin{freq}{Dynamische Laufzeitübersetzung von JavaFX-Komponenten}
-	Die bereits existierenden Internationalisierungsmöglichkeiten sollen durch eine dynamische Übersetzung erweitert werden. Das Ändern der aktuellen Sprache soll durch beispielsweise einen Schaltflächenklick ausgelöst werden und zur Laufzeit die grafische Benutzeroberfläche aktualisieren. Ein Neustart der Anwendung oder ein erneutes Laden der FXML Dateien soll nicht mehr nötig sein. Der Entwickler soll dabei die zu übersetzenden JavaFX Komponenten in der jeweiligen FXML Datei deklarieren und diese sollen dann durch eine verbesserte Version der \texttt{FXMLLoader} Klasse geladen und instanziiert werden. Dabei soll das dynamische Übersetzen der definierten Elemente per Element deaktivierbar sein. Die Funktionalität von externen FXML Parsern wie den Scene-Builder soll durch das Hinzufügen von eigener FXML Syntax dabei nicht kompromittiert werden. Übersetzbare Elemente, welche auf parameterabhängigen Übersetzungsschlüsseln basieren, sollen an JavaFX Properties gebunden werden können und bei Änderung dieser aktualisiert werden. Wird eine dynamische Übersetzung, für nicht direkt durch den \texttt{FXMLLoader} übersetzbare, Elemente oder Prozesse wie das Ausgeben von Nachrichten auf der Konsole oder generelle methodeninterne Textverarbeitung benötigt, so soll der Entwickler auf Utility-Klassen der Bibliothek zurückgreifen können, welche ebendiese Funktionalität zur Verfügung stellen.
+\begin{freq}{Dynamische Laufzeitübersetzung von JavaFX-Komponenten}(c)
+	Die bereits existierenden Internationalisierungsmöglichkeiten sollen durch eine dynamische Übersetzung erweitert werden. Das Ändern der aktuellen Sprache soll durch beispielsweise einen Schaltflächenklick ausgelöst werden und zur Laufzeit die grafische Benutzeroberfläche aktualisieren. Ein Neustart der Anwendung oder ein erneutes Laden der FXML Dateien soll nicht mehr nötig sein. Der Entwickler soll dabei die zu übersetzenden JavaFX Komponenten in der jeweiligen FXML Datei deklarieren und diese sollen dann durch eine verbesserte Version der \texttt{FXMLLoader} Klasse geladen und instanziiert werden. Dabei soll das dynamische Übersetzen der definierten Elemente per Element deaktivierbar sein. Die Funktionalität von externen FXML Parsern wie dem Scene-Builder soll durch das Hinzufügen von eigener FXML Syntax nicht kompromittiert werden. Übersetzbare Elemente, welche auf parameterabhängigen Übersetzungsschlüsseln basieren, sollen an JavaFX Properties gebunden werden können und bei Änderung dieser aktualisiert werden. Wird eine dynamische Übersetzung für nicht direkt durch den \texttt{FXMLLoader} übersetzbare Elemente oder Prozesse wie das Ausgeben von Nachrichten auf der Konsole oder generelle methodeninterne Textverarbeitung benötigt, so soll der Entwickler auf Utility-Klassen der Bibliothek zurückgreifen können, welche ebendiese Funktionalität zur Verfügung stellen.
 \end{freq}
-\begin{freq}{Abhängigkeitsinjektion durch etablierte externe Bibliotheken}
-	Werden externe Bibliotheken zur Abhängigkeitsinjektion genutzt, so sollen eventuelle Abhängigkeiten und Dienste automatisch in Controller, die Applikationsinstanz und den optionalen Preloader injiziert werden. Die Nutzung etwaiger Bibliotheken und die dafür benötigten Konfigurations- bzw. Modulklassen sollen beim Start der Applikation in Form einer Annotation spezifiziert werden können. Eine Unterstützung der Bibliotheken Dagger, Spring und Guice soll dem Entwickler ermöglicht werden.
+\begin{freq}{Abhängigkeitsinjektion durch etablierte externe Bibliotheken}(c)
+	Werden externe Bibliotheken zur Abhängigkeitsinjektion genutzt, sollen eventuelle Abhängigkeiten und Dienste automatisch in Controller, die Applikationsinstanz und den optionalen Preloader injiziert werden. Die Nutzung etwaiger Bibliotheken und die dafür benötigten Konfigurations- bzw. Modulklassen sollen beim Start der Applikation in Form einer Annotation spezifiziert werden können. Eine Unterstützung der Bibliotheken Dagger, Spring und Guice soll dem Entwickler ermöglicht werden.
 \end{freq}
-\begin{freq}{Automatische \ac{css} Metadaten Generation}
-	Das Hinzufügen von \ac{css} Properties zu benutzerdefinierten JavaFX Komponenten durch den Entwickler soll durch das Nutzen von Annotationen erleichtert werden. Durch die automatische Generation dieser Metadaten, sollen eventuell auftretende repetitive Quelltextbausteine vermieden werden. Der verbesserte \texttt{FXMLLoader} soll hierbei nach statischen Feldern mit der \ac{css} Metadaten Annotation suchen und die gefundenen Metadaten automatisch mit den durch die Annotation definierten Einstellungen instanziieren.
+\begin{freq}{Automatische \ac{css} Metadaten Generation}(c)
+	Das Hinzufügen von \ac{css} Properties zu benutzerdefinierten JavaFX Komponenten durch den Entwickler soll durch das Nutzen von Annotationen erleichtert werden. Durch die automatische Generierung dieser Metadaten sollen eventuell auftretende repetitive Quelltextbausteine vermieden werden. Der verbesserte \texttt{FXMLLoader} soll hierbei nach statischen Feldern mit der \ac{css} Metadaten Annotation suchen und die gefundenen Metadaten automatisch mit den durch die Annotation definierten Einstellungen instanziieren.
 \end{freq}
-\add{Manual correct mistakes after this point}
-\begin{freq}{Annotationsbasierte Controllerdefinition}
-	Ein Controller soll als solcher erkannt werden, wenn dieser eine spezielle Annotation aufweist. Die Annotation muss dabei die Quelle der FXML und der \ac{css} Datei enthalten und weitere auf Controller bezogene Konfigurationsmöglichkeiten bereitstellen.
+\begin{freq}{Annotationsbasierte Controllerdefinition}(c)
+	Ein Controller soll als solcher erkannt werden, wenn dieser eine spezielle Annotation aufweist. Die Annotation muss dabei die Quelle der FXML und der \ac{css} Datei enthalten und weitere, auf Controller bezogene Konfigurationsmöglichkeiten bereitstellen.
 \end{freq}
-\begin{freq}{Erweiterung des Controllerlebenszyklus}
+\begin{freq}{Erweiterung des Controllerlebenszyklus}(c)
 	Der Lebenszyklus eines Controllers soll, ähnlich wie bei Android Activities, in mehrere Phasen eingeteilt sein, welche durch die Nutzung von Annotationen durch den Entwickler abrufbar gemacht werden sollen. Methoden, welche bei einer bestimmten Phase ausgeführt werden sollen, müssen mit der zu der Phase gehörenden Annotation annotiert werden können. Der Lebenszyklus soll um folgende Phasen erweitert werden:
 	\begin{itemize}
 		\item In der \textbf{\texttt{Setup}} Phase ist die grobe Initialisierung eines Controllers beendet und die vom Entwickler spezifizierten Subcontroller werden initialisiert.
@@ -147,81 +163,81 @@ Im Folgenden werden alle funktionalen Anforderungen definiert. Sie beschreiben a
 		\item In der \textbf{\texttt{OnDestroy}} Phase werden alle zwischengespeicherten Ressourcen und Informationen des Controllers entfernt. In dieser Phase sollen eventuell offene Ressourcen geschlossen werden. Damit der Controller wiederverwendet werden kann, muss eine erneute Initialisierung durch beispielsweise einen \texttt{FXMLLoader} erfolgen.
 	\end{itemize}
 \end{freq}
-\begin{freq}{Benachrichtigung bei Komplettierung der Einrichtung von Einstiegspunkten und Controllern}
-	Wenn \texttt{SimpliFX} die Einrichtung des Einstiegspunktes der Applikation, des Preloaders oder der Controller beendet hat, so soll die jeweilige Instanz benachrichtigt werden. Bei einer solchen Einrichtungskomplettierung, sollen speziell annotierte Methoden (@PostConstruct) aufgerufen werden. Die Reihenfolge der Aufrufe richtet sich nach der Priorität, welche in Form eines Parameters der Annotation übergeben werden kann.
+\begin{freq}{Benachrichtigung bei Komplettierung der Einrichtung von Einstiegspunkten und Controllern}(c)
+	Wenn die Einrichtung des Einstiegspunktes der Applikation, des Preloaders oder der Controller beendet ist, soll die jeweilige Instanz benachrichtigt werden. Bei einer solchen Einrichtungskomplettierung, sollen speziell annotierte Methoden (@PostConstruct) aufgerufen werden. Die Reihenfolge der Aufrufe richtet sich nach der Priorität, welche in Form eines Parameters der Annotation übergeben werden kann.
 \end{freq}
-\begin{freq}{Unterstützung von mehreren Lebenszyklusbehandlungsmethoden}
-	Wenn mehrere Methoden mit denselben Lebenszyklusannotationen annotiert wurden, so soll die Reihenfolge der Aufrufe dieser, anhand eines optionalen Parameters in der Annotation bestimmt werden. Weisen mehrere Annotationen dieselbe Priorisierung auf, so soll nach der Deklarationsreihenfolge in der Klasse sortiert werden.
+\begin{freq}{Unterstützung von mehreren Lebenszyklusbehandlungsmethoden}(c)
+	Wenn mehrere Methoden mit denselben Lebenszyklusannotationen annotiert wurden, soll die Reihenfolge der Aufrufe dieser anhand eines optionalen Parameters in der Annotation bestimmt werden.
 \end{freq}
-\begin{freq}{Controllerverschachtelung und Supercontroller}
-	Ist das Wurzelelement eines Controllers in einem durch einen weiteren Controller aufgespannten Teilbaum des Szenengraphen enthalten, so handelt es sich bei ersterem Controller um einen Subcontroller des Letzteren. Subcontroller sollen bei Phasenänderung des Lebenszyklus ihres Supercontrollers benachrichtigt werden. Beispielsweise soll der Subcontroller in den \texttt{OnHide} Zustand wechseln, wenn der Supercontroller in denselben Zustand wechselt. Diese Beziehung soll durch den Entwickler bei der Controllerdefinition deklariert werden können.
+\begin{freq}{Controllerverschachtelung und Supercontroller}(c)
+	Ist das Wurzelelement eines Controllers in einem, durch einen weiteren Controller aufgespannten, Teilbaum des Szenengraphen enthalten, so handelt es sich bei ersterem Controller um einen Subcontroller des Letzteren. Subcontroller sollen bei Phasenänderung des Lebenszyklus ihres Supercontrollers benachrichtigt werden. Beispielsweise soll der Subcontroller in den \texttt{OnHide} Zustand wechseln, wenn der Supercontroller in denselben Zustand wechselt. Diese Beziehung soll durch den Entwickler bei der Controllerdefinition deklariert werden können.
 \end{freq}
-\begin{freq}{Gruppierung von ähnlichen Controllern}
-	Ähnliche Controller sollen bei Definition, sogenannten Controllergruppen zugeordnet werden können. Eine Controllergruppe teilt sich dasselbe Wurzelelement, weshalb immer nur ein Controller einer Controllergruppe gleichzeitig aktiv sein kann. Ein Controller soll dabei nur einer Controllergruppe zuordenbar sein. Wechselt der aktive Controller einer Controllergruppe, so soll die Controllergruppe davon in Kenntnis gesetzt werden und eventuelle Phasenwechsel von betroffenen Controllern ausgelöst werden. Verschachtelte Subcontroller sollen dabei zwischen einem Wechsel durch einen Supercontroller und einem selbst ausgelösten Wechsel differenzieren können.
+\begin{freq}{Gruppierung von ähnlichen Controllern}(c)
+	Ähnliche Controller sollen bei Definition sogenannten Controllergruppen zugeordnet werden können. Eine Controllergruppe teilt sich dasselbe Wurzelelement, weshalb immer nur ein Controller einer Controllergruppe gleichzeitig aktiv sein kann. Ein Controller soll dabei nur einer Gruppe zuordenbar sein. Wechselt der aktive Controller, so soll die Controllergruppe davon in Kenntnis gesetzt werden und eventuelle Phasenwechsel von betroffenen Controllern ausgelöst werden. Verschachtelte Subcontroller sollen dabei zwischen einem Wechsel durch einen Supercontroller und einem selbst ausgelösten Wechsel differenzieren können.
 \end{freq}
-\begin{freq}{Zyklusprävention}
-	Damit keine unendlichen Schleifen und Prozesse aus dem falsche Nutzen des Systems resultieren, muss eine Art von Zyklusdetektion bei der Verschachtelung von Controllern erfolgen. Beispielsweise darf Controller A nicht als Supercontroller von Controller B definiert sein, wenn B, den Controller A ebenfalls als Supercontroller definiert.
+\begin{freq}{Zyklusprävention}(c)
+	Damit keine unendlichen Schleifen und Prozesse aus dem falsche Nutzen des Systems resultieren, muss eine Art von Zyklusdetektion bei der Verschachtelung von Controllern erfolgen. Beispielsweise darf Controller A nicht als Supercontroller von Controller B definiert sein, wenn B den Controller A ebenfalls als Supercontroller definiert.
 \end{freq}
-\begin{freq}{Wechsel von Controllern}
+\begin{freq}{Wechsel von Controllern}(c)
 	Das Wechseln von Controllern soll durch das vom Controller-System bereitgestellte Eventsystem ermöglicht werden. Ein manuelles Wechseln der Controller soll somit durch die Absendung eines Events durchführbar sein. Das automatische Wechseln eines Controllers soll durch vereinfachende Strukturen wie Annotationen über Schaltflächendefinitionen erleichtert werden. Der Entwickler soll den Wechsel durch die Angabe von Animationsparametern ästhetisch individualisieren können.
 \end{freq}
-\begin{freq}{Controller Preloading}
+\begin{freq}{Controller Preloading}(c)
 	Controller werden standardmäßig On-Demand geladen, also nur dann, wenn sie benötigt werden. Wenn der Entwickler einen Preloader definiert hat, dann soll das Erstellen und Initialisieren aller controllerrelevanten Elemente und Strukturen in dieser Preloading-Phase stattfinden können.
 \end{freq}
-\begin{freq}{Globale Fehlerbehandlung}
-	Beim Start der Anwendung, sollen optionale Klassen zur globalen Fehlerbehandlung spezifiziert werden können. Wird eine solche Klasse nicht durch den Entwickler angegeben, so soll auf eine vom System bereitgestellte Klasse zur Fehlerbehandlung zurückgegriffen werden. Auftretende Fehler im Controllersystem, ob reflektiv bedingt oder nicht, sollen so an zentraler Stelle verwaltet und optional als Fehleranzeige auf dem Hauptcontroller angezeigt werden können.
+\begin{freq}{Globale Fehlerbehandlung}(c)
+	Beim Start der Anwendung soll optional eine Klasse zur globalen Fehlerbehandlung spezifiziert werden können. Wird eine solche Klasse nicht durch den Entwickler angegeben, so soll auf eine vom System bereitgestellte Klasse zurückgegriffen werden. Auftretende Fehler im Controllersystem, ob reflektiv bedingt oder nicht, sollen so an zentraler Stelle verwaltet und optional als Fehleranzeige auf dem Hauptcontroller angezeigt werden können. Nutzt der Entwickler einen Preloader, so sollen etwaige Ausnahmen zuerst an diesen weitergeleitet werden.
 \end{freq}
-\begin{freq}{Geteilte Ressourcen}
+\begin{freq}{Geteilte Ressourcen}(c)
 	Controller sollen die Möglichkeit haben, bestimmte Felder mit anderen Controllern zu teilen. Geteilte Felder werden als solche identifiziert, wenn diese eine spezielle Annotation aufweisen. Das Controller-System soll dabei Referenzen von den jeweiligen Feldwerten erstellen und diese dann in Form von JavaFX Properties zur Verfügung zu stellen. Geteilte Ressourcen sollen dabei durch ihren Feldnamen oder optional durch einen Parameter der Annotation identifiziert werden. Der Annotationsparameter hat dabei immer eine höhere Priorität. Wird der Wert einer geteilten Ressource geändert, so soll sich diese Änderung in allen anderen Controllern mit ebendieser Ressource widerspiegeln.
 \end{freq}
-\begin{freq}{Anpassbare Events durch Annotationen}
-	Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, so soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welche den Annotationen als Parameter übergeben wird, aufweisen.
+\begin{freq}{Konfigurationsdateien}(c)
+	Felder eines Controllers sollen bei der Controllererstellung durch das Nutzen von automatisch oder manuell erstellten Konfigurationsdateien gesetzt werden, falls diese eine spezielle Annotation aufweisen. Der Konfigurationsschlüssel kann durch einen Annotationsparameter festgelegt werden. Standardwerte sollen optional spezifiziert werden können.
 \end{freq}
-\begin{freq}{Konfigurationsdateien}
-	Felder eines Controllers sollen bei der Controllererstellung, durch das Nutzen von automatisch oder manuell erstellten Konfigurationsdateien, gesetzt werden, falls diese eine spezielle Annotation aufweisen. Der Konfigurationsschlüssel kann durch einen Annotationsparameter festgelegt werden. Standardwerte sollen optional spezifiziert werden können.
+\begin{freq}{Anpassbare Events durch Annotationen}[o]
+	Häufig genutzte JavaFX Events wie beispielsweise das \texttt{ActionEvent} sollen durch einfache Annotationen mit im Controller definierten Methoden assoziiert werden. Tritt ein über diese Methode definiertes Event auf, soll die dazugehörige Methode des Controllers aufgerufen werden. Damit die Verbindung zwischen Feld und Methode gewährleistet ist, müssen beide Elemente annotiert werden und einen gemeinsamen Identifikator, welcher den Annotationen als Parameter übergeben wird, aufweisen.
 \end{freq}
-\begin{freq}[o]{Serialisierung von JavaFX Komponenten}
+\begin{freq}{Serialisierung von JavaFX Komponenten}[o]
 	Die Position und die aktuelle Konfiguration von jedem JavaFX Element, welches im Szenengraphen präsent ist, soll bei einem Ende der Anwendung gespeichert werden und bei dem nächsten Start rekonstruiert werden. Dadurch bleibt der aktuelle Zustand der grafischen Oberfläche auch bei Anwendungsterminierung erhalten.
 \end{freq}
-\begin{freq}[o]{Scheduling von Methoden}
-	Controllerinterne Methoden sollen von Entwickler als sog. Scheduler definiert werden. Eine solche Methode wird dann in einem bestimmten Zeitintervall automatisch ausgeführt und gegebenenfalls wiederholt. Das Verhalten der Methode (wiederholend, zeitverzögert) kann durch Annotationsparameter kontrolliert werden.
+\begin{freq}{Scheduling von Methoden}[o]
+	Controllerinterne Methoden sollen von Entwickler als Scheduler definiert werden. Eine solche Methode wird dann in einem bestimmten Zeitintervall automatisch ausgeführt und gegebenenfalls wiederholt. Das Verhalten der Methode (wiederholend, zeitverzögert) kann durch Annotationsparameter kontrolliert werden.
 \end{freq}
-\begin{freq}[o]{JavaFX Application-Thread Forcierung}
+\begin{freq}{JavaFX Application-Thread Forcierung}[o](c)
 	Einige Operationen auf Elemente des JavaFX Szenengraphen müssen auf dem JavaFX Application-Thread ausgeführt werden. Dazu gehört beispielsweise das aktive Ändern von renderbaren Elementen wie Textfeldinhalte oder Schaltflächen. Controllerinterne Methoden sollen auf dem JavaFX Application-Thread ausgeführt werden, wenn diese eine bestimmte Annotation aufweisen.
 \end{freq}
-\begin{freq}[o]{Annotationsvalidierung zur Kompilierzeit}
-	Reflektive Operationen sind definitionsbedingt nur per Laufzeit der Anwendung ausführbar. Das Auslesen und Verarbeiten von annotierten Elementen und Annotationen im Allgemeinen durch reflektive Operationen kann somit nur zur Laufzeit erfolgen. Ob eine Annotation inkorrekte oder ungenügende Informationen enthält oder falsche Typen annotiert wurden ist dem Entwickler nur durch die Auslösung von Ausnahmen zur Laufzeit mitzuteilen. Beispielsweise ist es offensichtlich inkorrekt, ein Feld, welches einen JavaFX Container repräsentiert (z.B. \texttt{StackPane}), mit einer Annotation zu annotieren, welche für die Übersetzung von Komponenten verantwortlich ist. Das Überprüfen der Korrektheit der Annotationsnutzung soll nicht nur durch eine Laufzeitfehlerbehandlung sondern auch durch einen Annotationsprozessor zur Kompilierzeit durchgeführt werden. Eventuelle Fehlkonfigurationen werden somit bereits beim Kompiliervorgang entdeckt und dem Entwickler mitgeteilt.
+\begin{freq}{Annotationsvalidierung zur Kompilierzeit}[o]
+	Reflektive Operationen sind definitionsbedingt nur per Laufzeit der Anwendung ausführbar. Das Auslesen und Verarbeiten von annotierten Elementen und Annotationen im Allgemeinen durch reflektive Operationen kann somit nur zur Laufzeit erfolgen. Ob eine Annotation inkorrekte oder ungenügende Informationen enthält oder falsche Typen annotiert wurden, ist dem Entwickler nur durch die Auslösung von Ausnahmen zur Laufzeit mitzuteilen. Beispielsweise ist es offensichtlich inkorrekt, ein Feld, welches einen JavaFX Container repräsentiert (z.B. \texttt{StackPane}), mit einer Annotation zu annotieren, welche für die Übersetzung von Komponenten verantwortlich ist. Das Überprüfen der Korrektheit der Annotationsnutzung soll nicht nur durch eine Laufzeitfehlerbehandlung sondern auch durch einen Annotationsprozessor zur Kompilierzeit durchgeführt werden. Eventuelle Fehlkonfigurationen werden somit bereits beim Kompiliervorgang entdeckt und dem Entwickler mitgeteilt.
 \end{freq}
 \subsection{Nichtfunktionale Anforderungen}
 \label{anforderungsanalyse_nichtfunktional}
 Im Folgenden werden alle nichtfunktionalen Anforderungen definiert. Sie beschreiben Qualitätseigenschaften an das System wie Möglichkeiten der Erweiterbarkeit und Wartbarkeit und spezifizieren Maßstäbe, welche zur Laufzeit der Anwendung eingehalten werden müssen. Darunter gehören beispielsweise die effiziente Ressourcennutzung, die Korrektheit des Systems sowie ein gewisser Grad an Zuverlässigkeit.
-\begin{nreq}{Benutzerfreundlichkeit}
-	Das Erstellen von JavaFX Anwendungen soll durch das Nutzen der zu entwickelnden Bibliothek erleichtert werden. Um diese Erleichterung sicherzustellen, müssen implementierte Komponenten ausreichend dokumentiert sein und intuitiv durch den Entwickler nutzbar gemacht werden. Komplexe und überflüssige Strukturen sollen vermieden werden. Jedes durch diese Bibliothek bereitgestellte konfigurierbare System, muss Standardparameter zur Konfiguration bereitstellen und bei Bedarf eine Konfigurationsänderung durch einen Entwickler zulassen.
+\begin{nreq}{Benutzerfreundlichkeit}(c)
+	Das Erstellen von JavaFX Anwendungen soll durch das Nutzen der zu entwickelnden Bibliothek erleichtert werden. Um diese Erleichterung sicherzustellen, müssen implementierte Komponenten ausreichend dokumentiert sein und intuitiv durch den Entwickler nutzbar gemacht werden. Komplexe und überflüssige Strukturen sollen vermieden werden. Jedes durch diese Bibliothek bereitgestellte konfigurierbare System muss Standardparameter zur Konfiguration bereitstellen und bei Bedarf eine Konfigurationsänderung durch einen Entwickler zulassen.
 \end{nreq}
-\begin{nreq}{Performance \& Effizienz}
+\begin{nreq}{Performance \& Effizienz}(c)
 	Obwohl das vollständige System an vielen Stellen die Reflection API nutzen muss, soll sowohl der Entwickler als auch der Endnutzer keinen gravierenden Performanceunterschied feststellen können. Es soll sichergestellt werden, dass der durch die Reflection API geschaffene Performanceoverhead, minimal gehalten wird.
 \end{nreq}
-\begin{nreq}{Wartbarkeit}
+\begin{nreq}{Wartbarkeit}(c)
 	Die Bibliothek soll ohne viel Aufwand an sich verändernde Anforderungen anpassbar sein. Dazu muss das System allgemein anerkannte, softwaretechnische und objektorientierte Prinzipien erfüllen.
 \end{nreq}
-\begin{nreq}{Erweiterbarkeit}
-	Die Architektur soll mit einer besonderen Fokussierung auf das Nutzen von Schnittstellen entwickelt werden. Annotationsbasierte Konzepte, welche nicht im Standardumfang der von der Bibliothek bereitgestellten Funktionalitäten enthalten sind, sollen ohne viel Aufwand durch externe Entwickler hinzugefügt werden können.
+\begin{nreq}{Erweiterbarkeit}(c)
+	Die Architektur soll mit einer besonderen Fokussierung auf das Nutzen von Schnittstellen entwickelt werden. Annotationsbasierte Konzepte, welche nicht im Standard-umfang der, von der Bibliothek bereitgestellten, Funktionalitäten enthalten sind, sollen ohne viel Aufwand durch externe Entwickler hinzugefügt werden können.
 \end{nreq}
-\begin{nreq}{Softwarequalität}
-	Eine hohe Softwarequalität ist ein essentieller Faktor für ein System, welches auch außerhalb der eigenen Entwicklungsumgebung genutzt werden soll. Andere Entwickler müssen mit einem geringen Zeitaufwand, einen Überblick über das System mit allen wichtigen Komponenten und deren Beziehung untereinander, gewinnen können. Um eine hohe Nachvollziehbarkeit zu gewährleisten, müssen etablierte Entwurfsmuster genutzt und auf komplexen Quelltext verzichtet werden. Klassen müssen gut strukturiert und leicht verständlich implementiert werden.
+\begin{nreq}{Softwarequalität}(c)
+	Eine hohe Softwarequalität ist ein essentieller Faktor für ein System, welches auch außerhalb der eigenen Entwicklungsumgebung genutzt werden soll. Andere Entwickler müssen mit einem geringen Zeitaufwand einen Überblick über das System, mit allen wichtigen Komponenten und deren Beziehung untereinander, gewinnen können. Um eine hohe Nachvollziehbarkeit zu gewährleisten, müssen etablierte Entwurfsmuster genutzt und auf komplexen Quelltext verzichtet werden. Klassen müssen gut strukturiert und leicht verständlich implementiert werden.
 \end{nreq}
-\begin{nreq}{Lizenzierung}
+\begin{nreq}{Lizenzierung}(c)
 	Die zu entwickelnde Bibliothek muss eine Konformität zu den von externen Bibliotheken genutzten Lizenzen aufweisen. Etwaige Lizenzverletzungen sind zu vermeiden.
 \end{nreq}
 \section{Konzept und Modellierung}
 \label{konzept_und_modellierung}
-Im Folgenden wird die, für das Erfüllen aller vorher genannten Anforderungen, benötigte Architektur konstruiert. Dabei werden ähnliche Systemanforderungen in Gruppen unterteilt und in Form von allgemeinen Zielen an das System zusammengefasst. Für jedes daraus resultierende Ziel, werden theoretische Implementierungsmöglichkeiten identifiziert, bei welchen benötigte Komponenten, die Beziehung zwischen den Komponenten und die eventuelle Nutzung von Entwurfsmustern ermittelt werden. Dabei wird besonders auf eine hochwertige Softwarequalität und Usability geachtet. Grundlegende, notwendige Entscheidungen wie die Namensgebung der Bibliothek und die Nutzung von externen Bibliotheken für eine effizientere und leichtere Implementierung werden ebenfalls getroffen. 
+Im Folgenden wird die, für das Erfüllen aller vorher genannten Anforderungen, benötigte Architektur konstruiert. Dabei werden ähnliche Systemanforderungen in Gruppen unterteilt und in Form von allgemeinen Zielen an das System zusammengefasst. Für jedes daraus resultierende Ziel, werden theoretische Implementierungsmöglichkeiten identifiziert, bei welchen benötigte Komponenten, die Beziehung zwischen diesen und die eventuelle Nutzung von Entwurfsmustern ermittelt werden. Dabei wird besonders auf eine hochwertige Softwarequalität und Gebrauchstauglichkeit geachtet. Grundlegende, notwendige Entscheidungen wie die Namensgebung der Bibliothek und die Nutzung von externen Bibliotheken für eine effizientere und leichtere Implementierung werden ebenfalls getroffen. 
 \subsection{Ziele des Systems}
 Aus der Problemanalyse und der nachfolgenden Erhebung von funktionalen und nichtfunktionalen Anforderungen ergeben sich drei grundlegende Ziele des Systems:
 \begin{itemize}
 	\item Erstellung von auf Annotationen basierenden Vereinfachungen für anspruchsvolle Aspekte der JavaFX-Programmierung.
-	\item Erweiterung von bereits existierenden Funktionen wie die Lokalisierung und die Controllerverwaltung.
-	\item Hinzufügen von Funktionen, welche aktuell nicht im Funktionsumfang von JavaFX enthalten sind wie die Abhängigkeitsinjektion.
+	\item Erweiterung von bereits existierenden Funktionen wie der Lokalisierung und der Controllerverwaltung.
+	\item Hinzufügen von Funktionen, welche aktuell nicht im Funktionsumfang von JavaFX enthalten sind wie beispielsweise die Abhängigkeitsinjektion.
 \end{itemize}
 Alle Ziele sollen neuen Entwicklern den Einstieg in JavaFX erleichtern aber auch erfahrenen Entwicklern die Möglichkeit geben, effizienter mit JavaFX zu programmieren. Dazu müssen diese nicht unbedingt die vom System zu Verfügung gestellten Annotationen verwenden, sondern können auch die Utility Klassen (für beispielsweise die Lokalisierung) und eventuell die vereinfachte Schnittstelle zur Java Reflection API nutzen.
 \subsection{Rahmenbedingungen und Designentscheidungen}
@@ -230,11 +246,11 @@ Nachfolgend werden grundlegende Designentscheidungen der Softwarearchitektur und
 \subsubsection{Namensgebung}
 Die zu entwickelnde Bibliothek benötigt einen Namen, welcher die Beziehung zu JavaFX verdeutlicht und gleichzeitig aufzeigt, dass die Vereinfachung und die Erweiterung von JavaFX Bausteinen und einzelnen Komponenten angestrebt wird und deshalb die oberste Priorität darstellt. Nachfolgend wird die Bibliothek als \textbf{\texttt{SimpliFX}} bezeichnet. \texttt{SimpliFX} ist dabei an das englische Wort \texttt{simplify} angelehnt, welches ins Deutsche übersetzt \texttt{vereinfachen} bzw. \texttt{simplifizieren} bedeutet. Damit die Verbindung zu Java\texttt{FX} untermauert wird, ist das \texttt{FY} Suffix durch das \texttt{FX} Suffix substituiert worden.
 \subsubsection{Modularisierung}
-Gute Softwaresysteme bestehen aus vielen Komponenten, welche jeweils auf eine einzelne Funktion spezialisiert sind. Einige dieser Komponenten funktionieren unabhängig von Anderen und können durch eine Dekomposition des Systems in unterschiedliche Module unterteilt werden. Eine modulare Softwarearchitektur folgt dem softwaretechnischen \ac{soc} Prinzip und resultiert in einer hohen Wartbarkeit sowie Erweiterbarkeit. Außerdem ermöglicht eine Modularisierung, dass einzelne Module aufgrund ihrer strikten Trennung einfacher ausgetauscht werden können.\\
-Häufig genutzte reflektive Operationen der Reflection API müssen durch eine einfache Schnittstelle für \texttt{SimpliFX} zugänglich gemacht werden. Diese Schnittstelle muss ein ordnungsgemäße Ausnahmebehandlung aufweisen, da das Nutzen der Reflection API sehr fehleranfällig ist und sehr effizient implementiert werden, da etwaige Operationen langsamer sind als Nutzen von herkömmlichen Java-Sprachfeatures. Diese Schnittstelle wird in einem von \texttt{SimpliFX} unabhängigen Apache Maven\footref{ft:maven} Modul ausgelagert. Auch die Testapplikationen, welche nach der Implementierung des eigentlichen Systems entwickelt werden und für die Evaluation von diesem dienen, werden in ein anderes Modul ausgelagert. Das Basissystem ist somit in einem dritten Modul zu finden und ist für die aus den Systemanforderungen resultierenden Funktionalitäten verantwortlich. Die verschiedenen Subsysteme werden dabei in Java-Pakete unterteilt.
+Gute Softwaresysteme bestehen aus vielen Komponenten, welche jeweils auf eine einzelne Funktion spezialisiert sind. Einige dieser Komponenten funktionieren unabhängig von anderen und können durch eine Dekomposition des Systems in unterschiedliche Module unterteilt werden. Eine modulare Softwarearchitektur folgt dem softwaretechnischen \ac{soc} Prinzip und resultiert in einer hohen Wartbarkeit sowie Erweiterbarkeit. Außerdem ermöglicht eine Modularisierung, dass einzelne Module aufgrund ihrer strikten Trennung einfacher ausgetauscht werden können.\\
+Häufig genutzte reflektive Operationen der Reflection API müssen durch eine einfache Schnittstelle für \texttt{SimpliFX} zugänglich gemacht werden. Diese Schnittstelle muss eine ordnungsgemäße Ausnahmebehandlung aufweisen, da das Nutzen der Reflection API sehr fehleranfällig ist und muss sehr effizient implementiert werden, da etwaige Operationen langsamer sind als die Nutzung von herkömmlichen Java-Sprachfeatures. Diese Schnittstelle wird in einem von \texttt{SimpliFX} unabhängigen Apache Maven\footref{ft:maven} Modul ausgelagert. Auch die Testapplikation, welche nach der Implementierung des eigentlichen Systems entwickelt wird und für die Evaluation von diesem dient, wird in ein anderes Modul ausgelagert. Das Basissystem ist somit in einem dritten Modul zu finden und ist für die aus den Systemanforderungen resultierenden Funktionalitäten verantwortlich. Die verschiedenen Subsysteme werden dabei in Java-Pakete unterteilt.
 \subsubsection{Externe Bibliotheken}
 Externe Bibliotheken sind ein wichtiger Bestandteil von heutigen Anwendungen und können, aufgrund von Entwicklungsumgebungen wie IntelliJ IDEA\footnote{IntelliJ IDEA: \url{https://www.jetbrains.com/de-de/idea/}} oder Build-Management-Tools wie Apache Maven\footref{ft:maven} und Gradle\footnote{Gradle: \url{https://gradle.org}}, einfacher als je zuvor einem Projekt hinzugefügt werden. Externe Bibliotheken haben dabei meist den Vorteil, dass diese oft als quelloffene Projekte für jeden Entwickler einsehbar und nutzbar sind und deshalb, aufgrund der vielen Beiträge von anderen Entwicklern, meist keine Fehler aufweisen. 
-Auf der einen Seite ist das Nutzen von externen Bibliotheken, im Vergleich zum manuellen Erstellen der selben Funktionen, ein effektiver Weg um Zeit zu sparen und Bugs zu vermeiden. Auf der anderen Seite kann das Nutzen von vielen externen Bibliotheken, aufgrund der verschiedenen Softwarelizenzen für quelloffene Projekte, zu Problemen führen, da nicht alle Lizenzen eine Kompatibilität untereinander aufweisen. Für das Projekt werden nur Bibliotheken verwendet, welche mit lizenztechnisch kompatibel sind. Alle verwendeten externen Bibliotheken sind mit einer Kurzbeschreibung der Funktion und der jeweiligen Lizenz in \autoref{tab:external_libraries} dargestellt.
+Auf der einen Seite ist das Nutzen von externen Bibliotheken im Vergleich zum manuellen Erstellen der gleichen Funktionen ein effektiver Weg um Zeit zu sparen und Bugs zu vermeiden. Auf der anderen Seite kann das Nutzen von vielen externen Bibliotheken, aufgrund der verschiedenen Softwarelizenzen für quelloffene Projekte, zu Problemen führen, da nicht alle Lizenzen eine Kompatibilität untereinander aufweisen. Für das Projekt werden nur Bibliotheken verwendet, welche lizenztechnisch kompatibel sind. Alle verwendeten, externen Bibliotheken sind mit einer Kurzbeschreibung der Funktion und der jeweiligen Lizenz in \autoref{tab:external_libraries} dargestellt.
 \newcolumntype{C}[1]{%
 >{\vbox to 5ex\bgroup\vfill\centering}%
 p{#1}%
@@ -248,18 +264,22 @@ p{#1}%
 		\multicolumn{1}{c}{Bibliothek} & \multicolumn{1}{c}{Funktion} & \multicolumn{1}{c}{Version} & \multicolumn{1}{c}{Lizenz} \\
 		\hline
 		JavaFX & Ermöglicht die Erstellung von Java Applikationen mit grafischen Oberflächen & 16 & GPLv2\tablefootnote{GPLv2 mit Classpath Exception: \url{https://openjdk.java.net/legal/gplv2+ce.html}} \\
-		ASM & Erlaubt die Modifikation von Java-Bytecode & 9.1 & BSD\tablefootnote{3-Clause BSD: \url{https://asm.ow2.io/license.html}} \\
-		... & ... & ... & ...\\
+		JFoenix & Layout-Erweiterungen für JavaFX & 9.0.10 & MIT\tablefootnote{MIT: \url{https://opensource.org/licenses/MIT}}\\
+		ASM & Erlaubt die Modifikation und das Auslesen von Java-Bytecode & 9.1 & BSD\tablefootnote{3-Clause BSD: \url{https://asm.ow2.io/license.html}} \\
+		Log4j2 & Bereitstellung einer Loggingumgebung & 2.14.1 & Apache 2.0\tablefootnote{Apache 2.0: \url{https://logging.apache.org/log4j/2.x/license.html}}\\
+		Guice & Abhängigkeitsinjektion & 5.0.1 & Apache 2.0\\
+		Dagger1 & Abhängigkeitsinjektion & 1.2.5 & Apache 2.0\\
+		Spring-Context & Abhängigkeitsinjektion & 5.3.8 & Apache 2.0\\
 		\hline
 	\end{tabular}
-	\caption{Verwendete Externe Bibliotheken.}
+	\caption{Verwendete Externe Bibliotheken}
 	\label{tab:external_libraries}
 \end{table}
 \subsection{Benötigte Schnittstellen}
-Für eine optimale und effiziente Implementierung von \texttt{SimpliFX}, müssen einige Java Schnittstellen durch Eigene vereinfacht oder Schnittstellen für nicht vorhandene Funktionen hinzugefügt werden. Fast jede der aufgestellten Anforderungen benötigt für Teilfunktionen die Reflection API. Diese ist relativ fehleranfällig und nahezu alle reflektiven Operationen können Ausnahmen erzeugen, weshalb ein vereinfachender Zugang zu ebendieser API wünschenswert ist. Außerdem müssen Subsysteme entwickelt werden um beispielsweise nach \autoref{freq1} bestimmte annotierte Klassen aus dem Klassenpfad zur Laufzeit der Anwendung zu identifizieren.
+Für eine optimale und effiziente Implementierung von \texttt{SimpliFX}, müssen einige Java Schnittstellen durch eigene vereinfacht oder Schnittstellen für nicht vorhandene Funktionen hinzugefügt werden. Fast jede der aufgestellten Anforderungen benötigt für Teilfunktionen die Reflection API. Diese ist relativ fehleranfällig und nahezu alle reflektiven Operationen können Ausnahmen erzeugen, weshalb ein vereinfachender Zugang zu ebendieser API wünschenswert ist. Außerdem müssen Subsysteme entwickelt werden, um beispielsweise nach \autoref{freq1} bestimmte annotierte Klassen aus dem Klassenpfad zur Laufzeit der Anwendung zu identifizieren.
 Im Folgenden werden die benötigten Subsysteme erläutert und die erforderlichen Komponenten mithilfe geeigneter Methoden modelliert. In Klassendiagrammen werden nur elementare Bestandteile der Klassen dargestellt und Funktionen wie Getter oder Setter, welche erst bei der eigentlichen Implementierung benötigt werden und für das Verständnis nicht relevant sind, werden weggelassen.
 \subsubsection{Schnittstelle: Reflection}
-Die Reflection Schnittstelle soll alle häufig genutzten reflektiven Operationen, wie das Aufrufen von Methoden, das Instanziieren von Klassen, den Zugriff auf Felder und das Auswerten mit Annotationen, an einem zentralen Ort ermöglichen. Reflektierbare Elemente sollen durch eigene Schnittstellen repräsentiert werden, welche, für diese relevante, Operationen zur Verfügung stellen. Diese spezialisierten Klassen werden im Folgenden \texttt{ReflectionScope}s genannt, welche grundlegende Konfigurationen und Funktionen für die Modifikation des zu betrachteten Elementes bereitstellen. Alle \texttt{ReflectionScope}s sind mit ihrer jeweiligen Funktionalität in \autoref{tab:reflection_scopes} aufgelistet und detailliert als UML Klassendiagramme in \autoref{fig:reflection_scopes} dargestellt. Außerdem ist der Wechsel von \texttt{ReflectionScope}s möglich. So ist es beispielsweise möglich von einer \texttt{ClassReflection} über einen gefundenen Konstruktor zu einer \texttt{ConstructorReflection} Instanz zu wechseln. Auftretende Ausnahmen bei dem Nutzen der API, können durch die Angabe einer Ausnahmebehandlung abgefangen werden und somit durch den Entwickler kontrolliert werden.
+Die Reflection Schnittstelle soll alle häufig genutzten, reflektiven Operationen, wie das Aufrufen von Methoden, das Instanziieren von Klassen, den Zugriff auf Felder und das Auswerten mit Annotationen, an einem zentralen Ort ermöglichen. Reflektierbare Elemente sollen durch eigene Schnittstellen repräsentiert werden, welche für diese relevante Operationen zur Verfügung stellen. Diese spezialisierten Klassen werden im Folgenden \texttt{ReflectionScope}s genannt, welche grundlegende Konfigurationen und Funktionen für die Modifikation des zu betrachteten Elementes bereitstellen. Alle \texttt{ReflectionScope}s sind mit ihrer jeweiligen Funktionalität in \autoref{tab:reflection_scopes} aufgelistet und detailliert als UML Klassendiagramme in \autoref{fig:reflection_scopes} dargestellt. Außerdem ist der Wechsel von \texttt{ReflectionScope}s möglich. So ist es beispielsweise möglich von einer \texttt{ClassReflection} über einen gefundenen Konstruktor zu einer \texttt{ConstructorReflection} Instanz zu wechseln. Auftretende Ausnahmen bei dem Nutzen der API, können durch die Angabe einer Ausnahmebehandlung abgefangen werden und somit durch den Entwickler kontrolliert werden.
 \begin{table}[H]
 	\centering
 	\renewcommand*{\arraystretch}{1.3}
@@ -278,7 +298,7 @@ Die Reflection Schnittstelle soll alle häufig genutzten reflektiven Operationen
 		\texttt{FieldReflection} & Stellt Funktionen zum Setzen und zum Auslesen von Feldern zur Verfügung.\\
 		\hline
 	\end{tabular}
-	\caption{Alle benötigten \texttt{ReflectionScope}s.}
+	\caption{Alle benötigten \texttt{ReflectionScope}s}
 	\label{tab:reflection_scopes}
 \end{table}
 \begin{figure}[H]
@@ -287,9 +307,9 @@ Die Reflection Schnittstelle soll alle häufig genutzten reflektiven Operationen
 	\caption{Diagramm -- \texttt{ReflectionScopes}}
 	\label{fig:reflection_scopes}
 \end{figure}
-\noindent Aus den Klassendiagrammen ist schlusszufolgern, dass alle häufig genutzten reflektiven Operationen durch die Verwendung von Method Chaining, also der Hintereinanderausführung von Methoden, welche Operationen auf dem Objekt ausführen und es dabei zurückgeben, möglich sind. Ein theoretisches Anwendungsbeispiel der Reflection Schnittstelle ist in \autoref{lst:example_reflection_usage} dargestellt. Dabei wird eine Instanz der \texttt{Test} Klasse mit einem \texttt{Integer} Konstruktorparameter erstellt, welcher als Objektattribut in der Instanz gespeichert wird und mithilfe einer \texttt{InstanceReflection} modifiziert wird.
+\noindent Aus den Klassendiagrammen ist schlusszufolgern, dass alle häufig genutzten reflektiven Operationen durch die Verwendung von Method Chaining, also der Hintereinanderausführung von Methoden, welche Operationen auf dem Objekt ausführen und dieses dabei zurückgeben, möglich sind. Ein theoretisches Anwendungsbeispiel der Reflection Schnittstelle ist in \autoref{lst:example_reflection_usage} dargestellt. Dabei wird eine Instanz der \texttt{Test} Klasse mit einem \texttt{Integer} Konstruktorparameter erstellt, welcher als Objektattribut in der Instanz gespeichert wird und mithilfe einer \texttt{InstanceReflection} modifiziert wird.
 \begin{figure}[H]
-	\begin{lstlisting}[caption={Beispiel -- Verwendung der Reflection Schnittstelle.}, captionpos=b, label=lst:example_reflection_usage]
+	\begin{lstlisting}[caption={Beispiel -- Verwendung der Reflection Schnittstelle}, captionpos=b, label=lst:example_reflection_usage]
 // Klassendefinition
 public static class Test {
 
@@ -310,97 +330,96 @@ System.out.println(f.get()); // 42
 \end{figure}
 \subsubsection{Schnittstelle: Klassenpfad}
 \label{classpath_interface}
-Damit die Automatisierungsmaßnahmen für \autoref{freq1} zum Finden von speziell annotierten Elementen möglich sind, muss eine Art von Klassenpfad-Scanner implementiert werden. Dabei werden alle Klassen, welche in den durch \texttt{Classloader} Instanzen bereitgestellten Klassenpfaden gefunden werden, nach den jeweiligen Annotationen gefiltert (siehe \autoref{fig:classpath_scanprocess}). Das Finden aller Klassen im Klassenpfad muss sowohl für normale Dateisysteme als auch für Applikationen, welche in Java Archiven gepackt worden sind, möglich sein. Um Klassen auf beispielsweise Annotationen zu filtern darf, aufgrund von möglichen Sicherheitsrisiken und Performanceproblemen, kein \texttt{Class} Objekt mittels \texttt{Class\#forName} erstellt werden.\add{sonarlint} Dadurch soll verhindert werden, dass eventuelle \texttt{static}-Blöcke ausgeführt werden. Das Scannen einer Klasse, ohne den \texttt{static}-Block auszuführen, kann durch die ASM Bibliothek\footref{ft:asm}, mithilfe des Besucher Entwurfsmusters erfolgen. Außerdem muss der Scanprozess eine gewisse Konfigurierbarkeit aufweisen, da manuell \texttt{Classloader} Instanzen zum Scanprozess hinzugefügt werden sollen und um eine optimale Leistung zu gewährleisten, soll ein initialer Paketname oder Teilstring eines Paketes angegeben werden können, damit nicht benötigte Klassen, schon im Scanprozess ignoriert werden. Ergebnisse des Scans müssen in einem Cache zwischengespeichert werden, damit nicht jeder Filtervorgang den Klassenpfad erneut scannen muss und somit unnötigerweise einen Performance-Hotspot kreiert.
+Damit die Automatisierungsmaßnahmen für \autoref{freq1} zum Finden von speziell annotierten Elementen möglich sind, muss eine Art von Klassenpfad-Scanner implementiert werden. Dabei werden alle Klassen, welche in den durch \texttt{Classloader} Instanzen bereitgestellten Klassenpfaden gefunden werden, nach den jeweiligen Annotationen gefiltert (siehe \autoref{fig:classpath_scanprocess}). Das Finden aller Klassen im Klassenpfad muss sowohl für normale Dateisysteme als auch für Applikationen, welche in Java Archiven gepackt worden sind, möglich sein. Um Klassen auf beispielsweise Annotationen zu filtern, darf, aufgrund von möglichen Sicherheitsrisiken und Performanceproblemen, kein \texttt{Class} Objekt mittels \texttt{Class\#forName} erstellt werden. Dadurch soll verhindert werden, dass eventuelle \texttt{static}-Blöcke ausgeführt werden. Das Scannen einer Klasse, ohne den \texttt{static}-Block auszuführen, kann durch die ASM Bibliothek\footref{ft:asm} mithilfe des Besucherentwurfsmusters erfolgen. Außerdem muss der Scanprozess eine gewisse Konfigurierbarkeit aufweisen, da manuell \texttt{Classloader} Instanzen zum Scanprozess hinzugefügt werden sollen und um eine optimale Leistung zu gewährleisten, soll ein initialer Paketname oder Teilstring eines Paketes angegeben werden können, damit nicht benötigte Klassen schon im Scanprozess ignoriert werden. Ergebnisse des Scans müssen in einem Cache zwischengespeichert werden, damit nicht jeder Filtervorgang den Klassenpfad erneut scannen muss und somit unnötigerweise einen Performance-Hotspot kreiert.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{Abbildungen/Klassenpfad Scanprozess.png}
-	\caption{Diagramm -- Klassenpfad-Scanprozess für Klassendateien.}
+	\caption{Diagramm -- Klassenpfad-Scanprozess für Klassendateien}
 	\label{fig:classpath_scanprocess}
 \end{figure}
 \subsubsection{Schnittstelle: Lokalisierung/Internationalisierung}
-Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref{freq3}) werden Utility-Methoden benötigt, welche alle verfügbaren \texttt{ResourceBundle} Instanzen beinhalten und Funktionen für das Ändern der aktuellen Sprache bereitstellen und JavaFX Bindings aus den jeweiligen Übersetzungsschlüsseln generieren. Dabei muss insbesondere die Unterstützung von parametrisierten Schlüsseln gewährleistet werden, das die daraus generierten Bindings bei einer Änderung der Parameterwerte, aktualisiert werden müssen. Alle nötigen Basisoperationen, welche durch die \texttt{II18N} Schnittstelle verfügbar gemacht werden und durch \texttt{I18N} implementiert wurden, sind in \autoref{fig:i18n_interface} dargestellt.
+Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref{freq3}) werden Utility-Methoden benötigt, welche alle verfügbaren \texttt{ResourceBundle} Instanzen beinhalten und Funktionen für das Ändern der aktuellen Sprache bereitstellen und JavaFX Bindings aus den jeweiligen Übersetzungsschlüsseln generieren. Dabei muss insbesondere die Unterstützung von parametrisierten Schlüsseln gewährleistet werden, da die daraus generierten Bindings bei einer Änderung der Parameterwerte aktualisiert werden müssen. Alle nötigen Basisoperationen, welche durch die \texttt{II18N} Schnittstelle verfügbar gemacht werden und durch \texttt{I18N} implementiert wurden, sind in \autoref{fig:i18n_interface} dargestellt.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth-2cm]{Abbildungen/I18N.png}
-	\caption{Diagramm -- I18N Schnittstelle.}
+	\caption{Diagramm -- I18N Schnittstelle}
 	\label{fig:i18n_interface}
 \end{figure}
 \noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird.
 \subsubsection{Schnittstelle: \texttt{SimpliFXMLLoader}}
 Damit Funktionalitäten wie die dynamische Übersetzung für \autoref{freq3} und das Initialisieren sowie die Generierung von \ac{css} Metadaten für \autoref{freq5} möglich sind, muss der herkömmliche \texttt{FXMLLoader} durch eigene Konstrukte erweitert werden. Die Implementierung neuer Methoden und die Modifikation von bereits existierenden Methoden wird in \autoref{simplifxmlloader} beschrieben. Die Erweiterung der \texttt{FXMLLoader} Klasse wird im Folgenden als \texttt{SimpliFXMLLoader} bezeichnet.
 \subsubsection{Schnittstelle: \texttt{SimpliFX} Einstiegspunkt}
-\texttt{SimpliFX} übernimmt die Konstruktion und die anschließende Verwaltung der JavaFX-Anwendungsklasse. Essentielle Methoden, welche durch die Java \texttt{Application} Klasse zur Verfügung gestellt werden, können per Annotation an den spezifizierten Einstiegspunkt delegiert werden und sind somit nachfolgend für den Entwickler zugänglich (\autoref{freq2}). Der Entwickler kann, vor einem Start der Anwendung, \texttt{SimpliFX} konfigurieren und Eigenschaften wie das Verhalten des Klassenpfadscanners (global, paketlokal) modifizieren. Der Entwickler muss zum Starten von \texttt{SimpliFX} eine der vordefinierten \texttt{launch}-Methoden verwenden (siehe \autoref{fig:simplifx_launch}). 
+\texttt{SimpliFX} übernimmt die Konstruktion und die anschließende Verwaltung der JavaFX-Anwendungsklasse. Essentielle Methoden, welche durch die Java \texttt{Application} Klasse zur Verfügung gestellt werden, können per Annotation an den spezifizierten Einstiegspunkt delegiert werden und sind somit nachfolgend für den Entwickler zugänglich (\autoref{freq2}). Der Entwickler kann, vor einem Start der Anwendung, \texttt{SimpliFX} konfigurieren und Eigenschaften wie das Verhalten des Klassenpfadscanners (global, paketlokal) modifizieren. Man muss zum Starten von \texttt{SimpliFX} eine der vordefinierten \texttt{launch}-Methoden verwenden (siehe \autoref{fig:simplifx_launch}). 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth-2cm]{Abbildungen/SimpliFX Einstiegspunkt.png}
-	\caption{Diagramm -- Konfigurations- und Startmethoden von SimpliFX.}
+	\includegraphics[width=\textwidth]{Abbildungen/SimpliFX Einstiegspunkt.png}
+	\caption{Diagramm -- Konfigurations- und Startmethoden von SimpliFX}
 	\label{fig:simplifx_launch}
 \end{figure}
-\noindent Der Entwickler kann die Applikation- und Preloaderklasse manuell angeben oder bereits instanziierte Objekte für diese übergeben. Wird keine Applikationsklasse (bzw. Preloaderklasse) angegeben, so wird mithilfe der Klassenpfad-Schnittstelle (\autoref{classpath_interface}) eine Detektion dieser gestartet. Der Startprozess für die Lokalisierung des Einstiegspunktes ist in \autoref{fig:entrypoint_search} als UML-Aktivitätsdiagramm dargestellt (ähnlich dazu wird ein Preloader identifiziert). Wird ein Einstiegspunkt gefunden, so wird dieser auf Korrektheit überprüft (Korrekte Annotationen und Parameter). Daraufhin beginnt die Initialisierung der JavaFX Plattform, der Applikationsklasse, des Controllersystems und des Hauptcontrollers, die Konfiguration von der jeweiligen Bibliothek für Abhängigkeitsinjektion (falls angegeben) und das Laden von Konfigurations- und Sprachdateien.
+\noindent Der Entwickler kann die Applikation- und Preloaderklasse manuell angeben oder bereits instanziierte Objekte für diese übergeben. Wird keine Applikationsklasse (bzw. Preloaderklasse) angegeben, so wird mithilfe der Klassenpfad-Schnittstelle (\autoref{classpath_interface}) eine Detektion dieser gestartet. Der Startprozess für die Lokalisierung des Einstiegspunktes ist in \autoref{fig:entrypoint_search} als UML-Aktivitätsdiagramm dargestellt (ähnlich dazu wird ein Preloader identifiziert). Wird ein Einstiegspunkt gefunden, so wird dieser auf Korrektheit von Annotationen überprüft. Daraufhin beginnt die Initialisierung der JavaFX Plattform, der Applikationsklasse, des Controllersystems und des Hauptcontrollers, die Konfiguration der jeweiligen Bibliothek für Abhängigkeitsinjektion (falls angegeben) und das Laden von Konfigurations- und Sprachdateien.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth-2cm]{Abbildungen/Startprozess.png}
-	\caption{Diagramm -- Finden und Validierung des Einstiegspunktes.}
+	\caption{Diagramm -- Finden und Validierung des Einstiegspunktes}
 	\label{fig:entrypoint_search}
 \end{figure}
-\noindent Das Setzen der \texttt{ClasspathScanPolicy} kann direkt durch eine statische Methode erfolgen, dabei muss sichergestellt werden, dass diese explizit vor dem eigentlichen Start aufgerufen wird. Änderungen der \texttt{ClasspathScanPolicy} nach dem Applikationsstart haben keine Auswirkung auf den initialen Klassenpfadscan. Jede \texttt{launch}-Methode überprüft die angegebenen bzw. gefundenen Einstiegspunkte für die Applikation und den Preloader auf die korrekte Benutzung und Konfiguration von erforderlichen und optionalen Annotationen. Ist die Validierung der Einstiegspunkte erfolgreich, so wird die angegebene Bibliothek zur Abhängigkeitsinjektion, die dazugehörigen Module initialisiert und alle Abhängigkeiten für die Applikation und den Preloader in die jeweiligen Instanzen injiziert. Ist keine Annotation zur Abhängigkeitsinjektion angegeben, so wird diese Phase übersprungen. Bevor die eigentliche JavaFX Applikation erstellt wird, werden alle angegebenen Pfade zu Lokalisierungsdateien auf Gültigkeit überprüft und mithilfe der Erstellung von \texttt{ResourceBundle} Instanzen, zu jeder verfügbaren Sprache, in einem \texttt{CompoundResourceBundle} kombiniert. Diese kombinierten \texttt{ResourceBundle}s, werden für die darauffolgende Instanziierung einer globalen \texttt{I18N} Instanz benötigt, welche optional in alle Einstiegspunkte und zukünftig erstellte Controller injiziert und für alle Ladeprozesse von FXML Dateien durch den \texttt{SimpliFXMLLoader} genutzt werden. Ist die Initialisierung abgeschlossen werden im Rahmen der \autoref{freq8}, alle PostConstruct Methoden der Einstiegspunkte aufgerufen.
+\noindent Das Setzen der \texttt{ClasspathScanPolicy} kann direkt durch eine statische Methode erfolgen. Dabei muss sichergestellt werden, dass diese explizit vor dem eigentlichen Start aufgerufen wird. Änderungen der \texttt{ClasspathScanPolicy} nach dem Applikationsstart haben keine Auswirkung auf den initialen Klassenpfadscan. Jede \texttt{launch}-Methode überprüft die angegebenen bzw. gefundenen Einstiegspunkte für die Applikation und den Preloader auf die korrekte Benutzung und Konfiguration von erforderlichen und optionalen Annotationen. Ist die Validierung der Einstiegspunkte erfolgreich, so wird die angegebene Bibliothek zur Abhängigkeitsinjektion geladen, die dazugehörigen Module initialisiert und alle Abhängigkeiten für die Applikation und den Preloader in die jeweiligen Instanzen injiziert. Ist keine Annotation zur Abhängigkeitsinjektion angegeben, so wird diese Phase übersprungen. Bevor die eigentliche JavaFX Applikation erstellt wird, werden alle angegebenen Pfade zu Lokalisierungsdateien auf Gültigkeit überprüft und mithilfe der Erstellung von \texttt{ResourceBundle} Instanzen zu jeder verfügbaren Sprache in einem \texttt{CompoundResourceBundle} kombiniert. Diese kombinierten \texttt{ResourceBundle}s werden für die darauffolgende Instanziierung einer globalen \texttt{I18N} Instanz benötigt, welche optional in alle Einstiegspunkte und zukünftig erstellte Controller injiziert und für alle Ladeprozesse von FXML Dateien durch den \texttt{SimpliFXMLLoader} genutzt werden. Ist die Initialisierung abgeschlossen werden, im Rahmen der \autoref{freq8}, alle PostConstruct Methoden der Einstiegspunkte aufgerufen.
 \subsection{Controller System}
-Nach dem Finden und der vollständigen Konstruktion der Einstiegspunkte wird das Controller-System mit dem angegebenen Startcontroller initialisiert. Verschiedene Controller können zu Controllergruppen zugeordnet werden. Jede solche Gruppe muss zu jedem Zeitpunkt mindestens einen Controller beinhalten und eindeutig durch einen \texttt{String} Wert identifiziert werden können. Der Erstellungsprozess eines Controllers und die Aufrufreihenfolge der Lebenszyklusbehandlungsmethoden ist in \autoref{fig:controller_init} schematisch dargestellt. Bei der Controllervalidierung wird die korrekte Definition eines Controllers überprüft, sowie nach eventuellen Zyklen im System gesucht (\autoref{freq12}). Nach \autoref{freq9} ist es ebenfalls möglich, mehrere Methoden für die selbe Phase zu deklarieren, die Aufrufreihenfolge richtet sich meist nach einem Annotationsparameter (siehe \autoref{annotations}). Während der Konstruktion kann der Entwickler durch die Deklaration von speziell annotierten Methoden bei Phasenwechsel benachrichtigt werden. Um ursprüngliche Funktionalitäten des \texttt{FXMLLoader}s zu bewahren, erlaubt es der \texttt{SimpliFXMLLoader} ebenfalls, dass ein geladener Controller die \texttt{Initializable} Schnittstelle implementiert und somit informiert wird, wenn der \texttt{FXML} Ladeprozess erfolgreich beendet wurde (Alle Abhängigkeiten, welche durch eine Bibliothek zur Abhängigkeitsinjizierung bereitgestellt werden, sind zu diesem Zeitpunkt ebenfalls im Controller vorhanden). Nach dem Injizieren der von \texttt{SimpliFX} bereitgestellten Ressourcen in den Controller, wechselt dieser, wie in \autoref{freq7} beschrieben, in die Setup-Phase. Hierbei werden eventuelle Setup-Methoden aufgerufen und eine Schnittstelle zur Interaktion mit dem Konstruktionsprozess der aktuellen Controllergruppe bzw. des Controllers bereitgestellt. Mit dieser Schnittstelle, kann der Entwickler die Erstellung von Subcontrollern/Subgruppen in der Setup-Phase koordinieren (\autoref{freq11}). Ein Controller wechselt in die PostConstruct-Phase, wenn alle Subcontroller vollständig konstruiert oder wenn solche zur Setup-Phase nicht angegeben wurden. Methodenaufrufe für die PostConstruct-Phase, werden ausschließlich auf dem JavaFX-Thread ausgeführt. Außerdem kann der Entwickler zu einem beliebigen Zeitpunkt einen Controller in einer Controllergruppe wechseln (\autoref{freq13}). Ein solcher Wechsel überführt den vorher angezeigten Controller in die OnHide-Phase und den neuen Controller in die OnShow-Phase. Dabei werden mögliche Subcontroller bzw. Subgruppen ebenfalls in den jeweiligen neuen Zustand des Supercontrollers versetzt. Der Entwickler kann durch einen Methodenparameter der OnHide-/OnShow-Methoden, feststellen, ob der Phasenwechsel durch einen Controllerwechsel der lokalen Controllergruppe oder durch einen Supercontroller hervorgerufen wurde. Der Wechsel kann durch die Angabe von verschiedenen vordefinierten, keinen oder eigenen Animationen durchgeführt werden. Des Weiteren ist es möglich Controller manuell zu laden, ohne diese direkt anzeigen zu lassen. Somit müssen Controller nicht On-Demand, also bei Bedarf, durch das Controller-System erstellt werden (\autoref{freq14}).
+Nach dem Finden und der vollständigen Konstruktion der Einstiegspunkte wird das Controller-System mit dem angegebenen Startcontroller initialisiert. Verschiedene Controller können zu Controllergruppen zugeordnet werden. Jede solche Gruppe muss zu jedem Zeitpunkt mindestens einen Controller beinhalten und eindeutig durch einen \texttt{String} Wert identifiziert werden können. Der Erstellungsprozess eines Controllers und die Aufrufreihenfolge der Lebenszyklusbehandlungsmethoden ist in \autoref{fig:controller_init} schematisch dargestellt. Bei der Controllervalidierung wird die korrekte Definition eines Controllers überprüft, sowie nach eventuellen Zyklen im System gesucht (\autoref{freq12}). Nach \autoref{freq9} ist es ebenfalls möglich, mehrere Methoden für die gleiche Phase zu deklarieren. Die Aufrufreihenfolge richtet sich meist nach einem Annotationsparameter (siehe \autoref{annotations}). Während der Konstruktion kann der Entwickler durch die Deklaration von speziell annotierten Methoden bei Phasenwechsel benachrichtigt werden. Um ursprüngliche Funktionalitäten des \texttt{FXMLLoader}s zu bewahren, erlaubt es der \texttt{SimpliFXMLLoader} ebenfalls, dass ein geladener Controller die \texttt{Initializable} Schnittstelle implementiert und somit informiert wird, wenn der \texttt{FXML} Ladeprozess erfolgreich beendet wurde (alle Abhängigkeiten, welche durch eine Bibliothek zur Abhängigkeitsinjizierung bereitgestellt werden, sind zu diesem Zeitpunkt ebenfalls im Controller vorhanden). Nach dem Injizieren der von \texttt{SimpliFX} bereitgestellten Ressourcen in den Controller, wechselt dieser, wie in \autoref{freq7} beschrieben, in die Setup-Phase. Hierbei werden eventuelle Setup-Methoden aufgerufen und eine Schnittstelle zur Interaktion mit dem Konstruktionsprozess der aktuellen Controllergruppe bzw. des Controllers bereitgestellt. Mit dieser Schnittstelle kann der Entwickler die Erstellung von Subcontrollern/Subgruppen in der Setup-Phase koordinieren (\autoref{freq11}). Ein Controller wechselt in die PostConstruct-Phase, wenn alle Subcontroller vollständig konstruiert oder wenn solche zur Setup-Phase nicht angegeben wurden. Methodenaufrufe für die PostConstruct-Phase werden ausschließlich auf dem JavaFX-Thread ausgeführt. Außerdem kann der Entwickler zu einem beliebigen Zeitpunkt einen Controller in einer Controllergruppe wechseln (\autoref{freq13}). Ein solcher Wechsel überführt den vorher angezeigten Controller in die OnHide-Phase und den neuen Controller in die OnShow-Phase. Dabei werden mögliche Subcontroller bzw. Subgruppen ebenfalls in den jeweiligen neuen Zustand des Supercontrollers versetzt. Der Entwickler kann durch einen Methodenparameter der OnHide-/OnShow-Methoden feststellen, ob der Phasenwechsel durch einen Controllerwechsel der lokalen Controllergruppe oder durch einen Supercontroller hervorgerufen wurde. Der Wechsel kann durch die Angabe von vordefinierten, keinen oder eigenen Animationen durchgeführt werden. Des Weiteren ist es möglich Controller manuell zu laden, ohne diese direkt anzeigen zu lassen. Somit müssen Controller nicht On-Demand, also bei Bedarf, durch das Controller-System erstellt werden (\autoref{freq14}).
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{Abbildungen/Controller Erstellungsprozess.png}
-	\caption{Diagramm -- Erstellung der Hauptgruppe und des Hauptcontrollers.}
+	\caption{Diagramm -- Erstellung der Hauptgruppe und des Hauptcontrollers}
 	\label{fig:controller_init}
 \end{figure}
-\noindent Ausschließlich der Hauptcontroller und die Hauptgruppe werden durch \texttt{SimpliFX} erstellt. Dabei wird für diese die Identifikation \texttt{main} gewählt. Dem Entwickler steht es frei, ob dieser die Hauptgruppe mit weiteren Controllern erweitert.
+\noindent Daneben können Controllergruppen Benachrichtigungen anzeigen lassen. Das Layout dieser ist durch den Entwickler änderbar. Ausschließlich der Hauptcontroller und die Hauptgruppe werden durch \texttt{SimpliFX} erstellt. Dabei wird für diese die Identifikation \texttt{main} gewählt. Dem Entwickler steht es frei, ob dieser die Hauptgruppe mit weiteren Controllern erweitert.
 \subsection{Annotationen}
 \label{annotations}
-Im Folgenden werden alle benötigten Annotationen mit ihren jeweiligen Parametern definiert und auf die zu implementierende Funktionalität sowie mögliche Restriktionen eingegangen. Dabei wird explizit angegeben, welche Parameter keinen \texttt{default} Wert besitzen und aufgrund dessen vom Entwickler manuell angegeben werden müssen.
+Im Folgenden werden alle benötigten Annotationen mit ihren jeweiligen Parametern definiert und auf die zu implementierende Funktionalität sowie mögliche Restriktionen eingegangen. Dabei wird explizit angegeben, welche Parameter optional sind und aufgrund dessen vom Entwickler nicht angegeben werden müssen.
 \subsubsection{Annotation: @ApplicationEntryPoint}
-Soll eine Anwendung mit \texttt{SimpliFX} verwendet werden, so muss eine Klasse existieren, welche als Einstiegspunkt fungieren soll und die \texttt{@ApplicationEntryPoint} Annotation aufweisen. Dieser kann ein einziger Parameter übergeben werden, welcher notwendig ist und die Klasse des Hauptcontrollers darstellen soll.
+Soll eine Anwendung mit \texttt{SimpliFX} verwendet werden, so muss eine Klasse existieren, welche als Einstiegspunkt fungieren soll und die \texttt{@ApplicationEntryPoint} Annotation aufweist. Dieser kann ein einziger Parameter übergeben werden, welcher notwendig ist und die Klasse des Hauptcontrollers darstellen soll (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Annotation: @PreloaderEntryPoint}
-Die \texttt{@PreloaderEntryPoint} Annotation besitzt ähnliche Funktionalitäten wie die \texttt{@ApplicationEntryPoint} Annotation, nur das kein Parameter angegeben werden kann und nicht der Anwendungseinstiegspunkt definiert wird, sondern der Einstiegspunkt für einen Preloader. Dieser ist optional und ist für ein Starten der Applikation nicht notwendig.
+Die \texttt{@PreloaderEntryPoint} Annotation besitzt ähnliche Funktionalitäten wie die \texttt{@ApplicationEntryPoint} Annotation, nur dass kein Parameter angegeben werden kann und nicht der Anwendungseinstiegspunkt definiert wird, sondern der Einstiegspunkt für einen Preloader. Dieser ist optional und ist für ein Starten der Applikation nicht notwendig.
 \subsubsection{Annotation: @ConfigSource}
-Mit der Java Properties-API kompatible Konfigurationsdateien können durch das Nutzen der \texttt{@ConfigSource} Annotation automatisch geladen und dem annotierten Properties-Feld zugewiesen werden. Die Annotation hat einen optionalen Parameter, welcher den Namen der Konfigurationsdatei bzw. den Pfad zu dieser enthält. Ist kein Pfad angegeben, so wird, je nach Klassenpfadscan-Einstellung, der Klassenpfad nach einer Datei mit einem Namen, welcher dem des annotierten Feldes entspricht, durchsucht. Jedes Element aus einer Konfigurationsdatei, welche auf diesem Wege geladen worden ist, kann durch die \texttt{@ConfigValue} Annotation verwendet werden.
+Mit der Java Properties-API kompatible Konfigurationsdateien können durch das Nutzen der \texttt{@ConfigSource} Annotation automatisch geladen und annotierten Properties-Feldern zugewiesen werden. Die Annotation hat einen optionalen Parameter, welcher den Namen der Konfigurationsdatei bzw. den Pfad zu dieser enthält. Der Pfad kann hierbei relativ oder absolut sein. Außerdem kann angegeben werden, ob die Konfigurationsdatei im Klassenpfad oder außerhalb davon zu finden ist. Jedes Element aus einer Konfigurationsdatei, welche auf diesem Wege geladen worden ist, kann durch die \texttt{@ConfigValue} Annotation verwendet werden (siehe \autoref{lst:fields_demo}).
 \subsubsection{Annotation: @ConfigValue}
-Konfigurierbare Elemente können mit \texttt{@ConfigValue} annotiert werden. Der Konfigurationsschlüssel muss in Form eines erforderlichen Parameters an die Annotation übergeben werden. Außerdem ist es möglich, einen optionalen Standardwert festzulegen, welcher dem jeweiligen annotierten Feld zugewiesen wird, wenn der angegebene Konfigurationsschlüssel in keiner Konfigurationsdatei gefunden werden kann.
+Konfigurierbare Elemente können mit \texttt{@ConfigValue} annotiert werden. Der Konfigurationsschlüssel muss in Form eines erforderlichen Parameters an die Annotation übergeben werden. Außerdem ist es möglich, einen optionalen Standardwert festzulegen, welcher dem jeweiligen annotierten Feld zugewiesen wird, wenn der angegebene Konfigurationsschlüssel in keiner Konfigurationsdatei gefunden werden kann (siehe \autoref{lst:sidebar_controller_localize}).
 \subsubsection{Annotation: @PostConstruct}
-Hat \texttt{SimpliFX} den Erstellungs- bzw. Einrichtungsprozess eines Objektes vollendet, so soll die jeweilige Instanz davon in Kenntnis gesetzt werden. Dazu werden Methoden, welche die \texttt{@PostConstruct} Annotation aufweisen, automatisch aufgerufen. Optional kann ein Prioritätsparameter angegeben werden, welcher die Aufrufreihenfolge, wenn mehrere solcher Methoden existieren, bestimmt. Die Priorität wird dabei als Ganzzahl repräsentiert und Methoden werden in aufsteigender Reihenfolge dieser aufgerufen.
+Hat \texttt{SimpliFX} den Erstellungs- bzw. Einrichtungsprozess eines Objektes vollendet, so soll die jeweilige Instanz davon in Kenntnis gesetzt werden. Dazu werden Methoden, welche die \texttt{@PostConstruct} Annotation aufweisen, automatisch aufgerufen. Optional kann ein Prioritätsparameter angegeben werden, welcher die Aufrufreihenfolge, bei der Existenz mehrerer solcher Methoden, bestimmt. Die Priorität wird dabei als Ganzzahl repräsentiert und Methoden werden in aufsteigender Reihenfolge aufgerufen (siehe \autoref{lst:titlebar_controller_content}).
 \subsubsection{Annotation: @Controller}
-Ein \texttt{SimpliFX} kompatibler Controller muss die \texttt{@Controller} Annotation aufweisen und dabei mindestens den FXML Parameter gesetzt haben. Der FXML Parameter gibt den Pfad zur FXML Datei an, welcher für die Konstruktion des Controllers benötigt wird. Analog dazu kann optional eine \ac{css} Datei angegeben werden. Desweiteren ist die Angabe einer Controllergruppe möglich, um verschiedene Controller in Gruppen zu unterteilen.
+Ein \texttt{SimpliFX} kompatibler Controller muss die \texttt{@Controller} Annotation aufweisen und dabei mindestens den FXML Parameter gesetzt haben. Der FXML Parameter gibt den Pfad zur FXML Datei an, welcher für die Konstruktion des Controllers benötigt wird. Analog dazu kann optional eine \ac{css} Datei angegeben werden (siehe \autoref{lst:main_controller_demo}).
 \subsubsection{Annotation: @EventHandler}
-Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Eventinformationen aufgerufen werden sollen, können mit der \texttt{@EventHandler} Annotation annotiert werden. Diese akzeptiert einen optionalen Prioritätsparameter, der für die Aufrufreihenfolge gleichartiger Methoden verantwortlich ist. Jede durch JavaFX ermöglichte Methode zum Abfangen von Events (\texttt{onAction}, \texttt{onClick}, ...), welche normalerweise mit \texttt{@FXML} annotiert wird, kann ebenfalls mit \texttt{@EventHandler} annotiert werden.
+Methoden, welche bei einem Auftreten eines globalen Events mit den jeweiligen Eventinformationen aufgerufen werden sollen, können mit der \texttt{@EventHandler} Annotation annotiert werden. Diese akzeptiert einen optionalen Prioritätsparameter, der für die Aufrufreihenfolge gleichartiger Methoden verantwortlich ist. Annotierte Methoden werden automatisch erkannt und aufgerufen, sofern diese in einem Einstiegspunkt deklariert worden sind. Die Verwendung des Event-Systems kann ebenfalls manuell durch den Entwickler außerhalb von Controllern und Einstiegspunkten verwendet werden. Dazu muss dieser die jeweiligen Klassen zur Eventbehandlung in einem \texttt{IEventEmitter} registrieren (siehe \autoref{lst:event_method_demo}).
 \subsubsection{Annotation: @ResourceBundle}
-Die Registrierung von \texttt{ResourceBundle}s aus dem Klassenpfad erfolgt durch die \texttt{@ResourceBundle} Annotation, welche als notwendigen Parameter den Basisnamen bzw. den relativen Pfad ausgehend vom \texttt{resources} Verzeichnis akzeptiert. Nur Felder, die \texttt{II18N} oder eine Implementierung dieser Schnittstelle als Typen aufweisen, können mit \texttt{@ResourceBundle} annotiert werden.
+Die Registrierung von \texttt{ResourceBundle}s aus dem Klassenpfad erfolgt durch die \texttt{@ResourceBundle} Annotation, welche als notwendigen Parameter den Basisnamen bzw. den relativen Pfad ausgehend vom \texttt{resources} Verzeichnis akzeptiert. Nur Felder, die \texttt{II18N} oder eine Implementierung dieser Schnittstelle als Typen aufweisen, können mit \texttt{@ResourceBundle} annotiert werden (siehe \autoref{lst:fields_demo}).
 \subsubsection{Annotation: @LocalizeValue}
-Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Komponenten handeln, welche eine Form von übersetzbarem Text darstellen können. Dazu gehören beispielsweise die \texttt{Button} und die \texttt{Label} Klasse. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden.
+Felder in Controllern werden automatisch übersetzt, sofern der Entwickler Pfade zu benötigten \texttt{ResourceBundle} Instanzen bereitstellt. Bei den Typen der Felder muss es sich immer um JavaFX Properties handeln, welche den jeweiligen Parametertypen darstellen können. Die Aktualisierung von Properties, welche eine Veränderung von, auf parametrisierten Übersetzungsschlüsseln basierenden, Textelementen hervorrufen sollen, können mit der \texttt{@LocalizeValue} Annotation kontrolliert werden, sofern es sich bei ebendiesen Properties um controllerinterne Felder handelt. Statische Felder können hierfür nicht genutzt werden. Für die automatische Verbindung der Property und der jeweiligen JavaFX-Komponente, muss die FX-Id dieser als Annotationsparameter angegeben werden. Bei mehreren Übersetzungsparametern kann der Annotation ein Parameterindex übergeben werden (siehe \autoref{lst:sidebar_controller_localize}).
 \subsubsection{Annotation: @CssProperty}
 Felder, welche einen \texttt{Collection}-Typen aufweisen, können mit der \texttt{CssProperty} Annotation annotiert werden. Dadurch wird automatisch eine neue \texttt{CssMetaData} Instanz erstellt und der Liste hinzugefügt. Der Entwickler muss den Namen der neuen \ac{css} Property und die Konvertierungsklasse als Parameter angeben. Dazu ist es möglich, ein Feld anzugeben, welches an den konvertierten Wert der \ac{css} Property gebunden wird und somit in der jeweiligen Klasseninstanz verfügbar ist. Die Annotation ist \texttt{Repeatable} und kann mehrmals an einem Feld angebracht werden.
 \subsubsection{Annotation: @DIAnnotation}
-Die \texttt{@DIAnnotation} Annotation ist eine Meta-Annotation, kann also nur an anderen Definitionen von Annotationen angebracht werden. Sie ist nicht für den Benutzer der Bibliothek bestimmt, sondern stellt anderen Annotationen wichtige Informationen zur Konstruktion von Komponenten zur Abhängigkeitsinjektion bereit. Es existieren drei Annotationen, welche jeweils für die Kompatibilität mit Spring, Guice und Dagger verantwortlich sind.
+Die \texttt{@DIAnnotation} Annotation ist eine Meta-Annotation, kann also nur an anderen Definitionen von Annotationen angebracht werden. Sie ist nicht für den Benutzer der Bibliothek bestimmt, sondern stellt anderen Annotationen wichtige Informationen zur Konstruktion von Komponenten zur Abhängigkeitsinjektion bereit. Es existieren drei Annotationen, welche jeweils für die Kompatibilität mit Spring, Guice und Dagger verantwortlich sind (siehe \autoref{appendix:add_new_di_library}).
 \subsubsection{Annotation: @SpringInjection}
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Spring und muss am Einstiegspunkt der Applikation angebracht sein. Konfigurationsklassen von Spring können als Parameter in Form eines Arrays übergeben werden.
 \subsubsection{Annotation: @GuiceInjection}
-Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Guice und muss am Einstiegspunkt der Applikation angebracht sein. Guice-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
+Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Guice und muss am Einstiegspunkt der Applikation angebracht sein. Guice-Modulklassen können als Parameter in Form eines Arrays übergeben werden (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Annotation: @Dagger1Injection}
 Diese Annotation aktiviert die Unterstützung der Abhängigkeitsinjektion mit Dagger der Version 1 und muss am Einstiegspunkt der Applikation angebracht werden. Dagger-Modulklassen können als Parameter in Form eines Arrays übergeben werden.
 \subsubsection{Annotation: @Setup}
-Die \texttt{@Setup} Annotation ist ausschließlich im Rahmen des Controller-Systems nutzbar und kann nur an Methoden angebracht werden. Hat \texttt{SimpliFX} einen Controller fertig initialisiert (Abhängigkeiten, Ressourcen, ...), so werden alle Setup-Methoden aufgerufen. In diesen Methoden kann der Entwickler neue Controller vom System initialisieren lassen und deren Wurzel-Node dann beispielsweise in anderen JavaFX-Komponenten integrieren.
+Die \texttt{@Setup} Annotation ist ausschließlich im Rahmen des Controller-Systems nutzbar und kann nur an Methoden angebracht werden. Hat \texttt{SimpliFX} einen Controller fertig initialisiert (Abhängigkeiten, Ressourcen etc.), so werden alle Setup-Methoden aufgerufen. In diesen Methoden kann der Entwickler neue Controller vom System initialisieren lassen und deren Wurzel-Node dann beispielsweise in anderen JavaFX-Komponenten integrieren (siehe \autoref{lst:main_controller_setup}).
 \subsubsection{Annotation: @OnShow und @OnHide}
-Methoden eines Controllers, welche mit \texttt{@OnShow} annotiert wurden, werden aufgerufen, wenn ein Controller im Szenengraphen enthalten ist und somit aktiv gerendert wird. Analog dazu werden \texttt{@OnHide} Methoden aufgerufen, wenn der Controller gewechselt wird und somit nicht mehr angezeigt wird.
+Methoden eines Controllers, welche mit \texttt{@OnShow} annotiert wurden, werden aufgerufen, wenn ein Controller im Szenengraphen enthalten ist und somit aktiv gerendert wird. Eine Priorisierung der Aufrufreihenfolge ist wie bei anderen Lebenszyklusbehandlungsannotationen ebenfalls möglich. Analog dazu werden \texttt{@OnHide} Methoden aufgerufen, wenn der Controller gewechselt und somit nicht mehr angezeigt wird (siehe \autoref{lst:login_controller_visibility_methods}).
 \subsubsection{Annotation: @OnDestroy}
 \texttt{@OnDestroy} Methoden werden aufgerufen, sobald ein Controller nicht länger benötigt wird und alle damit verbundenen Ressourcen gelöscht werden können.
 \subsubsection{Annotation: @EventEmitter und @EventReceiver}
-Die \texttt{@EventEmitter} Annotation verbindet das Auftreten von JavaFX-Events mit dem Aufruf von Methoden. Dabei werden Felder als EventEmitter deklariert und Methoden als EventReceiver. Ein notwendiger Parameter beider Annotationen ist ein gemeinsamer Identifikator, welcher die Beziehung zwischen Methode und Feld ermöglicht. Methoden müssen als Parameter die jeweilige JavaFX-Event Klasse als Parameter aufweisen.
+Die \texttt{@EventEmitter} Annotation verbindet das Auftreten von JavaFX-Events mit dem Aufruf von Methoden. Dabei werden Felder als EventEmitter deklariert und Methoden als EventReceiver. Ein notwendiger Parameter beider Annotationen ist ein gemeinsamer Identifikator, welcher die Beziehung zwischen Methode und Feld ermöglicht. Methoden müssen die jeweilige JavaFX-Event Klasse als Parameter aufweisen.
 \subsubsection{Annotation: @FXThread}
-Methoden, welche mit \texttt{@FXThread} annotiert wurden, sollen bei Aufruf von durch \texttt{SimpliFX} verwaltete Objekte, auf dem Java Application Thread ausgeführt werden.
+Methoden, welche mit \texttt{@FXThread} annotiert wurden, sollen bei Aufruf von durch \texttt{SimpliFX} verwaltete Objekte, auf dem Java Application Thread ausgeführt werden. Aufgrund des dynamischen Ladens der Klasse zur Laufzeit durch einen eigenen \texttt{ClassLoader} und der damit einhergehenden Bytecode-Manipulation, handelt es sich um eine experimentelle Funktion, welche speziell vor Anwendungsstart aktiviert werden muss.
 \subsubsection{Annotation: @Shared}
-Objekte und Referenzen auf Objekte, welche geteilte Ressourcen darstellen sollen und somit beispielsweise zwischen Controllern geteilt werden sollen, können mit \texttt{@Shared} annotiert werden. Bei einer eventuellen Veränderung der Werte von geteilten Ressourcen, müssen offensichtlich alle Vorkommnisse dieser Ressource aktualisiert werden. Aufgrund dieser Eigenschaft können nur von \texttt{SimpliFX} bereitgestellte Klassen (z.B. eine SharedResource oder SharedReference Klasse), sowie aktualisierbare JavaFX Properties eine geteilte Ressource darstellen und somit mit \texttt{@Shared} als solche deklariert werden. Geteilte Ressourcen sollen anhand eines \texttt{String} Wertes eindeutig identifizierbar sein, welcher optional per Parameter an die Annotation weitergegeben werden.
+Objekte und Referenzen auf Objekte, welche geteilte Ressourcen darstellen und somit beispielsweise zwischen Controllern geteilt werden sollen, können mit \texttt{@Shared} annotiert werden. Bei einer eventuellen Veränderung der Werte von geteilten Ressourcen, müssen offensichtlich alle Vorkommnisse dieser Ressource aktualisiert werden. Aufgrund dieser Eigenschaft können nur von \texttt{SimpliFX} bereitgestellte Klassen (z.B. eine SharedResource oder SharedReference Klasse), sowie read-only JavaFX \texttt{ObjectProperty} Felder eine geteilte Ressource darstellen und somit mit \texttt{@Shared} als solche deklariert werden. Geteilte Ressourcen sollen anhand eines \texttt{String} Wertes eindeutig identifizierbar sein, welcher optional per Parameter an die Annotation weitergegeben wird (siehe \autoref{lst:login_controller_fields}).
 \subsubsection{Annotation: @StageConfig}
-Die \texttt{@StageConfig} Annotation muss, bei Nutzung, den \texttt{SimpliFX} Einstiegspunkt annotieren und kann die JavaFX Hauptstage automatisch vorkonfigurieren. Mithilfe der Annotationsparameter kann der Titel, der \texttt{StageStyle}, das Vordergrund- und Skalierungsverhalten und das Symbol der Stage modifiziert werden. Außerdem kann der optionale \texttt{autoShow} Parameter angegeben werden, welcher kontrolliert, ob \texttt{SimpliFX} die \texttt{Stage} Instanz automatisch nach Erstellung mittels \texttt{Stage\#show} anzeigt. Ein \texttt{EventHandler}, welcher das \texttt{StartEvent} der JavaFX Applikation verarbeitet, muss somit nicht definiert werden.
+Die \texttt{@StageConfig} Annotation muss, bei Nutzung, den \texttt{SimpliFX} Einstiegspunkt annotieren und kann die JavaFX Hauptstage automatisch vorkonfigurieren. Mithilfe der Annotationsparameter kann der Titel, der \texttt{StageStyle}, das Vordergrund- und Skalierungsverhalten und das Symbol der Stage modifiziert werden. Außerdem kann der optionale \texttt{autoShow} Parameter angegeben werden, welcher kontrolliert, ob \texttt{SimpliFX} die \texttt{Stage} Instanz automatisch nach Erstellung mittels \texttt{Stage\#show} anzeigt. Ein \texttt{EventHandler}, welcher das \texttt{StartEvent} der JavaFX Applikation verarbeitet, muss somit nicht definiert werden (siehe \autoref{lst:entry_point_demo}).
 \subsubsection{Übersicht und Zusammenfassung}
 In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglichen Typ- oder Elementrestriktionen, Parametern und den zugrundeliegende funktionalen Anforderungen aufgelistet.
-\add{the javafx menu base class to eventemitter restrictions}
 \renewcommand*{\arraystretch}{1.3}
 \begin{longtable}[H]{|p{0.16\textwidth}|p{0.04\textwidth}|p{0.35\textwidth}|p{0.30\textwidth}|}
 	%\begin{tabular}{|p{0.16\textwidth}|p{0.04\textwidth}|p{0.35\textwidth}|p{0.30\textwidth}|}
@@ -482,8 +501,9 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		LocalizeValue & \ref{freq3} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Feldname
+				\item FX-Id
 				\item Parameterindex
+				\item Feldname der JavaFX Komponente
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -521,12 +541,13 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item \ac{css} Property
 				\item Konvertierungsklasse
-				\item JavaFX-Property Feld
+				\item Lokales JavaFX-Property Feld
+				\item Java-FX Property für das Binding
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Collection-Felder
+				\item Nur List-Felder
 			\end{itemize}
 		\end{minipage} \\
 		\hline
@@ -535,7 +556,6 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item FXML Pfad
 				\item \ac{css} Pfad
-				\item Controllergruppe
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -588,38 +608,15 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Property-Felder
+				\item \texttt{SharedResources}-, \texttt{SharedReference}-, \texttt{ObjectProperty}-Felder
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		EventEmitter & \ref{freq17} & 
-		\begin{minipage}[t]{\linewidth}
-			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Beziehungsidentifikator
-			\end{itemize}
-		\end{minipage} & 
-		\begin{minipage}[t]{\linewidth}
-			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item ButtonBase-Felder
-			\end{itemize}
-		\end{minipage} \\
-		\hline
-		EventReceiver & \ref{freq17} & 
-		\begin{minipage}[t]{\linewidth}
-			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Beziehungsidentifikator
-			\end{itemize}
-		\end{minipage} & 
-		\begin{minipage}[t]{\linewidth}
-			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Methoden
-			\end{itemize}
-		\end{minipage} \\
-		\hline
-		ConfigSource & \ref{freq18} & 
+		ConfigSource & \ref{freq17} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Pfad oder Name der Datei
+				\item Klassenpfadquelle
 			\end{itemize}
 		\end{minipage} & 
 		\begin{minipage}[t]{\linewidth}
@@ -628,7 +625,7 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
-		ConfigValue & \ref{freq18} & 
+		ConfigValue & \ref{freq17} & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
 				\item Konfigurationsschlüssel
@@ -641,10 +638,34 @@ In der folgenden Tabelle sind alle zu implementierenden Annotationen mit möglic
 			\end{itemize}
 		\end{minipage} \\
 		\hline
+		EventEmitter & \ref{freq18} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Beziehungsidentifikator
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item ButtonBase-Felder
+			\end{itemize}
+		\end{minipage} \\
+		\hline
+		EventReceiver & \ref{freq18} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Beziehungsidentifikator
+			\end{itemize}
+		\end{minipage} & 
+		\begin{minipage}[t]{\linewidth}
+			\begin{itemize}[nosep,after=\strut,leftmargin=*]
+				\item Methoden
+			\end{itemize}
+		\end{minipage} \\
+		\hline
 		FXThread & \ref{freq21} & -- & 
 		\begin{minipage}[t]{\linewidth}
 			\begin{itemize}[nosep,after=\strut,leftmargin=*]
-				\item Nur Methoden
+				\item Nur Methoden in Controllern
 			\end{itemize}
 		\end{minipage} \\
 		\hline

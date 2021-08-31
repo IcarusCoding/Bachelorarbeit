@@ -1,19 +1,64 @@
 \chapter{Fazit}
 \label{fazit}
-
-\add{Intro}
+In dieser Arbeit wurde eine auf Java Annotationen basierende Bibliothek zur Simplifizierung und Expansion von JavaFX konzipiert und implementiert. Vorhandene Funktionen wurden in einer Problemanalyse auf Komplexität und Vollständigkeit untersucht und die daraus resultierenden Probleme dienten als Grundlage für die Anforderungsanalyse. Die identifizierten funktionalen und nicht-funktionalen Anforderungen wurden für die Entwicklung eines Konzeptes genutzt, welches wiederum das Fundament der vollständigen Systemimplementierung bildete und dabei wurde ein besonderer Fokus auf die explizite Erfüllung aller Ziele gesetzt. In der prototypischen Implementierung wurden alle erforderlichen Anforderungen mit spezieller Berücksichtigung von paradigmatischen softwaretechnischen Qualitätsrichtlinien wie der Erweiterbarkeit und der Wartbarkeit eines Systems erfüllt. Abschließend wurde der Funktionsumfang von JavaFX mit dem von \texttt{SimpliFX} im Rahmen der Evaluation verglichen. 
 
 \section{Zusammenfassung}
 \label{zusammenfassung}
+Gemäß der in der Einleitung beschriebenen Zielsetzung wurde eine Bibliothek entwickelt, welche das Arbeiten und die Entwicklung von Applikationen mit JavaFX in einigen Kernkonzepten vereinfacht (siehe \autoref{zielsetzung}). Besonders die Sprachunterstützung und die dafür benötigte dynamische Übersetzung durch einen neuen \texttt{FXMLLoader} sowie eine Erweiterung der Funktionen für eine Erstellung und Verwaltung von Controllern, sind ein fundamentaler Bestandteil der Bibliothek. Des Weiteren können Konfigurationsdateien und Sprachdateien mit Leichtigkeit durch Annotationsverwendung geladen und nach Initialisierung der Anwendung genutzt werden. Außerdem wurden Schnittstellen hinzugefügt, welche die Interaktion zu komplexen Systemen wie der Java Reflection API vereinfachen und effektiv die Fehleranfälligkeit dieser durch eine zentralisierte Fehlerbehandlung reduzieren. Insgesamt wurden im Rahmen der Anforderungsanalyse (siehe \autoref{anforderungsanalyse}) \thereq{} Anforderungen an die Bibliothek gestellt. Diese setzen sich aus \thereqFunAmount{} fundamentalen und \NUMBERFORMAT{\thereqOptAmount{}} optionalen Anforderungen zusammen, von welchen jeweils \thereqFunCompleted{} bzw. \NUMBERFORMAT{\thereqOptCompleted{}} erfüllt worden sind. Daraus resultiert eine Erfüllquote von \CalculatePercentage{\thereqFunCompleted}{\thereqFunAmount} der fundamentalen Anforderungen und eine von \CalculatePercentage{\thereqOptCompleted}{\thereqOptAmount} bei den optionalen Anforderungen. Zusammenfassend wurden demnach \CalculatePercentage{\thereqTotalCompleted}{\thereq} aller Anforderungen erfüllt. In \autoref{fig:completeness_requirements} sind diese Quoten in Form eines Balkendiagramms grafisch dargestellt und eine Gesamtübersicht aller Anforderungen und Erfüllungsstatus ist in \autoref{tab:requirements} zu finden. Auch wenn es sich bei der entwickelten Bibliothek keinesfalls um ein vollkommen abgeschlossenes Projekt handelt und bei der aktiven Entwicklung von Testfällen und der generellen Erhöhung der Testabdeckung mit hoher Wahrscheinlichkeit noch Fehler im Quelltext detektiert werden, kann diese dennoch für andere Projekte verwendet werden und Neueinsteigern in die Java- bzw. JavaFX-Welt als Hilfestellung dienen.
+\begin{figure}[H]
+	\centering
+	\definecolor{complete}{HTML}{ABDDA4}
+	\definecolor{incomplete}{HTML}{D7191C}
+	\begin{tikzpicture}
+		\begin{axis}[xbar stacked, legend style={%
+				legend columns=2, at={(xticklabel cs:0.5)}, anchor=north,draw=none
+			}, ytick=data, axis y line*=none, axis x line*=bottom, xmin=0, xmax=\thereq+2, width=0.8\textwidth, bar width=6mm, xlabel={Anzahl}, yticklabels={Gesamt, Optional, Fundamental}, area legend, y=8mm, enlarge y limits={abs=0.625}]
+			\addplot[fill=complete] coordinates {(\thereqTotalCompleted, 0) (\thereqOptCompleted,1) (\thereqFunCompleted,2)};
+			\addplot[fill=incomplete] coordinates {(\thereq-\thereqTotalCompleted, 0) (\thereqOptAmount-\thereqOptCompleted,1) (\thereqFunAmount-\thereqFunCompleted,2)};
+			\legend{Erfüllt, Nicht erfüllt}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Diagramm -- Erfüllungsquote aller Anforderungen}
+	\label{fig:completeness_requirements}
+\end{figure}
 
-\add{Zusammenfassung}
+\newcounter{index}
 
-\section{Bewertung}
-\label{bewertung}
+\NewDocumentCommand{\myfunc}{ >{\SplitList{,}} m }{\ProcessList{#1}{\func}}
 
-\add{Bewertung}
+\NewDocumentCommand{\func}{m}{\stepcounter{index}\ifnum\value{index}=6\setcounter{index}{1}\fi\ifnum\value{index}=5\IfNoValueTF{#1}{\xmark}{\cmark}\ifthenelse{\thetextCounter < \thereq}{\\\hline}{}\else\ifthenelse{\equal{\value{index}}{4}}{\IfNoValueTF{#1}{\xmark}{\cmark}&}{\ifthenelse{\equal{\value{index}}{2}}{\ifthenelse{\equal{#1}{freq}}{F}{NF}&}{#1&}}\fi}
+\ExplSyntaxOn
+\NewDocumentCommand{\myList}{sm}{\IfBooleanTF{#1}{\holene_mylist:o{#2}}{\holene_mylist:n{#2}}}
+\newcounter{textCounter}
+\seq_new:N \l_holene_mylist_input_seq%
+\cs_new_protected:Npn \holene_mylist:n #1 {\seq_set_split:Nnn \l_holene_mylist_input_seq {;} { #1 }\seq_map_inline:Nn \l_holene_mylist_input_seq{\stepcounter{textCounter}\myfunc{##1}}} %\myfunc{##1}
+\cs_generate_variant:Nn \holene_mylist:n {o}%
+\ExplSyntaxOff
+\StrLen{\fullreqs}[\AllStrLen]
+\newcounter{lenCtr}
+\setcounter{lenCtr}{\AllStrLen}
+\StrMid{\fullreqs}{0}{\the\numexpr\value{lenCtr}-1\relax}[\FullConverted]
+
+\begin{table}[H]
+	\small
+	\centering
+	\begin{tabular}{|wc{0.03\textwidth}|wc{0.05\textwidth}|p{0.65\textwidth}|wc{0.05\textwidth}|wc{0.058\textwidth}|}
+		\hline
+		Nr. & Typ & Anforderung & Opt. & Erfüllt\\
+		\hline
+		\myList*{\FullConverted}\\\hline
+	\end{tabular}
+	\caption{Anforderungsliste}
+	\label{tab:requirements}
+\end{table}
 
 \section{Ausblick und mögliche Erweiterungen}
 \label{ausblick_und_mögliche_erweiterungen}
-
-\add{Ausblick und mögliche Erweiterungen}
+Im Folgenden werden mögliche Erweiterungen der implementierten Bibliothek vorgestellt. Auch wenn ein Großteil der Anforderungen durch das System erfüllt wird, existieren zu diesem Zeitpunkt noch einige optionale Anforderungen, welche nur teilweise bis gar nicht implementiert worden sind. Dazu gehört beispielsweise eine Annotationsvalidierung zur Kompilierzeit einer auf \texttt{SimpliFX} basierenden Applikation (\autoref{freq22}), was zu einer Detektion von Syntaxfehlern oder eventueller Inkorrektheiten in Konfigurationen führt. Wird eine solche Fehlkonfiguration entdeckt, kann ein Kompilierfehler durch einen Annotationsprozessor ausgelöst und Laufzeitausnahmen somit effektiv vermieden werden.\\
+Die Unterstützung von Konfigurationsdateien ist in den Aspekten des Dateiformats und der zugelassenen Operationen stark begrenzt. Neben dem Akzeptieren von Properties- und XML-Dateien, könnten beispielsweise noch weitere bekannte Konfigurationsformate wie \ac{json} oder \ac{yaml} durch \texttt{SimpliFX} erkannt und genutzt werden. Auch ist es momentan nicht möglich, eine schreibende Operation auf Konfigurationsdateien vorzunehmen, da zwischen Ressourcen im Klassenpfad und externen Ressourcen differenziert werden müsste und es generell kompliziert ist, Dateien zu modifizieren, welche sich innerhalb eines Java Archivs befinden.\\
+Das System könnte ebenfalls um vom Betriebssystem des Nutzers abhängige Funktionen erweitert werden. Das Fensterdesign für eine JavaFX \texttt{Stage} kann durch die Nutzung des \ac{jni} ergänzt werden. Unter Windows kann somit beispielsweise ein Unschärfeeffekt des Fensterhintergrundes realisiert oder eine Modifikation der Titelleiste ermöglicht werden. Auch könnte eine Schnittstelle entwickelt werden, welche eine direkte Interaktion mit der Taskleiste ermöglicht und so zum Beispiel Benachrichtigungen und Statusaktualisierungen an diese übermitteln kann.\\
+Steht eine Plattformunabhängigkeit in Vordergrund, könnte das System alternativ Titelleisten bereitstellen, welche ausschließlich durch JavaFX Komponenten konstruiert werden und auf einer nicht dekorierten oder transparenten \texttt{Stage} anwendbar sind. Das Fensterdesign ist somit nicht vom genutzten Betriebssystem abhängig, sondern auf jedem von JavaFX unterstützten System identisch. Basisoperationen wie das Ändern der Fenstergröße oder das Verschieben müssen dann jedoch manuell implementiert werden.\\
+Die Ausführung von EventHandler Methoden wird derzeit auf dem aufrufenden Thread durchgeführt und blockiert diesen dadurch. Auf der einen Seite ist dieses Verhalten vorteilhaft, da nach dem Senden eines Events auf die Beendigung der Eventbehandlung gewartet wird, aber auf der anderen Seite ist in Systemen mit einem hohen Grad an Parallelität eine asynchrone Ausführung der Behandlungsmethoden gewünscht. Aufgrund dessen könnte zu der von \texttt{SimpliFX} bereitgestellten \texttt{IEventEmitter} Implementierung eine weitere für ausschließlich asynchrone Operationen erstellt oder die vorhandene um eine Asynchronitätsunterstützung erweitert werden.\\
+Nicht zuletzt kann ein Ausbau der Funktionalitäten des Controllersystems durchgeführt werden. Beispielsweise können Controller in einer Controllergruppe durch die JavaFX \texttt{Pagination} Klasse oder ähnliche Implementierungen eine Anzeigereihenfolge zugewiesen bekommen, welche den Controllerwechsel aufgrund der prädestinierten Reihenfolge erleichtert. Auch ist eine Art Verlaufsspeicherung möglich, um solche Wechsel zu speichern und gegebenenfalls eine Zurückfunktion zu realisieren. Ein JavaFX \texttt{Button} kann dann mit \texttt{@Previous} annotiert werden und bei einem \texttt{ActionEvent} den vorherigen Controller anzeigen.\\
+Auch wenn im Rahmen dieser Arbeit explizit auf eine Modifikation der FXML Syntax verzichtet wurde, um einen Einfluss auf die Kompatibilität von externen Tools wie dem \texttt{SceneBuilder} oder Entwicklungsumgebungen wie \texttt{Intellij} zu vermeiden, ist die Erweiterbarkeit des \texttt{SimpliFXMLLoader} theoretisch uneingeschränkt. Die Einrichtung der Controller und Controllergruppen in der Setup-Phase könnte aus dem Javaquelltext in die FXML Datei ausgelagert werden, um eine dementsprechend automatische Konstruktion zur Laufzeit des Programms zu ermöglichen.\\
+Darüber hinaus kann die \texttt{Preloader} Funktion von JavaFX für den Entwickler zugänglicher gemacht werden. Wird beispielsweise ein \texttt{Preloader} erstellt um einen aktiven Ladeprozess in Form einer Fortschrittsanzeige anzuzeigen, muss diese Anzeige manuell bei einer Fortschrittsaktualisierung durch eine \texttt{ProgressNotification} benachrichtigt werden. Der Ladeprozess und die dazugehörige Erstellung von Benachrichtigungen kann durch ein Aufgabensystem verwaltet werden. Dazu wird ein \texttt{ExecutorService} erstellt, welcher alle registrierten Aufgaben (Laden von Ressourcen, Überprüfen und Download von neuen Applikationsversionen, etc.) sequentiell ausführt und automatisch das nötige Inkrement des aktuellen Ladefortschrittes berechnet und an den jeweiligen \texttt{Preloader} übermittelt.
