@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller;
+package de.intelligence.bachelorarbeit.demoapplications.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;

@@ -14,7 +14,6 @@ import java.util.stream.Stream;
  *
  * @author Deniz Groenhoff
  */
-//TODO nullability test everywhere in the project
 public final class InstanceReflection extends ReflectableScope<Object> implements ExceptionHandleable {
 
     private IReflectionExceptionHandler handler;

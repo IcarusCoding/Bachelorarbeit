@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller;
+package de.intelligence.bachelorarbeit.demoapplications.controller;
 
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.StringProperty;
@@ -17,7 +17,7 @@ import de.intelligence.bachelorarbeit.simplifx.shared.Shared;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedReference;
 import de.intelligence.bachelorarbeit.simplifx.shared.SharedResources;
 
-import static de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerOne;
+import static de.intelligence.bachelorarbeit.demoapplications.controller.TestControllers.TestControllerOne;
 
 @Controller(fxml = "/fxml/MainMenuController.fxml")
 public final class MainMenuController {

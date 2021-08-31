@@ -1578,7 +1578,6 @@ public class SimpliFXMLLoader {
 
         Class<?> type = loadTypeForPackage(packageName, className);
 
-        //TODO INJECT
         Reflection.reflect(type).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
                 Modifier.isStatic(field.getModifiers()), field -> {
             if (Reflection.reflectStatic(field).forceAccess().get() == null) {
@@ -2807,12 +2806,10 @@ public class SimpliFXMLLoader {
                 processInstancePropertyAttributes();
             }
 
-            //TODO MAYBE INJECT
             Reflection.reflect(value.getClass()).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
                     Modifier.isStatic(field.getModifiers()), field -> {
                 if (Reflection.reflectStatic(field).forceAccess().get() != null) {
                     CssMetaDataAdapter.bindMetaData(value, field, field.getAnnotationsByType(CssProperty.class));
-                    //System.out.println(Reflection.reflect(value).reflectField("styleableWidth").forceAccess().get());
                 }
             });
 

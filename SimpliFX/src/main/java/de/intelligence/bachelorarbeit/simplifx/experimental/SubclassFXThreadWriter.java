@@ -45,7 +45,7 @@ public final class SubclassFXThreadWriter {
     private final int flags;
     private final int version;
 
-    public SubclassFXThreadWriter(int flags, int version) {
+    SubclassFXThreadWriter(int flags, int version) {
         this.flags = flags;
         this.version = version;
     }
@@ -126,7 +126,7 @@ public final class SubclassFXThreadWriter {
         return builder.toString();
     }
 
-    public synchronized Pair<String, byte[]> createSubclassForClass(Class<?> clazz) {
+    synchronized Pair<String, byte[]> createSubclassForClass(Class<?> clazz) {
         final ClassWriter writer = new ClassWriter(flags);
         final String subclassName = createName(clazz.getSimpleName(), IDENTIFIER);
         writer.visit(this.version, Opcodes.ACC_PUBLIC, subclassName, null, Type.getInternalName(clazz), new String[]{});
@@ -176,8 +176,7 @@ public final class SubclassFXThreadWriter {
             visitor.visitEnd();
         });
         writer.visitEnd();
-        final byte[] bytecode = writer.toByteArray();
-        return Pair.of(subclassName, bytecode);
+        return Pair.of(subclassName, writer.toByteArray());
     }
 
     private int calculateMaxSize(Class<?>[] params) {

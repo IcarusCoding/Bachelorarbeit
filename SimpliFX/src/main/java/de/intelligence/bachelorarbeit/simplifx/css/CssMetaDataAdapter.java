@@ -106,7 +106,7 @@ public final class CssMetaDataAdapter {
             AtomicReference<Property<?>> bindToProp = new AtomicReference<>();
             if (!prop.bindTo().isBlank()) {
                 if (!adapter.containsKey(prop.bindTo())) {
-                    LOG.warn("Specified property field \"{}\" invalid or not available in class or superclass: {}.", prop.localPropertyField(), obj.getClass().getSimpleName());
+                    LOG.warn("Specified property field \"{}\" invalid or not available in class: {}.", prop.bindTo(), obj.getClass().getSimpleName());
                     return;
                 }
                 final ObservableValue<?> val = adapter.getPropertyModel(prop.bindTo());
@@ -118,7 +118,6 @@ public final class CssMetaDataAdapter {
             final Class<?> propertyClassImpl;
             final String propertyClassSimpleImpl = propertyClassInterface.getPackageName() + ".Simple" + propertyClassInterface.getSimpleName();
             try {
-                //TODO maybe switch case + anonymous own
                 propertyClassImpl = Class.forName(propertyClassSimpleImpl);
             } catch (ClassNotFoundException e) {
                 LOG.warn("Could not instantiate field: \"{}\". Reason: No implementation for \"{}\" was found", prop.localPropertyField(), propertyClassSimpleImpl);

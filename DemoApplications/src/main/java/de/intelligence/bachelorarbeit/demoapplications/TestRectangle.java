@@ -10,14 +10,15 @@ import javafx.scene.shape.Rectangle;
 
 import de.intelligence.bachelorarbeit.simplifx.css.CssProperty;
 
+// This class is not used in the demo application and is just a demonstration of the implemented css features.
 public final class TestRectangle extends Rectangle {
 
-    //TODO support null localProperty and only use temp vars then
-    @CssProperty(property = "-fx-width", localPropertyField = "testius", converterClass = SizeConverter.class, bindTo = "width")
-    @CssProperty(property = "-fx-height", localPropertyField = "testius2", converterClass = SizeConverter.class, bindTo = "height")
+    @CssProperty(property = "-fx-width", localPropertyField = "localWidthProperty", converterClass = SizeConverter.class, bindTo = "width")
+    @CssProperty(property = "-fx-height", localPropertyField = "localHeightProperty", converterClass = SizeConverter.class, bindTo = "height")
     public static List<CssMetaData<? extends Styleable, ?>> CLASS_CSS_META_DATA;
-    private StyleableObjectProperty<Double> testius;
-    private StyleableObjectProperty<String> testius2;
+
+    private StyleableObjectProperty<Double> localWidthProperty;
+    private StyleableObjectProperty<Double> localHeightProperty;
 
     public TestRectangle() {
         super();

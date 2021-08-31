@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller;
+package de.intelligence.bachelorarbeit.demoapplications.controller;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -8,9 +8,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerOne;
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerThree;
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.TestControllers.TestControllerTwo;
+import de.intelligence.bachelorarbeit.demoapplications.controller.TestControllers.TestControllerOne;
+import de.intelligence.bachelorarbeit.demoapplications.controller.TestControllers.TestControllerThree;
+import de.intelligence.bachelorarbeit.demoapplications.controller.TestControllers.TestControllerTwo;
 import de.intelligence.bachelorarbeit.simplifx.application.PostConstruct;
 import de.intelligence.bachelorarbeit.simplifx.config.ConfigValue;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;

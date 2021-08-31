@@ -62,8 +62,8 @@ public final class ClassDiscovery implements IClassDiscovery {
     @Override
     public IDiscoveryResult startDiscovery() {
         final Set<URL> classPathURLs = new HashSet<>();
-        final String path = this.convertPackage(this.context.getPath());
-        this.context.getClassLoaders().forEach(l -> this.findAllClassPathURLs(path, l, classPathURLs));
+        final String path = ClassDiscovery.convertPackage(this.context.getPath());
+        this.context.getClassLoaders().forEach(l -> ClassDiscovery.findAllClassPathURLs(path, l, classPathURLs));
         classPathURLs.stream()
                 .map(u -> DiscoverySourceType.createDiscoverySource(u, path))
                 .flatMap(s -> s.iterator().stream())

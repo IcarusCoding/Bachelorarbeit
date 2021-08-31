@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx;
+package de.intelligence.bachelorarbeit.demoapplications;
 
 import java.util.Properties;
 
@@ -6,8 +6,8 @@ import javafx.beans.property.StringProperty;
 
 import com.jfoenix.skins.JFXTextFieldSkin;
 
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.MainController;
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.di.MainModule;
+import de.intelligence.bachelorarbeit.demoapplications.controller.MainController;
+import de.intelligence.bachelorarbeit.demoapplications.di.MainModule;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.SimpliFX;
 import de.intelligence.bachelorarbeit.simplifx.application.ApplicationEntryPoint;

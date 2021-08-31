@@ -131,6 +131,7 @@ public final class SimpliFX {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the classpath scan policy after the application was launched");
         }
+        Conditions.checkNull(scanPolicy, "Scan policy must not be null!");
         SimpliFX.scanPolicy = scanPolicy;
     }
 
@@ -144,6 +145,7 @@ public final class SimpliFX {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the default notification handler after the application was launched");
         }
+
         SimpliFX.defaultNotificationHandler = defaultNotificationHandler;
     }
 
@@ -157,6 +159,7 @@ public final class SimpliFX {
         if (SimpliFX.launched) {
             throw new SimpliFXException("Cannot set the exception handler after the application was launched");
         }
+        Conditions.checkNull(exceptionHandler, "Exception handler must not be null!");
         SimpliFX.exceptionHandler = exceptionHandler;
     }
 
@@ -193,6 +196,7 @@ public final class SimpliFX {
      * @param args               The arguments which will be used in the application creation process.
      */
     public static void launch(Class<?> appEntrypointClass, String... args) {
+        Conditions.checkNull(appEntrypointClass, "Class of application entrypoint not be null!");
         SimpliFX.checkLaunch();
         SimpliFX.launchImpl(SimpliFX.validateEntrypointClass(appEntrypointClass, ApplicationEntryPoint.class)
                 .forceAccess().instantiate().getReflectable(), null, args);
@@ -206,6 +210,8 @@ public final class SimpliFX {
      * @param args             The arguments which will be used in the application creation process.
      */
     public static void launch(Class<?> applicationClass, Class<?> preloaderClass, String... args) {
+        Conditions.checkNull(applicationClass, "Class of application entrypoint not be null!");
+        Conditions.checkNull(preloaderClass, "Class of preloader entrypoint not be null!");
         Conditions.checkCondition(applicationClass != preloaderClass,
                 "Different classes needed for application and preloader entrypoint!");
         SimpliFX.checkLaunch();
@@ -222,6 +228,7 @@ public final class SimpliFX {
      * @param args                The arguments which will be used in the application creation process.
      */
     public static void launch(Object applicationListener, String... args) {
+        Conditions.checkNull(applicationListener, "Application entrypoint not be null!");
         SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);
         SimpliFX.checkLaunch();
         SimpliFX.launchImpl(applicationListener, null, args);
@@ -235,6 +242,8 @@ public final class SimpliFX {
      * @param args                The arguments which will be used in the application creation process.
      */
     public static void launch(Object applicationListener, Object preloaderListener, String... args) {
+        Conditions.checkNull(applicationListener, "Application entrypoint not be null!");
+        Conditions.checkNull(preloaderListener, "Preloader entrypoint not be null!");
         Conditions.checkCondition(applicationListener.getClass() != preloaderListener.getClass(),
                 "Different classes needed for application and preloader entrypoint!");
         SimpliFX.validateEntrypointInstance(applicationListener, ApplicationEntryPoint.class);

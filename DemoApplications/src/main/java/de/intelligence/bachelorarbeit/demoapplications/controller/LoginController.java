@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller;
+package de.intelligence.bachelorarbeit.demoapplications.controller;
 
 import javax.inject.Inject;
 
@@ -9,7 +9,7 @@ import javafx.util.Duration;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 
-import de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.service.ILoginService;
+import de.intelligence.bachelorarbeit.demoapplications.service.ILoginService;
 import de.intelligence.bachelorarbeit.simplifx.controller.Controller;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerGroupContext;
 import de.intelligence.bachelorarbeit.simplifx.controller.ControllerSetupContext;

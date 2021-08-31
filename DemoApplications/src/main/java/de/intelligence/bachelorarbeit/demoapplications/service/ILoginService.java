@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.service;
+package de.intelligence.bachelorarbeit.demoapplications.service;
 
 public interface ILoginService {
 
