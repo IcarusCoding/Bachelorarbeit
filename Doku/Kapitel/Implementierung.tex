@@ -53,6 +53,7 @@ Die verschiedenen Pakete von \texttt{SimpliFX} sind in \autoref{fig:package_stru
 			[event]
 			[events]
 			[exception]
+			[experimental]
 			[fxml]
 			[guice]
 			[localization]
@@ -107,6 +108,8 @@ Das vollständige Controller-System ist im \texttt{controller} Paket enthalten. 
 Eigene Ausnahmeklassen sind im \texttt{exception} Paket aufzufinden. Dazu gehören spezielle Ausnahmen für das Controller-System oder generelle Ausnahmen, welche von einer Vielzahl der \texttt{SimpliFX}-Komponenten genutzt werden.
 \subsection{Paket: css}
 Alle \ac{css} bezogenen Klassen sind im \texttt{css} Paket enthalten. Einige davon werden dabei ausschließlich durch den \texttt{SimpliFXMLLoader} genutzt, um automatisch \ac{css} Metadaten für eigene JavaFX-Komponenten zu generieren. 
+\subsection{Paket: experimental}
+Experimentelle Funktionen sind im \texttt{experimental} Paket zu finden. In der aktuellen Version der Bibliothek beinhaltet das Paket nur Klassen, welche für die Umsetzung der FX-Thread Forcierung (\autoref{freq21}) benötigt werden.
 \subsection{Paket: classpath}
 Wie bereits im Konzept beschrieben, wird für das Finden der Applikation- bzw. Preloader-Klasse ein System benötigt, welches in der Lage ist, den Klassenpfad zur Laufzeit des Programms nach Dateien zu durchsuchen. Dieses System findet nahezu alle Klassen und Ressourcen aus dem Klassenpfad, wird momentan aber nur für das Finden der jeweiligen Einstiegspunkte verwendet. Nur Klassenpfade aus einer unkomprimierten Orderstruktur (beispielsweise bei der Nutzung von verschiedenen Entwicklungsumgebungen) und aus komprimierten JAR-Archiven sind möglich. Die Architektur ermöglicht aber ein Hinzufügen von weiteren Klassenpfadquellen wie zum Beispiel WAR-Archiven (siehe \autoref{fig:classpath_sources}). 
 \begin{figure}[H]
