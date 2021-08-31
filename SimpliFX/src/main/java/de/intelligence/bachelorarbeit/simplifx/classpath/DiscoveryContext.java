@@ -1,5 +1,7 @@
 package de.intelligence.bachelorarbeit.simplifx.classpath;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class DiscoveryContext {
@@ -9,7 +11,7 @@ public final class DiscoveryContext {
 
     public DiscoveryContext(String path, List<ClassLoader> classLoaders) {
         this.path = path;
-        this.classLoaders = classLoaders;
+        this.classLoaders = new ArrayList<>(classLoaders);
     }
 
     public String getPath() {
@@ -17,7 +19,7 @@ public final class DiscoveryContext {
     }
 
     public List<ClassLoader> getClassLoaders() {
-        return this.classLoaders;
+        return Collections.unmodifiableList(this.classLoaders);
     }
 
 }

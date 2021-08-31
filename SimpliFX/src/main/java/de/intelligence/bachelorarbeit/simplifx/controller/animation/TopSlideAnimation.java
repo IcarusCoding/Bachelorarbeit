@@ -6,8 +6,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * An {@link IWrapperAnimation} which will use a top slide animation on a controller switch.
+ */
 public final class TopSlideAnimation extends AbstractWrapperAnimation {
 
+    /**
+     * Creates a new {@link TopSlideAnimation}.
+     *
+     * @param duration The {@link Duration} of the animation.
+     */
     public TopSlideAnimation(Duration duration) {
         super(duration);
     }

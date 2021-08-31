@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx"
-            fx:controller="de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.controller.MainMenuController"
+            fx:controller="de.intelligence.bachelorarbeit.demoapplications.controller.MainMenuController"
             fx:id="root"
             id="mainMenuRoot">
     <center>

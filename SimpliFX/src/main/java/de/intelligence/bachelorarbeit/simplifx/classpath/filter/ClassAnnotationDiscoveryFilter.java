@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -17,7 +18,7 @@ import org.objectweb.asm.Type;
 
 import de.intelligence.bachelorarbeit.simplifx.classpath.ClasspathDiscoveryException;
 
-public class ClassAnnotationDiscoveryFilter implements IDiscoveryFilter<ClassReader> {
+public class ClassAnnotationDiscoveryFilter implements Predicate<ClassReader> {
 
     private final Class<? extends Annotation> annotation;
 
@@ -27,14 +28,14 @@ public class ClassAnnotationDiscoveryFilter implements IDiscoveryFilter<ClassRea
             throw new ClasspathDiscoveryException("Specified annotation cannot be applied to class types.");
         }
         final Optional<Retention> retentionOpt = Optional.ofNullable(annotation.getAnnotation(Retention.class));
-        if (retentionOpt.isPresent() && !retentionOpt.get().value().equals(RetentionPolicy.RUNTIME)) {
+        if (retentionOpt.isPresent() && retentionOpt.get().value() != RetentionPolicy.RUNTIME) {
             throw new ClasspathDiscoveryException("Specified annotation is not visible at runtime.");
         }
         this.annotation = annotation;
     }
 
     @Override
-    public boolean matches(ClassReader reader) {
+    public boolean test(ClassReader reader) {
         final AtomicBoolean hasAnnotation = new AtomicBoolean(false);
         reader.accept(new ClassVisitor(Opcodes.ASM9) {
             @Override

@@ -4,14 +4,16 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 /**
  * The {@link InstanceReflection} class provides methods to perform reflective operations on instantiated objects.
  *
  * @author Deniz Groenhoff
  */
-//TODO nullability test everywhere in the project
 public final class InstanceReflection extends ReflectableScope<Object> implements ExceptionHandleable {
 
     private IReflectionExceptionHandler handler;
@@ -67,7 +69,8 @@ public final class InstanceReflection extends ReflectableScope<Object> implement
     }
 
     public Optional<FieldReflection> hasField(String name) {
-        return Arrays.stream(super.reflectable.getClass().getDeclaredFields()).filter(f -> f.getName().equals(name))
+        return Stream.iterate(super.getReflectable().getClass(), Objects::nonNull, (UnaryOperator<Class<?>>) Class::getSuperclass)
+                .flatMap(c -> Arrays.stream(c.getDeclaredFields())).filter(f -> f.getName().equals(name))
                 .map(f -> Reflection.setExceptionHandler(new FieldReflection(f, super.reflectable), this.handler))
                 .findFirst();
     }

@@ -11,6 +11,9 @@ import de.intelligence.bachelorarbeit.simplifx.event.EventEmitterImpl;
 import de.intelligence.bachelorarbeit.simplifx.event.IEventEmitter;
 import de.intelligence.bachelorarbeit.simplifx.fxml.SimpliFXMLLoader;
 
+/**
+ * The Guice {@link com.google.inject.Module} for SimpliFX.
+ */
 public final class DIConfig extends AbstractModule {
 
     private final IEventEmitter applicationEmitter;

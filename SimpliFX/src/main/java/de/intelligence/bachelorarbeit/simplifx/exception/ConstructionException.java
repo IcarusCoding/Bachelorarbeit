@@ -1,5 +1,8 @@
 package de.intelligence.bachelorarbeit.simplifx.exception;
 
+/**
+ * A {@link SimpliFXException} which handles errors that originated in a construction process.
+ */
 public class ConstructionException extends SimpliFXException {
 
     public ConstructionException() {

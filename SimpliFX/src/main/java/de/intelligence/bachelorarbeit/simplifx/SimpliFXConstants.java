@@ -3,6 +3,11 @@ package de.intelligence.bachelorarbeit.simplifx;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * An utility class for commonly used constants.
+ *
+ * @author Deniz Groenhoff
+ */
 public final class SimpliFXConstants {
 
     static final byte[] BANNER = {

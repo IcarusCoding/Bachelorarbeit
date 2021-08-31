@@ -1,4 +1,4 @@
-package de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx;
+package de.intelligence.bachelorarbeit.demoapplications;
 
 import javafx.application.Preloader;
 import javafx.stage.Stage;
@@ -32,12 +32,13 @@ public final class TestLoader {
 
     @EventHandler
     private void onPreloaderNotification(PreloaderNotificationEvent event) {
-        System.out.println("SUCCESSFULLY RECEIVED " + event.getNotification());
+        // handle optional preloader notifications
     }
 
     @EventHandler
     private void onError(ErrorEvent event) {
-        //event.setHandled();
+        // handle an error event
+        // event.setHandled();
     }
 
 }

@@ -29,7 +29,11 @@ import javafx.fxml.FXMLLoader;
 
 import com.sun.javafx.util.Utils;
 
-public class SimpliFXMLLoaderHelper {
+/**
+ * A class which provides multiple utility methods for interacting with a {@link SimpliFXMLLoader}.
+ * This class was copied and is a modified version of the {@link com.sun.javafx.fxml.FXMLLoaderHelper} class.
+ */
+public final class SimpliFXMLLoaderHelper {
 
     private static FXMLLoaderAccessor fxmlLoaderAccessor;
 
@@ -37,7 +41,8 @@ public class SimpliFXMLLoaderHelper {
         Utils.forceInit(FXMLLoader.class);
     }
 
-    private SimpliFXMLLoaderHelper() {}
+    private SimpliFXMLLoaderHelper() {
+    }
 
     public static void setStaticLoad(SimpliFXMLLoader fxmlLoader, boolean staticLoad) {
         fxmlLoaderAccessor.setStaticLoad(fxmlLoader, staticLoad);

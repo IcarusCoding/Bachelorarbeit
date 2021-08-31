@@ -14,6 +14,9 @@ import de.intelligence.bachelorarbeit.simplifx.events.InitEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StartEvent;
 import de.intelligence.bachelorarbeit.simplifx.events.StopEvent;
 
+/**
+ * The {@link Application} implementation which will be used as the JavaFX entrypoint.
+ */
 public final class ApplicationImpl extends Application {
 
     private final IEventEmitter emitter;

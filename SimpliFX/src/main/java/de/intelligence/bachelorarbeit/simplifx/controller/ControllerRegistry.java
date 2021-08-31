@@ -5,7 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class ControllerRegistry {
+/**
+ * A global registry for all controllers and controller groups.
+ */
+final class ControllerRegistry {
 
     private static final Set<String> registeredIds = new HashSet<>();
     private static final Map<String, ControllerGroupContext> contextMap = new HashMap<>();
@@ -15,32 +18,32 @@ public final class ControllerRegistry {
         throw new UnsupportedOperationException();
     }
 
-    public static String getGroupId(Class<?> clazz) {
+    static String getGroupId(Class<?> clazz) {
         return controllerToIdMap.get(clazz);
     }
 
-    public static ControllerGroupContext getContextFor(String groupId) {
+    static ControllerGroupContext getContextFor(String groupId) {
         return contextMap.get(groupId);
     }
 
-    public static void register(String groupId, ControllerGroupContext ctx) {
+    static void register(String groupId, ControllerGroupContext ctx) {
         registeredIds.add(groupId);
         contextMap.put(groupId, ctx);
     }
 
-    public static boolean isRegistered(Class<?> clazz) {
+    static boolean isRegistered(Class<?> clazz) {
         return controllerToIdMap.containsKey(clazz);
     }
 
-    public static boolean isRegistered(String groupId) {
+    static boolean isRegistered(String groupId) {
         return registeredIds.contains(groupId);
     }
 
-    public static void removeController(Class<?> clazz) {
+    static void removeController(Class<?> clazz) {
         controllerToIdMap.remove(clazz);
     }
 
-    public static boolean removeGroup(String groupId) {
+    static boolean removeGroup(String groupId) {
         if (controllerToIdMap.values().stream().anyMatch(groupId::equals)) {
             return false;
         }
@@ -49,9 +52,9 @@ public final class ControllerRegistry {
         return true;
     }
 
-    public static void addController(String groupId, Class<?> clazz) {
-        if (registeredIds.contains(groupId) && !controllerToIdMap.containsKey(clazz)) {
-            controllerToIdMap.put(clazz, groupId);
+    static void addController(String groupId, Class<?> clazz) {
+        if (registeredIds.contains(groupId)) {
+            controllerToIdMap.putIfAbsent(clazz, groupId);
         }
     }
 

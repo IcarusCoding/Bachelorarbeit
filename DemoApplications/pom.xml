@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bachelorarbeit</artifactId>
         <groupId>de.intelligence</groupId>
-        <version>1.5</version>
+        <version>1.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -101,7 +101,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.DemoApplication
+                                de.intelligence.bachelorarbeit.demoapplications.DemoApplication
                             </mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>${lib.path}</classpathPrefix>
@@ -127,7 +127,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.DemoApplication
+                                de.intelligence.bachelorarbeit.demoapplications.DemoApplication
                             </mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>

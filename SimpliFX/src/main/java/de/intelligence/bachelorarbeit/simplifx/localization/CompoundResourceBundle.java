@@ -8,11 +8,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * A {@link ResourceBundle} implementation which combines multiple {@link ResourceBundle} instances into a single one.
+ */
 public final class CompoundResourceBundle extends ResourceBundle {
 
     private final Locale locale;
     private final Map<String, String> resources;
 
+    /**
+     * Creates a new {@link CompoundResourceBundle} instance.
+     *
+     * @param locale  The {@link Locale} of this {@link CompoundResourceBundle}.
+     * @param bundles The {@link List} of {@link ResourceBundle} instances which will be combined into a single one.
+     */
     public CompoundResourceBundle(Locale locale, List<ResourceBundle> bundles) {
         this.locale = locale;
         this.resources = new HashMap<>();

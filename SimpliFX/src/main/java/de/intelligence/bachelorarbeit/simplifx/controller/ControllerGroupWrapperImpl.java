@@ -6,7 +6,6 @@ import java.util.function.Function;
 import javafx.animation.Timeline;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
@@ -88,16 +87,11 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
 
     @Override
     public void setController(IController controller) {
-        if (this.wrapper.get().getChildren().size() == 0) {
+        if (this.wrapper.get().getChildren().isEmpty()) {
             this.setController(controller.getRoot());
             return;
         }
         this.switchController(controller, new DefaultWrapperAnimation());
-    }
-
-    @Override
-    public ReadOnlyObjectProperty<Pane> wrapperProperty() {
-        return this.wrapper.getReadOnlyProperty();
     }
 
     @Override
@@ -109,13 +103,13 @@ public class ControllerGroupWrapperImpl implements IControllerGroupWrapper {
     public void showNotification(StringBinding title, StringBinding content, NotificationKind kind) {
         final INotificationDialog dialog = this.dialog.get();
         if (dialog != null) {
-            dialog.showMessage(title, content, kind);
+            dialog.handleMessage(title, content, kind);
         }
     }
 
     @Override
     public void destroy() {
-        this.dialog.get().close();
+        this.dialog.get().reset();
         final Pane w = this.wrapper.get();
         if (w != null && w.getParent() != null && w.getParent() instanceof Pane) {
             ((Pane) w.getParent()).getChildren().remove(w);

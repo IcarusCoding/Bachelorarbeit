@@ -6,8 +6,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * An {@link IWrapperAnimation} which will use a left slide animation on a controller switch.
+ */
 public final class LeftSlideAnimation extends AbstractWrapperAnimation {
 
+    /**
+     * Creates a new {@link LeftSlideAnimation}.
+     *
+     * @param duration The {@link Duration} of the animation.
+     */
     public LeftSlideAnimation(Duration duration) {
         super(duration);
     }

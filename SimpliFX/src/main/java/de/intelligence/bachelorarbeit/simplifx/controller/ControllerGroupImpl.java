@@ -31,6 +31,9 @@ import de.intelligence.bachelorarbeit.simplifx.utils.AnnotationUtils;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.FXThreadUtils;
 
+/**
+ * An implementation of the {@link IControllerGroup} interface.
+ */
 public final class ControllerGroupImpl implements IControllerGroup {
 
     private final String groupId;
@@ -228,14 +231,14 @@ public final class ControllerGroupImpl implements IControllerGroup {
         ControllerRegistry.addController(this.groupId, clazz);
         this.loadedControllers.put(clazz, controller);
         final ChangeListener<VisibilityState> listener = (obs, oldVal, newVal) -> {
-            if (oldVal.type().equals(newVal.type())) {
+            if (oldVal.type() == newVal.type()) {
                 return;
             }
-            if (newVal.type().equals(VisibilityState.SHOWN)) {
+            if (newVal.type() == VisibilityState.SHOWN) {
                 controller.getVisibilityContext().incrementShow();
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnShow.class, OnShow::value,
                         true, controller.getVisibilityContext());
-            } else if (newVal.type().equals(VisibilityState.HIDDEN)) {
+            } else if (newVal.type() == VisibilityState.HIDDEN) {
                 controller.getVisibilityContext().incrementHide();
                 AnnotationUtils.invokeMethodsByAnnotation(controller.getControllerInstance(), OnHide.class, OnHide::value,
                         true, controller.getVisibilityContext());
@@ -253,19 +256,17 @@ public final class ControllerGroupImpl implements IControllerGroup {
     }
 
     private void setController(IController controller, IWrapperAnimation animation) {
-        if (controller.visibilityProperty().get().equals(VisibilityState.UNDEFINED)) {
+        if (controller.visibilityProperty().get() == VisibilityState.UNDEFINED) {
             final ChangeListener<VisibilityState> visListener = (obs, oldVal, newVal) -> controller.getSubGroups().values()
-                    .forEach(group -> {
-                        group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
-                            final VisibilityState controllerState = controller.visibilityProperty().get();
-                            if (controllerState.type().equals(VisibilityState.HIDDEN)) {
-                                return VisibilityState.GROUP_HIDDEN;
-                            } else if (controllerState.type().equals(VisibilityState.SHOWN)) {
-                                return VisibilityState.GROUP_SHOWN;
-                            }
-                            return VisibilityState.UNDEFINED;
-                        }, controller.visibilityProperty()));
-                    });
+                    .forEach(group -> group.visibilityProperty().bind(Bindings.createObjectBinding(() -> {
+                        final VisibilityState controllerState = controller.visibilityProperty().get();
+                        if (controllerState.type() == VisibilityState.HIDDEN) {
+                            return VisibilityState.GROUP_HIDDEN;
+                        } else if (controllerState.type() == VisibilityState.SHOWN) {
+                            return VisibilityState.GROUP_SHOWN;
+                        }
+                        return VisibilityState.UNDEFINED;
+                    }, controller.visibilityProperty())));
             controller.registerWeakListener(visListener);
             controller.visibilityProperty().addListener(new WeakChangeListener<>(visListener));
             final ChangeListener<VisibilityState> listener = (obs, oldVal, newVal) -> {
@@ -278,7 +279,7 @@ public final class ControllerGroupImpl implements IControllerGroup {
         }
         if (this.activeController.get() == null) {
             final ChangeListener<IController> listener = (obs, oldVal, newVal) -> {
-                if (this.visibility.get().equals(VisibilityState.UNDEFINED)) {
+                if (this.visibility.get() == VisibilityState.UNDEFINED) {
                     return;
                 }
                 if (oldVal != null) {
