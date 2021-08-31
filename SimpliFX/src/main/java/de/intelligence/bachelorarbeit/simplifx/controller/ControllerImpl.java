@@ -10,6 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.Pane;
 
+/**
+ * An implementation of the {@link IController} interface.
+ */
 class ControllerImpl implements IController {
 
     private final Object controllerInstance;

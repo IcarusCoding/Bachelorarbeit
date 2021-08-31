@@ -18,7 +18,7 @@ public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<Guic
     private static final Logger LOG = LogManager.getLogger(GuiceEnvironmentFactory.class);
 
     @Override
-    public DIEnvironment create(Object obj, GuiceInjection guiceInjection) {
+    public DIEnvironment create(GuiceInjection guiceInjection) {
         final Module[] modules = Arrays.stream(guiceInjection.value()).distinct().map(Reflection::reflect)
                 .map(classRef -> {
                     final Optional<ConstructorReflection> conRefOpt = classRef.hasConstructor();
@@ -32,7 +32,7 @@ public final class GuiceEnvironmentFactory implements IDIEnvironmentFactory<Guic
                 .map(Optional::get)
                 .map(conRef -> conRef.forceAccess().instantiate().getReflectable())
                 .map(Module.class::cast).toArray(Module[]::new);
-        return new GuiceEnvironment(obj, modules);
+        return new GuiceEnvironment(modules);
     }
 
 }

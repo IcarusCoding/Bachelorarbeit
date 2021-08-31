@@ -21,10 +21,13 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-import org.apache.commons.lang3.ArrayUtils;
+import com.google.common.collect.ObjectArrays;
 
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
+/**
+ * An implementation of the {@link II18N} interface.
+ */
 public final class I18N implements II18N {
 
     private static final String NOT_FOUND = "<key not found>";
@@ -32,6 +35,11 @@ public final class I18N implements II18N {
     private final ReadOnlyObjectWrapper<Locale> currentLocale;
     private final Map<Locale, CompoundResourceBundle> bundles;
 
+    /**
+     * Creates a new {@link I18N} instance with the specified {@link List} of {@link CompoundResourceBundle} instances.
+     *
+     * @param resourceBundles The {@link List} of {@link CompoundResourceBundle} instances.
+     */
     public I18N(List<CompoundResourceBundle> resourceBundles) {
         this.bundles = resourceBundles.stream()
                 .collect(Collectors.toMap(CompoundResourceBundle::getLocale, Function.identity()));
@@ -84,10 +92,14 @@ public final class I18N implements II18N {
     public StringBinding createObservedBinding(String key, Object... params) {
         return Bindings.createStringBinding(
                 () -> this.containsKey(key) ? MessageFormat.format(this.bundles.get(this.currentLocale.get()).getString(key),
-                        Arrays.stream(params).map(o -> o instanceof ObservableValue ?
-                                ((ObservableValue<?>) o).getValue() : Objects.requireNonNullElse(o, "null")
-                                .toString()).toArray()) : I18N.NOT_FOUND,
-                ArrayUtils.addAll(Arrays.stream(params)
+                        Arrays.stream(params).map(o -> {
+                            if (o instanceof ObservableValue) {
+                                return ((ObservableValue<?>) o).getValue();
+                            }
+                            return Objects.requireNonNullElse(o, "null")
+                                    .toString();
+                        }).toArray()) : I18N.NOT_FOUND,
+                ObjectArrays.concat(Arrays.stream(params)
                         .filter(ObservableValue.class::isInstance).map(ObservableValue.class::cast)
                         .toArray(ObservableValue[]::new), this.currentLocale));
     }

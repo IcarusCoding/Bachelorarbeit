@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.intelligence.bachelorarbeit.simplifx.classpath.filter.ClassAnnotationDiscoveryFilter;
-import de.intelligence.bachelorarbeit.simplifx.classpath.filter.IDiscoveryFilter;
 import de.intelligence.bachelorarbeit.simplifx.classpath.source.ResourceContext;
 import de.intelligence.bachelorarbeit.simplifx.classpath.transformer.ClassResourceTransformer;
 import de.intelligence.bachelorarbeit.simplifx.classpath.transformer.IResourceTypeTransformer;
@@ -29,11 +29,10 @@ public final class DiscoveryResult implements IDiscoveryResult {
                 .flatMap(List::stream).map(transformer::transform).collect(Collectors.toList());
     }
 
-    // TODO replace full transformer and filter classes with function and predicate interface when needed
     @Override
-    public <T, S> List<S> transformAndFilter(IResourceTypeTransformer<T> transformer, IDiscoveryFilter<T> filter,
+    public <T, S> List<S> transformAndFilter(IResourceTypeTransformer<T> transformer, Predicate<T> filter,
                                              Function<T, S> converter) {
-        return this.transform(transformer).stream().filter(filter::matches).map(converter).collect(Collectors.toList());
+        return this.transform(transformer).stream().filter(filter).map(converter).collect(Collectors.toList());
     }
 
     @Override

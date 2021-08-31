@@ -19,7 +19,11 @@ import de.intelligence.bachelorarbeit.simplifx.utils.AnnotatedMethodCache;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 import de.intelligence.bachelorarbeit.simplifx.utils.Pair;
 
-public class EventEmitterImpl implements IEventEmitter {
+/**
+ * An implementation of the {@link IEventEmitter} interface.
+ * The handling of events and the invocation of event handler methods will be executed synchronously on the emitting thread.
+ */
+public final class EventEmitterImpl implements IEventEmitter {
 
     private static final Logger LOG = LogManager.getLogger(EventEmitterImpl.class);
 
@@ -91,7 +95,6 @@ public class EventEmitterImpl implements IEventEmitter {
     }
 
     private record EventListener(Object subObj, Method method, int priority) {
-
     }
 
 }

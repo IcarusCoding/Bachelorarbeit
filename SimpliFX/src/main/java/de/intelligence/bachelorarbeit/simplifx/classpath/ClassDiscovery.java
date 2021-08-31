@@ -27,14 +27,16 @@ public final class ClassDiscovery implements IClassDiscovery {
         this.results = new HashMap<>();
     }
 
-    private String convertPackage(String pkg) {
+    private static String convertPackage(String pkg) {
         return pkg.replace('\\', Prefix.FILE_SEPARATOR_C).replace('.', Prefix.FILE_SEPARATOR_C);
     }
 
-    private void findAllClassPathURLs(String path, ClassLoader loader, Set<URL> classPathURLs) {
+    private static void findAllClassPathURLs(String path, ClassLoader loader, Set<URL> classPathURLs) {
         try {
             loader.getResources(path).asIterator().forEachRemaining(classPathURLs::add);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            // ignored
+        }
         if (path.isBlank()) {
             ClassLoader current = loader;
             do {
@@ -47,8 +49,8 @@ public final class ClassDiscovery implements IClassDiscovery {
                         try {
                             classPathURLs.add(new URL(Prefix.JAR_PREFIX + Prefix.FILE_PREFIX + new File(s)
                                     .getAbsolutePath() + Prefix.JAR_SEPARATOR));
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
+                        } catch (MalformedURLException ignored) {
+                            // ignored
                         }
                     });
                 }
@@ -60,8 +62,8 @@ public final class ClassDiscovery implements IClassDiscovery {
     @Override
     public IDiscoveryResult startDiscovery() {
         final Set<URL> classPathURLs = new HashSet<>();
-        final String path = this.convertPackage(this.context.getPath());
-        this.context.getClassLoaders().forEach(l -> this.findAllClassPathURLs(path, l, classPathURLs));
+        final String path = ClassDiscovery.convertPackage(this.context.getPath());
+        this.context.getClassLoaders().forEach(l -> ClassDiscovery.findAllClassPathURLs(path, l, classPathURLs));
         classPathURLs.stream()
                 .map(u -> DiscoverySourceType.createDiscoverySource(u, path))
                 .flatMap(s -> s.iterator().stream())

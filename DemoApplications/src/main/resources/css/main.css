@@ -11,6 +11,11 @@
     -fx-border-style: solid;
 }
 
+TestRectangle {
+    -fx-width: 100px;
+    -fx-height: 100px;
+}
+
 .testController {
     -fx-border-color: #ffbf00;
     -fx-border-width: 3px;

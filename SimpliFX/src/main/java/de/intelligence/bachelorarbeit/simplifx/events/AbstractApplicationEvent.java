@@ -2,6 +2,9 @@ package de.intelligence.bachelorarbeit.simplifx.events;
 
 import javafx.application.Application;
 
+/**
+ * A basic event which currently only encapsulates the global {@link Application.Parameters} for the created application instance.
+ */
 public abstract class AbstractApplicationEvent {
 
     private final Application.Parameters parameters;

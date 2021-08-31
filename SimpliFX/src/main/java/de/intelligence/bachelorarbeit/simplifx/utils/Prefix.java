@@ -1,11 +1,11 @@
 package de.intelligence.bachelorarbeit.simplifx.utils;
 
 /**
- * An utility class which provides constants for common used prefixes and separators
+ * An utility class which provides constants for common used prefixes and separators.
  *
  * @author Deniz Groenhoff
  */
-public class Prefix {
+public final class Prefix {
 
     public static final String FILE_SCHEME = "file";
     public static final String FILE_PREFIX = "file:";

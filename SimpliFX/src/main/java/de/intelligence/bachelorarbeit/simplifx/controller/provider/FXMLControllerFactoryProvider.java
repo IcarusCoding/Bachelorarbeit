@@ -4,6 +4,9 @@ import javafx.util.Callback;
 
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 
+/**
+ * A {@link IControllerFactoryProvider} which instantiates a controller by its default constructor.
+ */
 public final class FXMLControllerFactoryProvider implements IControllerFactoryProvider {
 
     @Override

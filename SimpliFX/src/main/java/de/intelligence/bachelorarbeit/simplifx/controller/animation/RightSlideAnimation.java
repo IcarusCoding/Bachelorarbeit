@@ -6,8 +6,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * An {@link IWrapperAnimation} which will use a right slide animation on a controller switch.
+ */
 public final class RightSlideAnimation extends AbstractWrapperAnimation {
 
+    /**
+     * Creates a new {@link RightSlideAnimation}.
+     *
+     * @param duration The {@link Duration} of the animation.
+     */
     public RightSlideAnimation(Duration duration) {
         super(duration);
     }

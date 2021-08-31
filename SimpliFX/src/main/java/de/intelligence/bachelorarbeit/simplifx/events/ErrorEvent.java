@@ -2,6 +2,9 @@ package de.intelligence.bachelorarbeit.simplifx.events;
 
 import javafx.application.Application;
 
+/**
+ * An {@link AbstractApplicationEvent} for handling the {@link javafx.application.Preloader#handleErrorNotification} method invocation.
+ */
 public final class ErrorEvent extends AbstractApplicationEvent {
 
     private final Throwable cause;

@@ -4,13 +4,21 @@ import dagger.ObjectGraph;
 
 import de.intelligence.bachelorarbeit.simplifx.di.DIEnvironment;
 
+/**
+ * An implementation of the {@link DIEnvironment} interface which manages a dagger {@link ObjectGraph}
+ * for dependency injection.
+ */
 final class Dagger1Environment implements DIEnvironment {
 
     private final ObjectGraph graph;
 
-    Dagger1Environment(Object obj, Object... modules) {
+    /**
+     * Creates a new instance of this {@link DIEnvironment}.
+     *
+     * @param modules An array of dagger configuration classes.
+     */
+    Dagger1Environment(Object... modules) {
         this.graph = ObjectGraph.create(modules);
-        this.inject(obj);
     }
 
     @Override

@@ -2,7 +2,6 @@ package de.intelligence.bachelorarbeit.simplifx.injection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,16 +17,28 @@ import de.intelligence.bachelorarbeit.reflectionutils.FieldReflection;
 import de.intelligence.bachelorarbeit.reflectionutils.Reflection;
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
+/**
+ * An implementation of the {@link IAnnotatedFieldDetector} interface which allows the detection and injection
+ * into fields of multiple object instances.
+ *
+ * @param <T> The annotation type.
+ */
 public final class AnnotatedFieldDetector<T extends Annotation> implements IAnnotatedFieldDetector<T> {
 
     private final Class<T> annotation;
     private final List<Object> searchIn;
     private final Map<Object, Map<Field, T[]>> foundFields;
 
+    /**
+     * Creates a new {@link AnnotatedFieldDetector} with the specified annotation and object instances.
+     *
+     * @param annotation The annotation for which fields should get detected.
+     * @param obj        The instance in which these fields should be found.
+     * @param more       More instances in which fields should be found.
+     */
     public AnnotatedFieldDetector(Class<T> annotation, Object obj, Object... more) {
         this.annotation = annotation;
-        this.searchIn = new ArrayList<>();
-        Arrays.stream(Conditions.concat(more, obj)).filter(Objects::nonNull).forEach(this.searchIn::add);
+        this.searchIn = Arrays.stream(Conditions.concat(more, obj)).filter(Objects::nonNull).collect(Collectors.toList());
         this.foundFields = new HashMap<>();
     }
 
@@ -88,9 +99,9 @@ public final class AnnotatedFieldDetector<T extends Annotation> implements IAnno
     }
 
     @Override
-    public List<Field> getFields() {
+    public Set<Field> getFields() {
         return this.foundFields.values().stream().flatMap(m -> m.keySet().stream())
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
 }

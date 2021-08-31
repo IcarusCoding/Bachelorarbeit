@@ -101,7 +101,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.DemoApplication
+                                de.intelligence.bachelorarbeit.demoapplications.DemoApplication
                             </mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>${lib.path}</classpathPrefix>
@@ -127,7 +127,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                de.intelligence.bachelorarbeit.demoapplications.realapp.simplifx.DemoApplication
+                                de.intelligence.bachelorarbeit.demoapplications.DemoApplication
                             </mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>

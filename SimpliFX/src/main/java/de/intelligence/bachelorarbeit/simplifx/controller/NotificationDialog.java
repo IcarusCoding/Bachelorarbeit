@@ -7,7 +7,6 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
@@ -25,7 +24,10 @@ import javafx.util.Duration;
 
 import de.intelligence.bachelorarbeit.simplifx.utils.Conditions;
 
-public class NotificationDialog extends StackPane implements INotificationDialog {
+/**
+ * A default {@link INotificationDialog} implementation that will be used if no other was specified.
+ */
+public final class NotificationDialog extends StackPane implements INotificationDialog {
 
     private static final double PREF_WIDTH = 300;
     private static final double PREF_HEIGHT = 60;
@@ -100,13 +102,9 @@ public class NotificationDialog extends StackPane implements INotificationDialog
         });
     }
 
-    public ReadOnlyBooleanProperty showingProperty() {
-        return this.showing.getReadOnlyProperty();
-    }
-
     @Override
-    public void showMessage(StringBinding title, StringBinding content, NotificationKind kind) {
-        this.sameCount = (title.get().equals(this.lastTitle) && content.get().equals(this.contentText.getText()) && kind.equals(this.root.getUserData()) ? this.sameCount + 1 : 0);
+    public void handleMessage(StringBinding title, StringBinding content, NotificationKind kind) {
+        this.sameCount = ((title.get().equals(this.lastTitle) && content.get().equals(this.contentText.getText()) && (kind == this.root.getUserData())) ? (this.sameCount + 1) : 0);
         this.lastTitle = title.get();
         this.titleLbl.textProperty().bind(Bindings.createStringBinding(() ->
                 this.sameCount > 0 ? String.format("%s [%d]", this.lastTitle, this.sameCount + 1) : this.lastTitle, title));
@@ -118,7 +116,7 @@ public class NotificationDialog extends StackPane implements INotificationDialog
     }
 
     @Override
-    public void close() {
+    public void reset() {
         this.showing.set(false);
     }
 

@@ -3,6 +3,9 @@ package de.intelligence.bachelorarbeit.simplifx.events;
 import javafx.application.Application;
 import javafx.application.Preloader;
 
+/**
+ * An {@link AbstractApplicationEvent} for handling the {@link Preloader#handleStateChangeNotification} method invocation.
+ */
 public class StateChangeEvent extends AbstractApplicationEvent {
 
     private final Preloader.StateChangeNotification.Type type;

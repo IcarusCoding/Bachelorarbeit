@@ -120,6 +120,8 @@ import static com.sun.javafx.FXPermissions.MODIFY_FXML_CLASS_LOADER_PERMISSION;
  * For more information, see the
  * <a href="doc-files/introduction_to_fxml.html">Introduction to FXML</a>
  * document.
+ * <p>
+ * This class was copied and is a modified version of the {@link javafx.fxml.FXMLLoader} class.
  *
  * @since JavaFX 2.0
  */
@@ -1576,7 +1578,6 @@ public class SimpliFXMLLoader {
 
         Class<?> type = loadTypeForPackage(packageName, className);
 
-        //TODO INJECT
         Reflection.reflect(type).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
                 Modifier.isStatic(field.getModifiers()), field -> {
             if (Reflection.reflectStatic(field).forceAccess().get() == null) {
@@ -2805,12 +2806,10 @@ public class SimpliFXMLLoader {
                 processInstancePropertyAttributes();
             }
 
-            //TODO MAYBE INJECT
             Reflection.reflect(value.getClass()).iterateFields(field -> field.getAnnotationsByType(CssProperty.class).length > 0 &&
                     Modifier.isStatic(field.getModifiers()), field -> {
                 if (Reflection.reflectStatic(field).forceAccess().get() != null) {
                     CssMetaDataAdapter.bindMetaData(value, field, field.getAnnotationsByType(CssProperty.class));
-                    //System.out.println(Reflection.reflect(value).reflectField("styleableWidth").forceAccess().get());
                 }
             });
 

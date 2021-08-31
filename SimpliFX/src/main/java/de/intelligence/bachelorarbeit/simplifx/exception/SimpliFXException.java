@@ -1,5 +1,8 @@
 package de.intelligence.bachelorarbeit.simplifx.exception;
 
+/**
+ * A basic {@link RuntimeException} for handling errors which originated from a SimpliFX context.
+ */
 public class SimpliFXException extends RuntimeException {
 
     public SimpliFXException() {

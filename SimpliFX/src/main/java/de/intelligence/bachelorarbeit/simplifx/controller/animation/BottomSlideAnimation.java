@@ -6,8 +6,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * An {@link IWrapperAnimation} which will use a bottom slide animation on a controller switch.
+ */
 public final class BottomSlideAnimation extends AbstractWrapperAnimation {
 
+    /**
+     * Creates a new {@link BottomSlideAnimation}.
+     *
+     * @param duration The {@link Duration} of the animation.
+     */
     public BottomSlideAnimation(Duration duration) {
         super(duration);
     }

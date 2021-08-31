@@ -23,7 +23,7 @@ import de.intelligence.bachelorarbeit.simplifx.utils.Prefix;
  */
 public final class JarDiscoverySource extends AbstractDiscoverySource {
 
-    private static Logger LOG = LogManager.getLogger(JarDiscoverySource.class);
+    private static final Logger LOG = LogManager.getLogger(JarDiscoverySource.class);
 
     public JarDiscoverySource(URL sourceURL, String pathPrefix) {
         super(sourceURL, pathPrefix);

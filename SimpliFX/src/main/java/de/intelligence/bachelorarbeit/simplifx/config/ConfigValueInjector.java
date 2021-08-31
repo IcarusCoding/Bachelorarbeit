@@ -12,16 +12,29 @@ import de.intelligence.bachelorarbeit.simplifx.exception.InvalidConfigValueTypeE
 import de.intelligence.bachelorarbeit.simplifx.injection.AnnotatedFieldDetector;
 import de.intelligence.bachelorarbeit.simplifx.injection.IAnnotatedFieldDetector;
 
+/**
+ * An injector for fields annotated with the {@link ConfigValue} annotation.
+ */
 public final class ConfigValueInjector {
 
     private final IAnnotatedFieldDetector<ConfigValue> configValueDetector;
 
+    /**
+     * Creates a new injector.
+     *
+     * @param instance The instance in which the fields should get injected.
+     * @param more     Other instances in which the fields should get injected.
+     */
     public ConfigValueInjector(Object instance, Object... more) {
         this.configValueDetector = new AnnotatedFieldDetector<>(ConfigValue.class, instance, more);
     }
 
+    /**
+     * Injects the values from the specified {@link PropertyRegistry} into found fields.
+     *
+     * @param registry The {@link PropertyRegistry} which should get injected.
+     */
     public void inject(PropertyRegistry registry) {
-        // find all fields
         this.configValueDetector.findAllFields();
         final Map<FieldReflection, ConfigValue> fields = new LinkedHashMap<>();
         for (final Map.Entry<Object, Map<Field, ConfigValue[]>> entry : this.configValueDetector.getFieldMap().entrySet()) {
@@ -55,16 +68,6 @@ public final class ConfigValueInjector {
                         + field.getDeclaringClass().getName() + "." + field.getName() + ".", ex);
             }
         }
-    }
-
-    private Object getDefault(Class<?> expected) {
-        if (expected.isAssignableFrom(Number.class)) {
-            return 0;
-        }
-        if (expected.equals(Boolean.class)) {
-            return false;
-        }
-        return "";
     }
 
 }

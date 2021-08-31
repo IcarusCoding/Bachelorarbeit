@@ -18,7 +18,7 @@ public final class Dagger1EnvironmentFactory implements IDIEnvironmentFactory<Da
     private static final Logger LOG = LogManager.getLogger(Dagger1EnvironmentFactory.class);
 
     @Override
-    public DIEnvironment create(Object obj, Dagger1Injection dagger1Injection) {
+    public DIEnvironment create(Dagger1Injection dagger1Injection) {
         final Object[] modules = Arrays.stream(dagger1Injection.value()).distinct().map(Reflection::reflect)
                 .filter(classRef -> {
                     boolean annotationPresent = classRef.isAnnotationPresent(Module.class);
@@ -39,7 +39,7 @@ public final class Dagger1EnvironmentFactory implements IDIEnvironmentFactory<Da
                 .map(Optional::get)
                 .map(conRef -> conRef.forceAccess().instantiate().getReflectable())
                 .toArray();
-        return new Dagger1Environment(obj, modules);
+        return new Dagger1Environment(modules);
     }
 
 }
