@@ -1,7 +1,7 @@
 \chapter{Prototypische Anwendung und Evaluation der Bibliothek}
 \chaptermark{Anwendung und Evaluation}
 \label{evaluation}
-Im folgenden Kapitel werden Kernkonzepte von \texttt{SimpliFX} durch Quelltextbeispiele und eine Beispielanwendung erklärt. Außerdem werden die genutzten Funktionen mit reinen JavaFX Möglichkeiten verglichen. Falls ein solcher Vergleich, aufgrund von keinen äquivalenten Funktionen oder durch das Nichtvorhandensein dieser in JavaFX nicht möglich ist, werden nur die durch \texttt{SimpliFX} resultierenden Simplifizierungen erläutert. Vergleichbare Funktionen werden in verschiedenen Aspekten wie der Benutzerfreundlichkeit oder dem Zeitaufwand gegenübergestellt und die Ergebnisse werden abschließend in einem Fazit zusammengefasst.
+Im folgenden Kapitel werden Kernkonzepte von \texttt{SimpliFX} durch Quelltextbeispiele und eine Beispielanwendung erklärt. Außerdem werden die genutzten Funktionen mit reinen JavaFX Möglichkeiten verglichen. Falls ein solcher Vergleich, aufgrund von keinen äquivalenten Funktionen oder durch das Nichtvorhandensein dieser in JavaFX nicht möglich ist, werden nur die durch \texttt{SimpliFX} resultierenden Simplifizierungen erläutert. Vergleichbare Funktionen werden in verschiedenen Aspekten wie der Benutzungsfreundlichkeit oder dem Zeitaufwand gegenübergestellt und die Ergebnisse werden abschließend in einem Fazit zusammengefasst.
 \section{Entwicklung von Beispielsoftware}
 \label{entwicklung_von_beispielsoftware}
 \noindent Bevor die Entwicklung der eigentlichen Software begonnen werden kann, müssen etwaige externe Bibliotheken wie JavaFX für \texttt{SimpliFX} bereitgestellt werden. Außerdem muss \texttt{SimpliFX} zur Kompilierzeit im Klassenpfad der zu entwickelnden Anwendung existieren. Da die Bibliothek im Github Maven-Repository verfügbar ist, wird der folgende Entwicklungsprozess sowie die Verwaltung von externen Bibliotheken durch die Verwendung von Maven unterstützt. In der \texttt{pom.xml} müssen für eine volle Funktionalität folgende Artefakte als Abhängigkeiten deklariert werden:
@@ -125,9 +125,8 @@ private void setup(ControllerSetupContext ctx) {
 }
 	\end{lstlisting}
 \end{figure}
-\noindent Der vollständige Quelltext des Hauptcontrollers ist in \autoref{lst:main_controller} zu finden.
-\notebox{Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem Startcontroller dieser. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth}-Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.}
-\noindent Der für das Ändern der Sprache verantwortliche \texttt{TitleBarController} benötigt ein JavaFX \texttt{Menu}, welches durch die FXML Datei zur Verfügung gestellt wird und eine PostConstruct Methode, welche dieses initialisiert (\autoref{lst:titlebar_controller_content}).
+\noindent Der vollständige Quelltext des Hauptcontrollers ist in \autoref{lst:main_controller} zu finden. Die Höhe und die Breite einer Controllergruppe richtet sich immer nach dem Startcontroller dieser. \texttt{SimpliFX} nutzt dazu das \texttt{prefHeight}- und \texttt{prefWidth}-Attribut des jeweiligen Wurzelelementes. Ist kein solches Attribut gesetzt worden, werden Standardwerte genutzt.\\
+Der für das Ändern der Sprache verantwortliche \texttt{TitleBarController} benötigt ein JavaFX \texttt{Menu}, welches durch die FXML Datei zur Verfügung gestellt wird und eine PostConstruct Methode, welche dieses initialisiert (\autoref{lst:titlebar_controller_content}).
 \begin{figure}[H]
 	\begin{lstlisting}[caption=Demo -- Felder und Methoden im \texttt{TitleBarController}, captionpos=b, label=lst:titlebar_controller_content]
 #@FXML

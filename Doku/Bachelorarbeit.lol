@@ -39,9 +39,9 @@
 \contentsline {lstlisting}{\numberline {6.5}Demo -- \texttt {MainController} Klassenkopf}{67}{lstlisting.6.5}%
 \contentsline {lstlisting}{\numberline {6.6}Demo -- \texttt {MainController} Setup-Phase}{67}{lstlisting.6.6}%
 \contentsline {lstlisting}{\numberline {6.7}Demo -- Felder und Methoden im \texttt {TitleBarController}}{68}{lstlisting.6.7}%
-\contentsline {lstlisting}{\numberline {6.8}Demo -- Injizierte Felder des \texttt {LoginController}s}{69}{lstlisting.6.8}%
+\contentsline {lstlisting}{\numberline {6.8}Demo -- Injizierte Felder des \texttt {LoginController}s}{68}{lstlisting.6.8}%
 \contentsline {lstlisting}{\numberline {6.9}Demo -- OnShow und OnHide Methoden}{69}{lstlisting.6.9}%
-\contentsline {lstlisting}{\numberline {6.10}Demo -- Subgruppen Einrichtung}{71}{lstlisting.6.10}%
+\contentsline {lstlisting}{\numberline {6.10}Demo -- Subgruppen Einrichtung}{70}{lstlisting.6.10}%
 \contentsline {lstlisting}{\numberline {6.11}Demo -- \texttt {@LocalizeValue} und \texttt {@ConfigValue}}{71}{lstlisting.6.11}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
