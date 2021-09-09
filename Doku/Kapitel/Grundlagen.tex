@@ -35,7 +35,7 @@ Das \ac{mvc} Entwurfsmuster\footnote{Je nach Interpretation, kann es sich bei de
 \begin{description}
 	\item Das \texttt{\textbf{Model}} beinhaltet alle Klassen, welche für die Logik und die Datenhaltung der Anwendung verantwortlich sind und ist vollständig unabhängig vom View.
 	\item Der \texttt{\textbf{View}} stellt die Anwendung visuell dar, ermöglicht eine Interaktion mit dieser und ist in den meisten Applikationen äquivalent zu einer grafischen Benutzungsoberfläche.
-	\item Der \texttt{\textbf{Controller}} ist für das Verändern des Views verantwortlich. So werden beispielsweise Interaktionen mit der Benutzungsoberfläche, wie ein Schaltflächenklick im Controller, verarbeitet, was wiederum den View aktualisiert. Der View und das Model sind vollständig entkoppelt und der Controller ist die Schnittstelle zwischen diesen.
+	\item Der \texttt{\textbf{Controller}} ist für das Verändern des Views verantwortlich. So werden beispielsweise Interaktionen mit der Benutzungsoberfläche, wie ein Schaltflächenklick im Controller, verarbeitet, was wiederum den View aktualisiert. Dabei kennt der View das Model, das Model aber nicht direkt den View. Der Controller verwaltet sowohl den View als auch das Model.
 \end{description}
 \section{JavaFX}
 \label{javafx}
@@ -85,7 +85,7 @@ Ein minimales Beispiel für eine voll funktionsfähige JavaFX-Anwendung, welche 
 \noindent Nach der Initialisierung der JavaFX Anwendung wird in \CircledStandalone{1} das Wurzelelement des Szenengraphen erstellt und um eine \texttt{Button} Instanz erweitert. Dieses wird dann in \CircledStandalone{2} zu einem \texttt{Scene} Objekt hinzugefügt, welches wiederum als Szene der \texttt{primaryStage} dient. Das Beispiel wird mit dem Anzeigen der Stage beendet.
 \subsection{Properties und Bindings}
 \label{properties_und_bindings}
-JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster basierende API, welche es dem Programmierer ermöglicht, eine synchronisierende Beziehung zwischen zwei oder mehr Variablen zu erstellen. Wird eine Variable in einer solchen Beziehung geändert, so wird automatisch auch die andere geändert \cite{Hommel2013}. Dabei ist es auch möglich, Event Listener für eigene oder durch von JavaFX-Nodes automatisch erzeugte Properties zu registrieren. Soll beispielsweise Quelltext ausgeführt werden, wenn eine Änderung eines Wertes einer Property festgestellt wird, so kann dies mit dem Erstellen einer \texttt{ChangeListener}-Instanz durchgeführt werden \cite{Gao2019}. 
+JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster basierende API, welche es dem Programmierer ermöglicht, eine synchronisierende Beziehung zwischen zwei oder mehr Variablen zu erstellen. Im Rahmen von JavaFX werden diese Variablen auch Properties genannt. Wird eine Property in einer solchen Beziehung geändert, so wird automatisch auch die andere geändert \cite{Hommel2013}. Dabei ist es auch möglich, Event Listener für eigene oder durch von JavaFX-Nodes automatisch erzeugte Properties zu registrieren. Soll beispielsweise Quelltext ausgeführt werden, wenn eine Änderung eines Wertes einer Property festgestellt wird, so kann dies mit dem Erstellen einer \texttt{ChangeListener}-Instanz durchgeführt werden \cite{Gao2019}. 
 \begin{figure}
 	\begin{lstlisting}[caption=Beispiel -- ChangeListener \& EventHandler, captionpos=b, label=lst:property_example]
 	Button btn = new Button("Test");
@@ -99,7 +99,7 @@ JavaFX besitzt eine auf dem JavaBeans-System und dem Observer-Entwurfsmuster bas
 	})
 	\end{lstlisting}
 \end{figure}
-\noindent Im ersten Teil von \autoref{lst:property_example} soll der Text einer Schaltfläche bei einer Änderung auf die Konsole ausgegeben werden. Dazu wird mittels Lambdaausdruck ein neuer \texttt{ChangeListener} mit der \texttt{StringProperty} der Schaltfläche verknüpft.\\
+\noindent Im ersten Teil von \autoref{lst:property_example} soll der Text einer Schaltfläche bei einer Änderung auf die Konsole ausgegeben werden. Dazu wird mittels Lambdaausdruck ein neuer \texttt{ChangeListener} mit der \texttt{textProperty}-\texttt{StringProperty} der Schaltfläche verknüpft.\\
 Des Weiteren unterstützt JavaFX ein Event-System, welches anhand von verschiedenen Aktionen Events durch den Szenengraphen propagiert. Ein solches Event wird beispielsweise durch das Eintragen von Text in ein Textfeld oder das Aktivieren einer Dropdown-Liste ausgelöst. In zweiten Teil von \autoref{lst:property_example} wird ein \texttt{EventHandler} für das Aktivieren einer Schaltfläche erstellt.
 
 \subsection{Layouting: FXML vs. Quelltext}
@@ -281,3 +281,5 @@ public class TestProcessor extends AbstractProcessor {
 }
 	\end{lstlisting}
 \end{figure}
+\section{Zusammenfassung}
+Nachdem die für das Verständnis dieser Arbeit benötigten Grundlagen wie verschiedene Entwurfsmuster, JavaFX und Java Annotationen eingeführt wurden, kann im nächsten Kapitel der aktuelle Stand der Technik vorgestellt werden. Das folgende Kapitel knüpft an das Annotationskonzept an und präsentiert verschiedene auf Annotationen basierende Implementierungen in der Java-Umgebung sowie in anderen Programmiersprachen und externen Bibliotheken.

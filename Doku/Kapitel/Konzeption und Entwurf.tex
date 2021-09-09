@@ -47,7 +47,7 @@ Bei der Abhängigkeitsinjektion werden Abhängigkeiten von Objekten zur Laufzeit
 	\end{lstlisting}
 \end{figure}
 \subsection{CSS Metadatengeneration}
-Ein wichtiger Bestandteil von JavaFX ist die Möglichkeit, das Aussehen und den Stil von einzelnen Komponenten wie Schaltflächen und Containerelementen durch die Verwendung von \ac{css} zu modifizieren. Werden eigene Komponenten erstellt oder bestehende Komponenten erweitert, so erlaubt JavaFX das Hinzufügen von eigenen \ac{css} Properties zu den jeweiligen Komponenten mithilfe von neuen Instanzen der \texttt{CssMetaData} Klasse. Für jede neue \ac{css} Property muss dabei eine neue \texttt{CssMetaData} Instanz erstellt werden, weshalb das Hinzufügen von vielen solcher Instanzen ein repetitiver Prozess mit vielen Boilerplate Quelltextfragmenten ist, welcher durchaus vereinfacht werden kann.
+Ein wichtiger Bestandteil von JavaFX ist die Möglichkeit, das Aussehen und den Stil von einzelnen Komponenten wie Schaltflächen und Containerelementen durch die Verwendung von \ac{css} zu modifizieren. Werden eigene Komponenten erstellt oder bestehende Komponenten erweitert, so erlaubt JavaFX das Hinzufügen von eigenen \ac{css} Properties zu den jeweiligen Komponenten mithilfe von neuen Instanzen der \texttt{CssMetaData} Klasse. Für jede neue \ac{css} Property muss dabei eine neue \texttt{CssMetaData} Instanz erstellt werden, weshalb das Hinzufügen von vielen dieser Instanzen ein repetitiver Prozess mit vielen Boilerplate Quelltextfragmenten ist, welcher durchaus vereinfacht werden kann.
 \subsection{JavaFX Einstiegspunkt und Preloader}
 Damit eine JavaFX Applikation gestartet werden kann, muss, wie in \autoref{javafx} beschrieben, 
 eine Klasse existieren, welche von der \texttt{Application} Klasse erbt. Müssen bestimmte performanceintensive Aufgaben wie das Laden von Sound-, Video- oder Bilddateien vor dem Start der eigentlichen Anwendungen ausgeführt werden, so kann dies in einer Klasse, welche von der \texttt{Preloader} Klasse erben muss, realisiert werden. Der \texttt{Preloader} ist dabei eine spezialisierte Form der \texttt{Application}, welche es dem Entwickler ermöglicht, Ressourcen zu laden und dies dem Nutzer durch eventbasierte Statusaktualisierungen mitzuteilen. Damit ein \texttt{Preloader} mit einer standardmäßigen JavaFX Anwendung verbunden werden kann, muss statt \texttt{Platform\#launch} die interne \texttt{PlatformImpl\#launchApplication} Methode genutzt werden. Entwickler sollen das Nutzen von internen Klassen und Methoden weitgehend vermeiden, da sich Implementierungen und Funktionen dieser ständig ändern können. Das Verwalten der Aufgaben, welche vor dem Anwendungsstart durchgeführt werden müssen, soll vereinfacht werden, wobei insbesondere die vorhandenen Statusaktualisierungen erweitert werden sollen. Auch die Initialisierung einer Applikationsklasse bzw. der benötigten \texttt{Stage} läuft in den meisten Fällen gleich ab und soll bei Bedarf vom Entwickler zu einem großen Teil automatisiert werden können.
@@ -85,13 +85,6 @@ In der Anforderungsanalyse werden die gefundenen Problemlösungen und Vereinfach
 	\item \textbf{Fundamentale Anforderungen} sind Anforderungen, welche für eine Funktion des Systems essentiell sind, alle genannten Probleme weitgehend beheben und daher zwangsläufig implementiert werden müssen. Alle folgenden fundamentalen Anforderungen haben den [+A--\#\#] Präfix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
 	\item \textbf{Optionale Anforderungen} sind Anforderungen, welche keinen Einfluss auf eine ordnungsgemäße Funktionalität des Systems haben. Sie sind optional und werden möglicherweise aufgrund ihrer Komplexität nur teilweise oder gar nicht implementiert und können stattdessen für eine Erweiterung des Systems durch weitere Entwickler genutzt werden. Alle folgenden optionalen Anforderungen haben den (+A--\#\#) Präfix, wobei + durch die Art der Anforderung (funktional, nichtfunktional) und \#\# durch die jeweilige Anforderungsnummer substituiert wird.
 \end{description}
-
-% counter for functional requirements
-%\newcounter{fcounter}
-%\setcounter{fcounter}{0}
-%\newcommand*{\freq}[1]{%
-%	\protecting{\stepcounter{fcounter}\ifblank{#1}{[FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}]}{(FA--\ifnum\value{fcounter}<10 0\fi\arabic{fcounter}) Optional --\label{freq\arabic{fcounter}}}}%
-%}
 
 \newcounter{z}
 \newcommand{\CalculatePercentage}[2]{%
@@ -341,10 +334,19 @@ Für die Sprach- und \texttt{ResourceBundle}-Verwaltung (notwendig für \autoref
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth-2cm]{Abbildungen/I18N.png}
-	\caption{Diagramm -- I18N Schnittstelle}
+	\caption{Diagramm -- II18N Schnittstelle}
 	\label{fig:i18n_interface}
 \end{figure}
-\noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird.
+\noindent Eine \texttt{I18N} Instanz soll dabei, bei Bedarf, mehrere \texttt{ResourceBundle}s verwalten, welche in Form eines \texttt{CompoundResourceBundle} Objektes per Konstruktor übergeben werden. Das Spezifizieren von \texttt{ResourceBundle} Instanzen kann durch den Nutzer von \texttt{SimpliFX} manuell beim Applikationsstart erfolgen oder durch das Verwenden, der in \autoref{classpath_interface} beschriebenen Schnittstelle, automatisch geschehen. \texttt{SimpliFX} wird alle angegebenen/gefundenen \texttt{ResourceBundle}s in ein \texttt{CompoundResourceBundle} konvertieren und ein entsprechendes \texttt{I18N} Objekt erstellen, welches beim Erstellen aller Controller genutzt und dem Entwickler, für Übersetzungen außerhalb von Controllern, bereitgestellt wird. Ein Beispiel für die Instanziierung der \texttt{I18N} Klasse ist in \autoref{lst:example_i18n_creation} dargestellt.
+\begin{figure}[H]
+	\begin{lstlisting}[caption={Beispiel -- Erstellen einer I18N Instanz}, captionpos=b, label=lst:example_i18n_creation]
+Map<Locale, List<ResourceBundle>> bundles = ...;
+II18N lang = new I18N(bundles.entrySet().stream()
+		.map(e -> new CompoundResourceBundle(e.getKey(), 
+				e.getValue()))
+		.collect(Collectors.toList()));
+	\end{lstlisting}
+\end{figure}
 \subsubsection{Schnittstelle: \texttt{SimpliFXMLLoader}}
 Damit Funktionalitäten wie die dynamische Übersetzung für \autoref{freq3} und das Initialisieren sowie die Generierung von \ac{css} Metadaten für \autoref{freq5} möglich sind, muss der herkömmliche \texttt{FXMLLoader} durch eigene Konstrukte erweitert werden. Die Implementierung neuer Methoden und die Modifikation von bereits existierenden Methoden wird in \autoref{simplifxmlloader} beschrieben. Die Erweiterung der \texttt{FXMLLoader} Klasse wird im Folgenden als \texttt{SimpliFXMLLoader} bezeichnet.
 \subsubsection{Schnittstelle: \texttt{SimpliFX} Einstiegspunkt}

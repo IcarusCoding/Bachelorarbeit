@@ -218,23 +218,13 @@ public final class SidebarController {
         this.mainCtx.switchController(LoginController.class, 
 				new BottomSlideAnimation(Duration.millis(250)));
     }
-	(@\newpage\clearpage@)
+	
+	// Aus Platzgründen sind onTwoPressed() und onThreePressed()
+	// nicht dargestellt worden
     #@FXML
     private void onOnePressed() {
         sidebarContentCtx.switchController(TestControllerOne.class, 
 				new TopSlideAnimation(Duration.millis(250)));
-    }
-
-    #@FXML
-    private void onTwoPressed() {
-        sidebarContentCtx.switchController(TestControllerTwo.class,
-				new RightSlideAnimation(Duration.millis(250)));
-    }
-
-    #@FXML
-    private void onThreePressed() {
-        sidebarContentCtx.switchController(TestControllerThree.class, 
-				new LeftSlideAnimation(Duration.millis(250)));
     }
 
 }

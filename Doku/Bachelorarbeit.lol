@@ -26,6 +26,7 @@
 \contentsline {lstlisting}{\numberline {4.2}Beispiel -- Controller mit injizierten Diensten}{27}{lstlisting.4.2}%
 \contentsline {lstlisting}{\numberline {4.3}Beispiel -- Instanziierungsablauf.}{29}{lstlisting.4.3}%
 \contentsline {lstlisting}{\numberline {4.4}Beispiel -- Verwendung der Reflection Schnittstelle}{41}{lstlisting.4.4}%
+\contentsline {lstlisting}{\numberline {4.5}Beispiel -- Erstellen einer I18N Instanz}{43}{lstlisting.4.5}%
 \addvspace {10\p@ }
 \contentsline {lstlisting}{\numberline {5.1}Beispiel -- Nutzung der \texttt {Pair} Klasse}{55}{lstlisting.5.1}%
 \contentsline {lstlisting}{\numberline {5.2}Beispiel -- Initiierung eines Klassenpfadscans.}{58}{lstlisting.5.2}%
