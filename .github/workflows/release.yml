@@ -22,8 +22,6 @@ jobs:
           distribution: adopt
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      - name: Test dir
-        run: dir
       - name: Build & Package
         run: |
           mvn -B package --file pom.xml
