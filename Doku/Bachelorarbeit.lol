@@ -26,6 +26,7 @@
 \contentsline {lstlisting}{\numberline {4.2}Beispiel -- Controller mit injizierten Diensten}{27}{lstlisting.4.2}%
 \contentsline {lstlisting}{\numberline {4.3}Beispiel -- Instanziierungsablauf.}{29}{lstlisting.4.3}%
 \contentsline {lstlisting}{\numberline {4.4}Beispiel -- Verwendung der Reflection Schnittstelle}{41}{lstlisting.4.4}%
+\contentsline {lstlisting}{\numberline {4.5}Beispiel -- Erstellen einer I18N Instanz}{43}{lstlisting.4.5}%
 \addvspace {10\p@ }
 \contentsline {lstlisting}{\numberline {5.1}Beispiel -- Nutzung der \texttt {Pair} Klasse}{55}{lstlisting.5.1}%
 \contentsline {lstlisting}{\numberline {5.2}Beispiel -- Initiierung eines Klassenpfadscans.}{58}{lstlisting.5.2}%
@@ -39,9 +40,9 @@
 \contentsline {lstlisting}{\numberline {6.5}Demo -- \texttt {MainController} Klassenkopf}{67}{lstlisting.6.5}%
 \contentsline {lstlisting}{\numberline {6.6}Demo -- \texttt {MainController} Setup-Phase}{67}{lstlisting.6.6}%
 \contentsline {lstlisting}{\numberline {6.7}Demo -- Felder und Methoden im \texttt {TitleBarController}}{68}{lstlisting.6.7}%
-\contentsline {lstlisting}{\numberline {6.8}Demo -- Injizierte Felder des \texttt {LoginController}s}{69}{lstlisting.6.8}%
+\contentsline {lstlisting}{\numberline {6.8}Demo -- Injizierte Felder des \texttt {LoginController}s}{68}{lstlisting.6.8}%
 \contentsline {lstlisting}{\numberline {6.9}Demo -- OnShow und OnHide Methoden}{69}{lstlisting.6.9}%
-\contentsline {lstlisting}{\numberline {6.10}Demo -- Subgruppen Einrichtung}{71}{lstlisting.6.10}%
+\contentsline {lstlisting}{\numberline {6.10}Demo -- Subgruppen Einrichtung}{70}{lstlisting.6.10}%
 \contentsline {lstlisting}{\numberline {6.11}Demo -- \texttt {@LocalizeValue} und \texttt {@ConfigValue}}{71}{lstlisting.6.11}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
